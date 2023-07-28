@@ -5,6 +5,7 @@ import {
     options,
     web3AuthModalPack,
 } from "../auth/config";
+import HomePage from "../ui_components/home/HomePage";
 import "./globals.css";
 import { ADAPTER_EVENTS } from "@web3auth/base";
 export default function Home() {
@@ -34,13 +35,14 @@ export default function Home() {
     };
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-24">
+        <div className="flex min-h-screen flex-col items-center justify-between p-24">
+            <HomePage />
             <button className="btn" type="button" onClick={signIn}>
                 SignIn
             </button>
             <button className="btn" type="button" onClick={signOut}>
                 SignOut
             </button>
-        </main>
+        </div>
     );
 }
