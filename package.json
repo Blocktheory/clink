@@ -9,7 +9,7 @@
         "lint": "next lint"
     },
     "dependencies": {
-        "@solana/web3.js": "^1.78.0",
+        "@safe-global/auth-kit": "^1.2.0",
         "@toruslabs/openlogin": "^4.7.2",
         "@toruslabs/openlogin-ed25519": "^4.2.0",
         "@types/node": "20.4.5",
