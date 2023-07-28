@@ -1,12 +1,8 @@
-export declare const OPENLOGIN_NETWORK: {
-    readonly MAINNET: "mainnet";
-    readonly TESTNET: "testnet";
-    readonly CYAN: "cyan";
-    readonly DEVELOPMENT: "development";
-    readonly SK_TESTNET: "sk_testnet";
-    readonly CELESTE: "celeste";
-    readonly AQUA: "aqua";
-};
+enum OPENLOGIN_NETWORK {
+    MAINNET = "mainnet",
+    DEVELOPMENT = "development",
+    TESTNET = "testnet",
+}
 
 const baseGoerli = {
     chainName: "Base Goerli",
@@ -16,7 +12,7 @@ const baseGoerli = {
         mainnet: { url: "", displayName: OPENLOGIN_NETWORK.MAINNET },
         devnet: { url: "", displayName: OPENLOGIN_NETWORK.DEVELOPMENT },
         testnet: {
-            url: "https://solana-mainnet.g.alchemy.com/v2/GVkrt_8cLHv1Yi04m7lqZ2dbteVprcjQ",
+            url: "https://goerli.base.org",
             displayName: OPENLOGIN_NETWORK.TESTNET,
         },
     },

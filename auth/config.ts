@@ -11,7 +11,7 @@ import {
 import { baseGoerli, loginProvider, projectId } from "../constants/base";
 
 // https://web3auth.io/docs/sdk/pnp/web/modal/initialize#arguments
-const options: Web3AuthOptions = {
+export const options: Web3AuthOptions = {
     clientId: projectId,
     web3AuthNetwork: baseGoerli.networks.testnet.displayName,
     chainConfig: {
@@ -26,7 +26,7 @@ const options: Web3AuthOptions = {
 };
 
 // https://web3auth.io/docs/sdk/pnp/web/modal/initialize#configuring-adapters
-const modalConfig = {
+export const modalConfig = {
     [WALLET_ADAPTERS.TORUS_EVM]: {
         label: "torus",
         showOnModal: false,
@@ -39,7 +39,7 @@ const modalConfig = {
 };
 
 // https://web3auth.io/docs/sdk/pnp/web/modal/whitelabel#whitelabeling-while-modal-initialization
-const openloginAdapter = new OpenloginAdapter({
+export const openLoginAdapter = new OpenloginAdapter({
     loginSettings: {
         mfaLevel: "mandatory",
     },
