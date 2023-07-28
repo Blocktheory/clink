@@ -1,6 +1,9 @@
 import OpenLogin from "@toruslabs/openlogin";
 import { getED25519Key } from "@toruslabs/openlogin-ed25519";
 import { useEffect, useState } from "react";
+import { Fragment } from "react";
+import { Menu, Transition } from "@headlessui/react";
+import ConnectBtn from "./ConnectBtn";
 
 export default function HomePage() {
     useEffect(() => {}, []);
@@ -25,9 +28,7 @@ export default function HomePage() {
                     <p className="paragraph text-center !text-gray-700">
                         Create your TipLink
                     </p>
-                    <div className="rounded-lg bg-[#19A5E1] py-3 my-2">
-                        <p className="text-white text-center">Connect Options</p>
-                    </div>
+                    <ConnectBtn />
                     <p className="paragraph text-center !text-gray-500">
                         Suported assests: Base
                     </p>
