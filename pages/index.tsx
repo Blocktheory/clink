@@ -1,10 +1,4 @@
 import React, { useMemo, useState } from "react";
-import {
-    modalConfig,
-    openLoginAdapter,
-    options,
-    web3AuthModalPack,
-} from "../auth/config";
 import HomePage from "../ui_components/home/HomePage";
 import "./globals.css";
 import { ADAPTER_EVENTS } from "@web3auth/base";
@@ -33,18 +27,6 @@ export default function Home() {
             setSdk(sdkInstance);
         }
         initializeOpenlogin();
-
-        await web3AuthModalPack.init({
-            options,
-            adapters: [openLoginAdapter],
-            modalConfig,
-        });
-        web3AuthModalPack.subscribe(ADAPTER_EVENTS.CONNECTED, () => {
-            console.log("User is authenticated");
-        });
-        web3AuthModalPack.subscribe(ADAPTER_EVENTS.DISCONNECTED, () => {
-            console.log("User is not authenticated");
-        });
     }, []);
 
     const signIn = async () => {
@@ -67,7 +49,7 @@ export default function Home() {
     };
 
     const signOut = async () => {
-        await web3AuthModalPack.signOut();
+
     };
 
     return (
