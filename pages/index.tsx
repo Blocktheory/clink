@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import {
     modalConfig,
     openLoginAdapter,
@@ -8,6 +8,7 @@ import {
 import HomePage from "../ui_components/home/HomePage";
 import "./globals.css";
 import { ADAPTER_EVENTS } from "@web3auth/base";
+
 export default function Home() {
     useMemo(async () => {
         await web3AuthModalPack.init({

@@ -20,18 +20,15 @@ export default function HomePage() {
     return (
         <div className="flex min-h-screen flex-col items-center justify-between p-24">
             <div className="bg-white/30 p-6">
-                <p className="heading3">Links that are money</p>
+                <p className="heading3">Share crypto rewards in just a link</p>
                 <p className="paragraph text-center !text-gray-500">
-                    Send crypto & NFTs to anyone, even if they don't have a wallet. <br />{" "}
-                    No app needed!
+                    Load a chest with tokens or nfts that can be claimed by anyone you
+                    share the link with
                 </p>
                 <div className="bg-white p-6">
-                    <p className="paragraph text-center !text-gray-700">
-                        Create your TipLink
-                    </p>
                     <ConnectBtn />
                     <p className="paragraph text-center !text-gray-500">
-                        Suported assests: Base
+                        Support asset: ETH
                     </p>
                     <div className="rounded-lg border border-gray-500 p-4">
                         <div className="flex items-center justify-center">
@@ -45,12 +42,11 @@ export default function HomePage() {
                                 }
                             />
                         </div>
-
                         <p className="paragraph text-center !text-gray-500">~ 0.000ETH</p>
                     </div>
 
                     <div className="rounded-lg bg-[#19A5E1] py-3 my-2">
-                        <p className="text-white text-center">Create LootLink</p>
+                        <p className="text-white text-center">Setup a Tresure Chest</p>
                     </div>
                 </div>
             </div>
