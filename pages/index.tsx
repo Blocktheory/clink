@@ -5,7 +5,6 @@ import OpenLogin from "@toruslabs/openlogin";
 import { baseGoerli, projectId } from "../constants/base";
 import { Wallet } from "../utils/wallet";
 import { initWasm } from "@trustwallet/wallet-core";
-import { globalApiService } from "../utils/globalApiServices";
 
 export default function Home() {
     const [openlogin, setSdk] = useState<any>("");
@@ -50,19 +49,6 @@ export default function Home() {
     const signOut = async () => {
         await openlogin.logout();
     };
-
-    const getBalance = async () => {
-        globalApiService("eth_getBalance", [
-            "0x06e70f295B6337c213DDe82D13cc198027687A7B",
-            "latest",
-        ]).then((response) => {
-            debugger;
-        });
-    };
-
-    useEffect(() => {
-        getBalance();
-    }, []);
 
     return (
         <div className="flex min-h-screen flex-row items-center justify-between p-4">
