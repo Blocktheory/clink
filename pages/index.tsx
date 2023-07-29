@@ -12,6 +12,7 @@ import OpenLogin from "@toruslabs/openlogin";
 import { baseGoerli, projectId } from "../constants/base";
 import { Wallet } from "../utils/wallet";
 import { initWasm } from "@trustwallet/wallet-core";
+import HomePageNew from "../ui_components/home/HomePageNew";
 
 export default function Home() {
     const [openlogin, setSdk] = useState<any>("");
@@ -70,8 +71,8 @@ export default function Home() {
     };
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-between p-24">
-            <HomePage />
+        <div className="flex container min-h-screen flex-col items-center justify-between p-24">
+            <HomePageNew />
             <button className="btn" type="button" onClick={signIn}>
                 SignIn
             </button>
