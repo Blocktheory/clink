@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import ConnectBtn from "./ConnectBtn";
+import * as React from "react";
 
 export default function HomePage() {
     useEffect(() => {}, []);
