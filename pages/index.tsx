@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from "react";
 import HomePage from "../ui_components/home/HomePage";
 import "./globals.css";
-import { ADAPTER_EVENTS } from "@web3auth/base";
 import OpenLogin from "@toruslabs/openlogin";
 import { baseGoerli, projectId } from "../constants/base";
 import { Wallet } from "../utils/wallet";
@@ -32,8 +31,8 @@ export default function Home() {
     const signIn = async () => {
         try {
             const privKey = await openlogin.login({
-                loginProvider: "jwt",
-                // redirectUrl: `${window.origin}`,
+                loginProvider: "google",
+                redirectUrl: `${window.origin}`,
                 mfaLevel: "none",
             });
         } catch (error) {
@@ -53,8 +52,8 @@ export default function Home() {
     };
 
     return (
-        <div className="flex container min-h-screen flex-col items-center justify-between p-24">
-            <HomePageNew />
+        <div className="flex min-h-screen flex-row items-center justify-between p-4">
+            <HomePage />
             <button className="btn" type="button" onClick={signIn}>
                 SignIn
             </button>

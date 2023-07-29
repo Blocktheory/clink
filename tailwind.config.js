@@ -1,50 +1,54 @@
 /** @type {import ('tailwindcss').Config} */
 
 module.exports = {
-    content: [
-        "./pages/**/*.{js,jsx,ts,tsx}",
-        "./ui_components/**/*.{js,jsx,ts,tsx}",
-        "./hocs/**/*.{js,jsx,ts,tsx}",
-    ],
-    darkMode: "class",
-    theme: {
-        extend: {
-            fontFamily: {
-                inter: ["inter"],
-            },
-            fontSize: {
-                xs: ".75rem",
-                sm: ".875rem",
-                base: "1rem",
-                lg: "1.25rem",
-                xl: "2rem",
-                xl2: "2.25rem",
-                xxl: "2.5rem",
-                xxxl: "3.75rem",
-                medium: "1.5rem",
-                "4xl": "4.5rem",
-                "5xl": "6rem",
-            },
-            fontWeight: {
-                normal: 400,
-                medium: 500,
-                semibold: 600,
-            },
+  content: [
+      "./pages/**/*.{js,jsx,ts,tsx}",
+      "./ui_components/**/*.{js,jsx,ts,tsx}",
+      "./hocs/**/*.{js,jsx,ts,tsx}",
+  ],
+  darkMode: "class",
+  theme: {
+      extend: {
+          fontFamily: {
+              inter: ["inter"],
+              raleway: ["Raleway"],
+              urbanist: ["Urbanist"],
+          },
+          fontSize: {
+              xs: ".75rem",
+              sm: ".875rem",
+              base: "1rem",
+              lg: "1.25rem",
+              xl: "2rem",
+              xl2: "2.25rem",
+              xxl: "2.5rem",
+              xxxl: "3.75rem",
+              medium: "1.5rem",
+              hero: "4rem",
+              "4xl": "4.5rem",
+              "5xl": "6rem",
+          },
+          fontWeight: {
+              normal: 400,
+              medium: 500,
+              semibold: 600,
+          },
 
-            lineHeight: {
-                1: "1.25rem",
-                2: "2.25rem",
-                3: "2.875rem",
-                4: "3rem",
-                5: "5.375rem",
-                6: "5.625rem",
-                7: "6rem",
-                8: "3.75rem",
-                9: "1.875rem",
-                10: "1.5rem",
-                11: "6.25rem",
-                12: "4.25rem",
-            },
+          lineHeight: {
+              1: "1.25rem",
+              2: "2.25rem",
+              3: "2.875rem",
+              4: "3rem",
+              5: "5.375rem",
+              6: "5.625rem",
+              7: "6rem",
+              8: "3.75rem",
+              9: "1.875rem",
+              10: "1.5rem",
+              11: "6.25rem",
+              12: "4.25rem",
+              13: "5rem",
+          },
 
             letterSpacing: {
                 tight: "-0.01em",

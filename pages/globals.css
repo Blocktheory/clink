@@ -19,6 +19,14 @@
 
 body {
     color: rgb(var(--foreground-rgb));
-    background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb)))
-        rgb(var(--background-start-rgb));
+    background: linear-gradient(0deg, #150937, #150937),
+        radial-gradient(
+            60.4% 60.4% at 72.76% 81.19%,
+            rgba(51, 202, 175, 0.44) 0%,
+            rgba(51, 202, 175, 0) 100%
+        );
+}
+
+.btnBg {
+    background: linear-gradient(93.22deg, #44e6d2 8.1%, #26d797 93.89%);
 }
