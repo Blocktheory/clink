@@ -7,6 +7,9 @@
 .heading3 {
     @apply font-inter font-semibold text-xl leading-5 md:text-xxxl md:leading-5 text-black;
 }
+.heading3_regular {
+    @apply font-inter font-normal text-xl leading-3 text-white;
+}
 .heading4 {
     @apply font-inter font-semibold text-xl leading-4 md:text-xxl md:leading-4 text-black;
 }
@@ -43,4 +46,7 @@
 }
 .decode_heading4_regular {
     @apply font-urbanist font-normal text-xl leading-4  text-black;
+}
+.hero_text {
+    @apply font-inter font-semibold text-hero leading-13 text-white;
 }
