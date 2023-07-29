@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
     modalConfig,
     openLoginAdapter,
@@ -8,9 +8,31 @@ import {
 import HomePage from "../ui_components/home/HomePage";
 import "./globals.css";
 import { ADAPTER_EVENTS } from "@web3auth/base";
+import OpenLogin from "@toruslabs/openlogin";
+import { baseGoerli, projectId } from "../constants/base";
+import { Wallet } from "../utils/wallet";
+import { initWasm } from "@trustwallet/wallet-core";
 
 export default function Home() {
+    const [openlogin, setSdk] = useState<any>("");
+
     useMemo(async () => {
+        async function initializeOpenlogin() {
+            const sdkInstance = new OpenLogin({
+                clientId: projectId,
+                network: baseGoerli.networks.testnet.displayName,
+                mfaSettings: undefined,
+            });
+            await sdkInstance.init();
+            if (sdkInstance.privKey) {
+                console.log("priv key ", sdkInstance.privKey);
+                const prvKey = sdkInstance.privKey;
+                getAddress(prvKey);
+            }
+            setSdk(sdkInstance);
+        }
+        initializeOpenlogin();
+
         await web3AuthModalPack.init({
             options,
             adapters: [openLoginAdapter],
@@ -25,10 +47,22 @@ export default function Home() {
     }, []);
 
     const signIn = async () => {
-        const signData = await web3AuthModalPack.signIn();
-        const provider = web3AuthModalPack.getProvider();
-        const address = await web3AuthModalPack.getAddress();
-        debugger;
+        try {
+            const privKey = await openlogin.login({
+                loginProvider: "jwt",
+                // redirectUrl: `${window.origin}`,
+                mfaLevel: "none",
+            });
+        } catch (error) {
+            console.log("error", error);
+        }
+    };
+
+    const getAddress = async (prvKey: string) => {
+        const walletCore = await initWasm();
+        const wallet = new Wallet(walletCore);
+        const address = await wallet.importWithPrvKey(prvKey);
+        console.log("priv key address captured ", address);
     };
 
     const signOut = async () => {
