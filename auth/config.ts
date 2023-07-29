@@ -55,4 +55,6 @@ const web3AuthConfig: Web3AuthConfig = {
     txServiceUrl: "https://safe-transaction-goerli.safe.global",
 };
 
+export const baseRPC = baseGoerli.networks.testnet.url;
+
 export const web3AuthModalPack = new Web3AuthModalPack(web3AuthConfig);

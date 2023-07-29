@@ -1,4 +1,3 @@
-import { TTranx } from "./types";
 import * as bs58 from "bs58";
 import { TW, WalletCore } from "@trustwallet/wallet-core";
 export class Wallet {
