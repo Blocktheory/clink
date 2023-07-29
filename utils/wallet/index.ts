@@ -1,6 +1,5 @@
 import { TTranx } from "./types";
 import * as bs58 from "bs58";
-import Long from "long";
 import { TW, WalletCore } from "@trustwallet/wallet-core";
 export class Wallet {
     CoinType: WalletCore["CoinType"];
@@ -88,6 +87,47 @@ export class Wallet {
         return generatedAddress;
     };
 
+    createPayLink = () => {
+        const account = this.HDWallet.create(128, "");
+        const entropy = account.entropy();
+        const hash = bs58.encode(entropy);
+        return "i/" + hash;
+    };
+
+    getAccountFromPayLink = (url: string) => {
+        const urlHash = this.formatUrlHash(url);
+        try {
+            const bs58Decoded = bs58.decode(urlHash);
+            const account = this.HDWallet.createWithEntropy(bs58Decoded, "");
+            return account.getAddressForCoin(this.CoinType.ethereum);
+        } catch {
+            return "";
+        }
+    };
+
+    // Not required to use this
+    getKeyFromPayLink = (url: string) => {
+        const urlHash = this.formatUrlHash(url);
+        try {
+            const bs58Decoded = bs58.decode(urlHash);
+            const account = this.HDWallet.createWithEntropy(bs58Decoded, "");
+            return this.bufferToHex(account.getKeyForCoin(this.CoinType.ethereum).data());
+        } catch {
+            return "";
+        }
+    };
+
+    formatUrlHash = (url: string) => {
+        let urlHash = url ?? "";
+        if (!urlHash && urlHash == "") {
+            return "";
+        }
+        if (urlHash.includes("/")) {
+            urlHash = url.split("/").pop() ?? "";
+        }
+        return urlHash.replace("i/", "");
+    };
+
     trimZeroHex = (zeroHex: string) => {
         if (zeroHex.startsWith("0x")) {
             return zeroHex.slice(2, zeroHex.length);
@@ -125,10 +165,6 @@ export class Wallet {
                 return coinType.polygon;
             case "solana":
                 return coinType.solana;
-            case "emoney":
-                return coinType.cosmos;
-            case "shentu":
-                return coinType.cosmos;
             case "zkevm":
                 return coinType.polygonzkEVM;
             case "zksync":
@@ -137,5 +173,8 @@ export class Wallet {
                 return coinType.ethereum;
         }
     };
-}
 
+    bufferToHex = (unitArray: Uint8Array) => {
+        return Buffer.from(unitArray).toString("hex");
+    };
+}
