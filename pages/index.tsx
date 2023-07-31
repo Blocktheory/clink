@@ -23,12 +23,12 @@ export enum ESteps {
 
 export default function Home() {
     const [loader, setLoader] = useState(true);
-    const [openlogin, setSdk] = useState<any>("");
+    const [openLogin, setSdk] = useState<any>("");
     const [walletAddress, setWalletAddress] = useState<string>("");
     const [step, setStep] = useState<number>(ESteps.ONE);
 
     useMemo(async () => {
-        async function initializeOpenlogin() {
+        async function initializeOpenLogin() {
             const sdkInstance = new OpenLogin({
                 clientId: projectId,
                 network: baseGoerli.networks.testnet.displayName,
@@ -36,6 +36,10 @@ export default function Home() {
             });
             await sdkInstance.init();
             if (sdkInstance.privKey) {
+                if (localStorage.getItem("loginAttempted") === "true") {
+                    handleSteps(ESteps.THREE);
+                    localStorage.removeItem("loginAttempted");
+                }
                 const prvKey = sdkInstance.privKey;
                 getAddress(prvKey);
             } else {
@@ -43,12 +47,13 @@ export default function Home() {
             }
             setSdk(sdkInstance);
         }
-        initializeOpenlogin();
+        initializeOpenLogin();
     }, []);
 
     const signIn = async () => {
+        localStorage.setItem("loginAttempted", "true");
         try {
-            await openlogin.login({
+            await openLogin.login({
                 loginProvider: "google",
                 redirectUrl: `${window.origin}`,
                 mfaLevel: "none",
@@ -67,7 +72,7 @@ export default function Home() {
     };
 
     const signOut = async () => {
-        await openlogin.logout();
+        await openLogin.logout();
     };
 
     const handleSteps = (step: number) => {
