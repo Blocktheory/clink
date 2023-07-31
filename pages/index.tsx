@@ -6,7 +6,6 @@ import OpenLogin from "@toruslabs/openlogin";
 import { baseGoerli, projectId } from "../constants/base";
 import { Wallet } from "../utils/wallet";
 import { initWasm } from "@trustwallet/wallet-core";
-import { LoadChestComponent } from "../ui_components/loadChest/LoadChestComponent";
 import SecondaryBtn from "../ui_components/SecondaryBtn";
 
 export type THandleStep = {
@@ -20,6 +19,8 @@ export enum ESteps {
     FOUR = 4,
     FIVE = 5,
 }
+import GlobalContext from "../context/GlobalContext";
+import { LoadChestComponent } from "../ui_components/loadchest/LoadChestComponent";
 
 export default function Home() {
     const [loader, setLoader] = useState(true);
