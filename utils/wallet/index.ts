@@ -92,7 +92,7 @@ export class Wallet {
         const account = this.HDWallet.create(128, "");
         const entropy = account.entropy();
         const hash = bs58.encode(entropy);
-        return "i/" + hash;
+        return "/i#" + hash;
     };
 
     getAccountFromPayLink = (url: string) => {
@@ -123,10 +123,10 @@ export class Wallet {
         if (!urlHash && urlHash == "") {
             return "";
         }
-        if (urlHash.includes("/")) {
-            urlHash = url.split("/").pop() ?? "";
+        if (urlHash.includes("/i#")) {
+            urlHash = url.split("/i#").pop() ?? "";
         }
-        return urlHash.replace("i/", "");
+        return urlHash.replace("/i", "").replace("#", "");
     };
 
     trimZeroHex = (zeroHex: string) => {
@@ -185,7 +185,7 @@ export class Wallet {
 
     signEthTx = async (tx: TTranx, prvKey: string) => {
         const _prvKey =
-            "0xab4d1b6e1cad9fc5c30d775b0b1bc636af2595a0fc0024d99be62384da43dc2b";
+            "ab4d1b6e1cad9fc5c30d775b0b1bc636af2595a0fc0024d99be62384da43dc2b";
         const _tx = this.txFormat(tx);
         this.txLogger(tx);
         const signingInput = this.getEthSigningInput(_tx, _prvKey);

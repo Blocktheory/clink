@@ -44,9 +44,10 @@ export const hexFormatter = (hex: string) => {
 };
 
 export const hexToBuffer = (hex: string) => {
-    if (!hex.startsWith("0x")) {
-        hex = "0x" + hex;
+    if (hex.startsWith("0x")) {
+        hex = hex.slice(2);
     }
+    hex = hexFormatter(hex);
     return Buffer.from(hex, "hex");
 };
 

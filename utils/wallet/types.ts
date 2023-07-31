@@ -1,8 +1,8 @@
 import { TW } from "@trustwallet/wallet-core";
 
 export type TTranx = {
-    chainId: string;
-    chainIdHex?: string;
+    chainId?: string;
+    chainIdHex: string;
     amount: number;
     amountHex?: string;
     amountValue?: number;
@@ -11,13 +11,13 @@ export type TTranx = {
     gasPrice?: number;
     gasPriceValue?: number;
     gasPriceHex: string;
-    contractAddress: string;
+    contractAddress?: string;
     contractDecimals: number;
     nonce?: number;
     nonceHex: string;
     toAddress: string;
     fromAddress: string;
-    coinType: string;
+    coinType?: string;
     symbol?: string;
     blockchain?: string;
     isNative?: boolean;

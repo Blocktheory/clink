@@ -14,48 +14,45 @@ import {
 } from "../../apiServices";
 import { hexToNumber, numHex } from "../../utils";
 import { TRANSACTION_TYPE, TTranx } from "../../utils/wallet/types";
+import { Base } from "../../utils/chain/base";
 
 export const LoadChestComponent: FC = () => {
     const router = useRouter();
     const createWallet = async () => {
         try {
-            console.log("came to fun");
             const walletCore = await initWasm();
             const wallet = new Wallet(walletCore);
             const link = await wallet.createPayLink();
-            console.log(link, "link");
+            console.log("generated link", link);
             const address = await wallet.getAccountFromPayLink(link);
             console.log(address, "address");
-            const balance = (await getBalance(
-                "0x77B7e897EB1ED7C5D5fd5237a5B9CB100B739f1d",
-            )) as any;
-            console.log(hexToNumber(balance.result as string), "balance");
-            const gasPriceData = (await getGasPrice()) as any;
-            console.log(hexToNumber(gasPriceData.result), "gasprice");
+            const fromAddress = "0x77B7e897EB1ED7C5D5fd5237a5B9CB100B739f1d";
+            const balance = (await getBalance(fromAddress)) as any;
+            console.log(Number(balance.result as string), "balance");
             const value = 0.01 * Math.pow(10, 18);
-            let valueHex = String(numHex(value))
-            if (!valueHex.startsWith("0x")) {valueHex = "0x" + valueHex}
+            let valueHex = String(numHex(value));
+            if (!valueHex.startsWith("0x")) {
+                valueHex = "0x" + valueHex;
+            }
             const gasLimitData = (await getEstimatedGas({
-                from: "0x77B7e897EB1ED7C5D5fd5237a5B9CB100B739f1d",
+                from: fromAddress,
                 to: address,
                 value: valueHex,
             })) as any;
-            console.log(hexToNumber(gasLimitData.result), "est gas");
-            const nonce = (await getNonce(address)) as any;
-            console.log(hexToNumber(nonce.result), "nonce");
+            console.log(Number(gasLimitData.result), "est gas");
+            const nonce = (await getNonce(fromAddress)) as any;
+            console.log(Number(nonce.result), "nonce api ");
             const tx: TTranx = {
                 toAddress: address,
-                chainId: "1",
                 nonceHex: nonce.result,
-                chainIdHex: numHex(1),
-                gasPriceHex: gasPriceData.result ?? "0x1",
+                chainIdHex: numHex(Number(Base.chainId)),
+                // gas price is hardcoded to pass 1 by default as of now
+                gasPriceHex: "3B9ACA00" ?? "0x1",
                 gasLimitHex: gasLimitData.result,
                 amountHex: numHex(value),
                 amount: value,
-                contractAddress: "",
-                contractDecimals: 0,
-                fromAddress: "",
-                coinType: "",
+                contractDecimals: 18,
+                fromAddress: fromAddress,
                 transactionType: TRANSACTION_TYPE.SEND,
                 isNative: true,
             };
