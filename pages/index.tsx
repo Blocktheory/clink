@@ -6,7 +6,7 @@ import OpenLogin from "@toruslabs/openlogin";
 import { baseGoerli, projectId } from "../constants/base";
 import { Wallet } from "../utils/wallet";
 import { initWasm } from "@trustwallet/wallet-core";
-import { LoadChestComponent } from "../ui_components/LoadChest/LoadChestComponent";
+import { LoadChestComponent } from "../ui_components/loadchest/LoadChestComponent";
 
 export type THandleStep = {
     handleSteps: (step: number) => void;
@@ -21,6 +21,7 @@ export enum ESteps {
 }
 
 export default function Home() {
+    const [loader, setLoader] = useState(true);
     const [openlogin, setSdk] = useState<any>("");
     const [walletAddress, setWalletAddress] = useState<string>("");
     const [step, setStep] = useState<number>(1);
@@ -34,9 +35,10 @@ export default function Home() {
             });
             await sdkInstance.init();
             if (sdkInstance.privKey) {
-                console.log("priv key ", sdkInstance.privKey);
                 const prvKey = sdkInstance.privKey;
                 getAddress(prvKey);
+            } else {
+                setLoader(false);
             }
             setSdk(sdkInstance);
         }
@@ -90,7 +92,7 @@ export default function Home() {
 
     return (
         <div className="flex min-h-screen flex-row items-center justify-between p-4 relative">
-            {getUIComponent(step)}
+            {loader ? "loading...." : getUIComponent(step)}
         </div>
     );
 }

@@ -2,7 +2,8 @@ import * as React from "react";
 import { icons } from "../../utils/images";
 import Image from "next/image";
 import SecondaryBtn from "../SecondaryBtn";
-import { THandleStep } from "../../pages";
+import { ESteps, THandleStep } from "../../pages";
+import BackBtn from "../BackBtn";
 
 interface IConnectWallet extends THandleStep {
     signIn: () => Promise<void>;
@@ -13,11 +14,7 @@ export default function ConnectWallet(props: IConnectWallet) {
     return (
         <div className="w-full h-full relative">
             <div>
-                <Image
-                    src={icons.backIcon}
-                    alt="back-icon"
-                    className="relative top-20 left-1/2 -translate-x-1/2"
-                />
+                <BackBtn onClick={() => handleSteps(ESteps.ONE)} />
             </div>
             <div className="w-full  h-[50%] text-center p-2  flex flex-col gap-10 relative top-[25%] md:left-1/2 md:-translate-x-1/2">
                 <div>
