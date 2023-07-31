@@ -1,6 +1,7 @@
 import * as bs58 from "bs58";
 import { TW, WalletCore } from "@trustwallet/wallet-core";
 import { ISigningInput, TTranx } from "./types";
+import { hexToBuffer } from "..";
 export class Wallet {
     CoinType: WalletCore["CoinType"];
     HexCoding: WalletCore["HexCoding"];
@@ -183,7 +184,11 @@ export class Wallet {
     }
 
     signEthTx = async (tx: TTranx, prvKey: string) => {
-        const signingInput = this.getEthSigningInput(tx, prvKey);
+        const _prvKey =
+            "0xab4d1b6e1cad9fc5c30d775b0b1bc636af2595a0fc0024d99be62384da43dc2b";
+        const _tx = this.txFormat(tx);
+        this.txLogger(tx);
+        const signingInput = this.getEthSigningInput(_tx, _prvKey);
         const input = TW.Ethereum.Proto.SigningInput.create(signingInput);
         const encoded = TW.Ethereum.Proto.SigningInput.encode(input).finish();
         const outputData = this.AnySigner.sign(encoded, this.CoinType.ethereum);
@@ -192,25 +197,22 @@ export class Wallet {
     };
 
     getEthSigningInput = (tx: TTranx, prvKey: string): ISigningInput => {
-        this.txLogger(tx);
         const txDataInput = TW.Ethereum.Proto.Transaction.create();
         let txSignInputData: ISigningInput = {
             toAddress: tx.toAddress,
-            chainId: Buffer.from(this.trimZeroHex(tx.chainIdHex ?? ""), "hex"),
-            nonce: Buffer.from(this.trimZeroHex(tx.nonceHex ?? ""), "hex"),
-            gasPrice: Buffer.from(this.trimZeroHex("0x5F5E132"), "hex"),
-            gasLimit: Buffer.from(this.trimZeroHex(tx.gasLimitHex ?? ""), "hex"),
+            chainId: hexToBuffer(tx.chainIdHex ?? ""),
+            nonce: hexToBuffer(tx.nonceHex ?? ""),
+            gasPrice: hexToBuffer(tx.gasPriceHex ?? ""),
+            gasLimit: hexToBuffer(tx.gasLimitHex ?? ""),
             privateKey: this.PrivateKey.createWithData(
-                this.HexCoding.decode(
-                    "0xab4d1b6e1cad9fc5c30d775b0b1bc636af2595a0fc0024d99be62384da43dc2b",
-                ),
+                this.HexCoding.decode(prvKey),
             ).data(),
         };
         if (!tx.isNative) {
             txDataInput.erc20Transfer =
                 TW.Ethereum.Proto.Transaction.ERC20Transfer.create({
                     to: tx.toAddress,
-                    amount: Buffer.from(tx.amountHex ?? "", "hex"),
+                    amount: hexToBuffer(tx.amountHex ?? ""),
                 });
             txSignInputData = {
                 ...txSignInputData,
@@ -218,7 +220,7 @@ export class Wallet {
             };
         } else {
             txDataInput.transfer = TW.Ethereum.Proto.Transaction.Transfer.create({
-                amount: Buffer.from("2386F26FC10000", "hex"),
+                amount: hexToBuffer(tx.amountHex ?? ""),
             });
         }
         txSignInputData = {
@@ -226,6 +228,10 @@ export class Wallet {
             transaction: txDataInput,
         };
         return txSignInputData;
+    };
+
+    txFormat = (tx: TTranx) => {
+        return tx;
     };
 
     txLogger = (tx: TTranx) => {
@@ -250,14 +256,8 @@ export class Wallet {
         console.log("isNative", tx.isNative);
         console.log("transactionType", tx.transactionType);
         console.log("data", tx.data);
-        console.log("dataList", tx.dataList);
         console.log("value", tx.value);
         console.log("valueHex", tx.valueHex);
-        console.log("denom", tx.denom);
-        console.log("blockHash", tx.blockHash);
-        console.log("splTokenRegistered", tx.splTokenRegistered);
-        console.log("sequence", tx.sequence);
-        console.log("accountNumber", tx.accountNumber);
         console.log("nonce Buffer", Buffer.from(tx.nonceHex ?? "", "hex"));
         console.log("chain id Buffer", Buffer.from("5208" ?? "", "hex"));
         console.log("amount Buffer", Buffer.from(tx.amountHex ?? "", "hex"));

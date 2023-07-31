@@ -31,13 +31,23 @@ export const toastFlashMessage = (
     }, 200);
 };
 
-export const numberToHex = (val: number | string, append = true) => {
-    val = Math.trunc(Number(val)).toString(16);
-    if (append) {
-        return "0x" + val;
-    } else {
-        return val;
+export const numHex = (num: number) => {
+    return hexFormatter(num.toString(16));
+};
+
+export const hexFormatter = (hex: string) => {
+    let a = hex;
+    if (a.length % 2 > 0) {
+        a = "0" + a;
     }
+    return a;
+};
+
+export const hexToBuffer = (hex: string) => {
+    if (!hex.startsWith("0x")) {
+        hex = "0x" + hex;
+    }
+    return Buffer.from(hex, "hex");
 };
 
 export const hexToNumber = (val: string, divider = 1) => {

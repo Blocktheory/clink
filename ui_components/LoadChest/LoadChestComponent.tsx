@@ -12,7 +12,7 @@ import {
     getNonce,
     getSendRawTransaction,
 } from "../../apiServices";
-import { hexToNumber, numberToHex } from "../../utils";
+import { hexToNumber, numHex } from "../../utils";
 import { TRANSACTION_TYPE, TTranx } from "../../utils/wallet/types";
 
 export const LoadChestComponent: FC = () => {
@@ -30,27 +30,27 @@ export const LoadChestComponent: FC = () => {
                 "0x77B7e897EB1ED7C5D5fd5237a5B9CB100B739f1d",
             )) as any;
             console.log(hexToNumber(balance.result as string), "balance");
-            const gasPrice = (await getGasPrice()) as any;
-            console.log(hexToNumber(gasPrice.result), "gasprice");
+            const gasPriceData = (await getGasPrice()) as any;
+            console.log(hexToNumber(gasPriceData.result), "gasprice");
             const value = 0.01 * Math.pow(10, 18);
-
-            const estGas = (await getEstimatedGas({
+            let valueHex = String(numHex(value))
+            if (!valueHex.startsWith("0x")) {valueHex = "0x" + valueHex}
+            const gasLimitData = (await getEstimatedGas({
                 from: "0x77B7e897EB1ED7C5D5fd5237a5B9CB100B739f1d",
                 to: address,
-                value: String(numberToHex(value)),
+                value: valueHex,
             })) as any;
-            console.log(hexToNumber(estGas.result), "est gas");
+            console.log(hexToNumber(gasLimitData.result), "est gas");
             const nonce = (await getNonce(address)) as any;
             console.log(hexToNumber(nonce.result), "nonce");
             const tx: TTranx = {
                 toAddress: address,
-                chainId: "84531",
-                nonce: nonce.result,
-                chainIdHex: numberToHex("84531"),
+                chainId: "1",
                 nonceHex: nonce.result,
-                gasPriceHex: numberToHex("1"),
-                gasLimitHex: estGas.result,
-                amountHex: numberToHex(value),
+                chainIdHex: numHex(1),
+                gasPriceHex: gasPriceData.result ?? "0x1",
+                gasLimitHex: gasLimitData.result,
+                amountHex: numHex(value),
                 amount: value,
                 contractAddress: "",
                 contractDecimals: 0,
