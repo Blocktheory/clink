@@ -12,9 +12,9 @@ interface IConnectWallet extends THandleStep {
 export default function ConnectWallet(props: IConnectWallet) {
     const { signIn, handleSteps } = props;
     return (
-        <div className="w-full h-full relative">
+        <div className="w-full relative">
             <BackBtn onClick={() => handleSteps(ESteps.ONE)} />
-            <div className="w-full  h-[50%] text-center p-2  flex flex-col gap-10 relative top-[25%] md:left-1/2 md:-translate-x-1/2">
+            <div className="w-full text-center p-2  flex flex-col gap-10 relative top-[25%] md:left-1/2 md:-translate-x-1/2">
                 <div>
                     <p className="text-sm md:text-lg font-bold leading-1 text-white/50 mb-6 md:mb-10">
                         STEP 1

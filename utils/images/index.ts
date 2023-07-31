@@ -5,6 +5,7 @@ import shareBtnIcon from "../../public/assets/images/share_btn_icon.svg";
 import downloadBtnIcon from "../../public/assets/images/download_btn_icon.svg";
 import backIcon from "../../public/assets/images/back_icon.png";
 import transferIcon from "../../public/assets/images/transfer_icon.svg";
+import tokensLoading from "../../public/assets/images/tokens_loading.png";
 
 export type TImages =
     | "logo"
@@ -13,6 +14,7 @@ export type TImages =
     | "backIcon"
     | "shareBtnIcon"
     | "transferIcon"
+    | "tokensLoading"
     | "downloadBtnIcon";
 
 export type TNextImage = {
@@ -29,4 +31,5 @@ export const icons: Record<TImages, TNextImage> = {
     shareBtnIcon,
     transferIcon,
     downloadBtnIcon,
+    tokensLoading,
 };
