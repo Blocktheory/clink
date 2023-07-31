@@ -1,4 +1,5 @@
 import { globalApiService } from "../utils/globalApiServices";
+import axiosInstance from "../utils/httpInterceptor";
 
 enum ETHEREUM_REQUESTS {
     ethBalance = "eth_getBalance",
@@ -62,5 +63,24 @@ export const getSendRawTransaction = async (tx: string) => {
                 resolve(response);
             })
             .catch((e) => reject(e));
+    });
+};
+
+export const getUsdPrice = (): Promise<any[]> => {
+    const config = {
+        method: "get",
+        url: "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd",
+        headers: { "Content-Type": "application/json" },
+    };
+    return new Promise((resolve) => {
+        axiosInstance(config)
+            .then((res: any) => {
+                if (res.status === 200) {
+                    resolve(res);
+                }
+            })
+            .catch((e) => {
+                console.log(e);
+            });
     });
 };

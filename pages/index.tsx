@@ -7,6 +7,7 @@ import { baseGoerli, projectId } from "../constants/base";
 import { Wallet } from "../utils/wallet";
 import { initWasm } from "@trustwallet/wallet-core";
 import SecondaryBtn from "../ui_components/SecondaryBtn";
+import { LoadChestComponent } from "../ui_components/LoadChest/LoadChestComponent";
 
 export type THandleStep = {
     handleSteps: (step: number) => void;
@@ -19,8 +20,6 @@ export enum ESteps {
     FOUR = 4,
     FIVE = 5,
 }
-import GlobalContext from "../context/GlobalContext";
-import { LoadChestComponent } from "../ui_components/loadchest/LoadChestComponent";
 
 export default function Home() {
     const [loader, setLoader] = useState(true);
@@ -87,7 +86,7 @@ export default function Home() {
             case ESteps.TWO:
                 return <ConnectWallet signIn={signIn} handleSteps={handleSteps} />;
             case ESteps.THREE:
-                return <LoadChestComponent />;
+                return <LoadChestComponent openLogin={openLogin} />;
             case ESteps.FOUR:
                 return <ConnectWallet signIn={signIn} handleSteps={handleSteps} />;
             case ESteps.FIVE:
