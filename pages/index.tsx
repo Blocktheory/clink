@@ -1,13 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import HomePage from "../ui_components/home/HomePage";
 import "./globals.css";
 import OpenLogin from "@toruslabs/openlogin";
 import { baseGoerli, projectId } from "../constants/base";
 import { Wallet } from "../utils/wallet";
 import { initWasm } from "@trustwallet/wallet-core";
+import GlobalContext from "../context/GlobalContext";
 
 export default function Home() {
     const [openlogin, setSdk] = useState<any>("");
+    const [walletAddress, setWalletAddress] = useState<string>("");
 
     useMemo(async () => {
         async function initializeOpenlogin() {
@@ -29,7 +31,7 @@ export default function Home() {
 
     const signIn = async () => {
         try {
-            const privKey = await openlogin.login({
+            await openlogin.login({
                 loginProvider: "google",
                 redirectUrl: `${window.origin}`,
                 mfaLevel: "none",
@@ -44,6 +46,7 @@ export default function Home() {
         const wallet = new Wallet(walletCore);
         const address = await wallet.importWithPrvKey(prvKey);
         console.log("priv key address captured ", address);
+        setWalletAddress(address);
     };
 
     const signOut = async () => {
@@ -51,14 +54,8 @@ export default function Home() {
     };
 
     return (
-        <div className="flex min-h-screen flex-row items-center justify-between p-4 realtive">
-            <HomePage />
-            {/* <button className="btn" type="button" onClick={signIn}>
-                SignIn
-            </button>
-            <button className="btn" type="button" onClick={signOut}>
-                SignOut
-            </button> */}
+        <div className="flex min-h-screen flex-row items-center justify-between p-4 relative">
+            <HomePage signIn={signIn} walletAddress={walletAddress} />
         </div>
     );
 }

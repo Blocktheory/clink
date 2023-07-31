@@ -1,13 +1,18 @@
 import React, { FC } from "react";
 
-export interface IprimaryBtn {
+interface IPrimaryBtn {
     title: string;
+    onClick: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-const PrimaryBtn: FC<IprimaryBtn> = (props) => {
-    const { title } = props;
+export default function PrimaryBtn(props: IPrimaryBtn) {
+    const { title, onClick } = props;
     return (
-        <button className="py-4 px-6 btnBg support_text_bold rounded-lg">{title}</button>
+        <button
+            className="py-4 px-6 btnBg support_text_bold rounded-lg"
+            onClick={onClick}
+        >
+            {title}
+        </button>
     );
-};
-export default PrimaryBtn;
+}
