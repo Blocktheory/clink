@@ -7,7 +7,7 @@ export const Base = {
     logo: "https://storage.googleapis.com/frontier-wallet/blockchains/base/info/logo.svg",
     coinId: 8453,
     symbol: "ETH",
-    chainId: "8453",
+    chainId: "84531",
     decimals: 18,
     blockchain: CHAINS_ENUMS.ETHEREUM,
     derivation: [

@@ -30,3 +30,27 @@ export const toastFlashMessage = (
         }, delay);
     }, 200);
 };
+
+export const numHex = (num: number) => {
+    return hexFormatter(num.toString(16));
+};
+
+export const hexFormatter = (hex: string) => {
+    let a = hex;
+    if (a.length % 2 > 0) {
+        a = "0" + a;
+    }
+    return a;
+};
+
+export const hexToBuffer = (hex: string) => {
+    if (hex.startsWith("0x")) {
+        hex = hex.slice(2);
+    }
+    hex = hexFormatter(hex);
+    return Buffer.from(hex, "hex");
+};
+
+export const hexToNumber = (val: string, divider = 1) => {
+    return parseInt(val, 16) / divider;
+};

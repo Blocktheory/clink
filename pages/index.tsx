@@ -87,7 +87,7 @@ export default function Home() {
             case ESteps.TWO:
                 return <ConnectWallet signIn={signIn} handleSteps={handleSteps} />;
             case ESteps.THREE:
-                return <LoadChestComponent />;
+                return <LoadChestComponent openLogin={openLogin} />;
             case ESteps.FOUR:
                 return <ConnectWallet signIn={signIn} handleSteps={handleSteps} />;
             case ESteps.FIVE:

@@ -1,6 +1,5 @@
 import * as React from "react";
 import { icons } from "../../utils/images";
-import Image from "next/image";
 import SecondaryBtn from "../SecondaryBtn";
 import { ESteps, THandleStep } from "../../pages";
 import BackBtn from "../BackBtn";
