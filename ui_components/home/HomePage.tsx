@@ -23,7 +23,7 @@ export default function HomePage(props: any) {
     console.log("walletAddress", walletAddress);
 
     return (
-        <div className="w-full text-center p-2">
+        <div className="w-full text-center items-center p-2 flex-col">
             <img className="m-auto" src={icons.logo.src} alt="Logo" />
             <h1 className="hero_text mt-10 text-[32px] leading-2 font-bold">
                 Share crypto rewards <br /> in just a link
@@ -34,6 +34,7 @@ export default function HomePage(props: any) {
             </p>
             <img className="m-auto mb-20" src={icons.tchest.src} alt="Chest" />
             <p className="text-red-500">{walletAddress ? walletAddress : address}</p>
+
             <PrimaryBtn title="Setup a Tresure Chest" onClick={signIn} />
         </div>
     );

@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Raleway:wght@400;600;700;800&display=swap");
 @import "./typography.css";
 @tailwind base;
 @tailwind components;
@@ -50,4 +51,8 @@ body {
     opacity: 0.20000000298023224;
     background: #28d799;
     filter: blur(62px);
+}
+
+.shareLinkBg {
+    background: linear-gradient(148deg, #051923 0%, #0b254d 100%);
 }
