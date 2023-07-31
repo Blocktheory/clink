@@ -1,8 +1,27 @@
 import * as React from "react";
 import PrimaryBtn from "../PrimaryBtn";
 import { icons } from "../../utils/images";
+import { ACTIONS, GlobalContext } from "../../context/GlobalContext";
 
-export default function HomePage() {
+export default function HomePage(props: any) {
+    const {
+        dispatch,
+        state: { address },
+    } = React.useContext(GlobalContext);
+    const { signIn, walletAddress } = props;
+
+    React.useMemo(() => {
+        if (walletAddress) {
+            dispatch({
+                type: ACTIONS.SET_ADDRESS,
+                payload: walletAddress,
+            });
+        }
+    }, [walletAddress]);
+
+    console.log("address", address);
+    console.log("walletAddress", walletAddress);
+
     return (
         <div className="w-full text-center p-2">
             <img className="m-auto" src={icons.logo.src} alt="Logo" />
@@ -14,7 +33,8 @@ export default function HomePage() {
                 share the link with
             </p>
             <img className="m-auto mb-20" src={icons.tchest.src} alt="Chest" />
-            <PrimaryBtn title="Set up a Treasure Chest!" />
+            <p className="text-red-500">{walletAddress ? walletAddress : address}</p>
+            <PrimaryBtn title="Setup a Tresure Chest" onClick={signIn} />
         </div>
     );
 }

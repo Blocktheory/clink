@@ -5,10 +5,12 @@ export enum ACTIONS {
     CLEAR_TOAST = "CLEAR_TOAST",
     SHOW_TOAST = "SHOW_TOAST",
     HIDE_TOAST = "HIDE_TOAST",
+    SET_ADDRESS = "SET_ADDRESS",
 }
 
 export type TInitialStateType = {
     toastLists: Array<TToastType> | [];
+    address: string;
 };
 
 export type TActionType = {
@@ -32,6 +34,7 @@ export type TGlobalContextType = {
 
 const initialState: TInitialStateType = {
     toastLists: [],
+    address: "",
 };
 
 export const GlobalContext = createContext<TGlobalContextType>({
@@ -88,6 +91,12 @@ function reducer(state: TInitialStateType, action: TActionType) {
             } else {
                 return { ...state };
             }
+        case ACTIONS.SET_ADDRESS: {
+            return {
+                ...state,
+                address: action.payload as string,
+            };
+        }
         default:
             return state;
     }
