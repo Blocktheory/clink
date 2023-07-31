@@ -6,7 +6,8 @@ import OpenLogin from "@toruslabs/openlogin";
 import { baseGoerli, projectId } from "../constants/base";
 import { Wallet } from "../utils/wallet";
 import { initWasm } from "@trustwallet/wallet-core";
-import { LoadChestComponent } from "../ui_components/loadchest/LoadChestComponent";
+import { LoadChestComponent } from "../ui_components/loadChest/LoadChestComponent";
+import SecondaryBtn from "../ui_components/SecondaryBtn";
 
 export type THandleStep = {
     handleSteps: (step: number) => void;
@@ -24,7 +25,7 @@ export default function Home() {
     const [loader, setLoader] = useState(true);
     const [openlogin, setSdk] = useState<any>("");
     const [walletAddress, setWalletAddress] = useState<string>("");
-    const [step, setStep] = useState<number>(1);
+    const [step, setStep] = useState<number>(ESteps.ONE);
 
     useMemo(async () => {
         async function initializeOpenlogin() {
@@ -62,7 +63,7 @@ export default function Home() {
         const wallet = new Wallet(walletCore);
         const address = await wallet.importWithPrvKey(prvKey);
         setWalletAddress(address);
-        handleSteps(ESteps.THREE);
+        setLoader(false);
     };
 
     const signOut = async () => {
@@ -76,7 +77,7 @@ export default function Home() {
     const getUIComponent = (step: number) => {
         switch (step) {
             case ESteps.ONE:
-                return <HomePage handleSteps={handleSteps} />;
+                return <HomePage handleSetupChest={handleSetupChest} />;
             case ESteps.TWO:
                 return <ConnectWallet signIn={signIn} handleSteps={handleSteps} />;
             case ESteps.THREE:
@@ -86,13 +87,21 @@ export default function Home() {
             case ESteps.FIVE:
                 return <ConnectWallet signIn={signIn} handleSteps={handleSteps} />;
             default:
-                return <HomePage handleSteps={handleSteps} />;
+                return <HomePage handleSetupChest={handleSetupChest} />;
+        }
+    };
+
+    const handleSetupChest = () => {
+        if (walletAddress) {
+            handleSteps(ESteps.THREE);
+        } else {
+            handleSteps(ESteps.TWO);
         }
     };
 
     return (
         <div className="flex min-h-screen flex-row items-center justify-between p-4 relative">
-            {loader ? "loading...." : getUIComponent(step)}
+            {getUIComponent(step)}
         </div>
     );
 }

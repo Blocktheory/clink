@@ -12,6 +12,7 @@ export type TImages =
     | "walletIcon"
     | "backIcon"
     | "shareBtnIcon"
+    | "transferIcon"
     | "downloadBtnIcon";
 
 export type TNextImage = {
@@ -26,5 +27,6 @@ export const icons: Record<TImages, TNextImage> = {
     walletIcon,
     backIcon,
     shareBtnIcon,
+    transferIcon,
     downloadBtnIcon,
 };

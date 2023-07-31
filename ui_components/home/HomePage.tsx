@@ -1,12 +1,12 @@
 import * as React from "react";
 import PrimaryBtn from "../PrimaryBtn";
 import { icons } from "../../utils/images";
-import { ESteps, THandleStep } from "../../pages";
-
-interface IHome extends THandleStep {}
+interface IHome {
+    handleSetupChest: () => void;
+}
 
 export default function HomePage(props: IHome) {
-    const { handleSteps } = props;
+    const { handleSetupChest } = props;
     return (
         <div className="w-full text-center items-center p-2 flex-col">
             <img className="m-auto" src={icons.logo.src} alt="Logo" />
@@ -20,7 +20,7 @@ export default function HomePage(props: IHome) {
             <img className="m-auto mb-20" src={icons.tchest.src} alt="Chest" />
             <PrimaryBtn
                 title="Setup a Tressure Chest"
-                onClick={() => handleSteps(ESteps.TWO)}
+                onClick={() => handleSetupChest()}
             />
         </div>
     );
