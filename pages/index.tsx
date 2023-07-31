@@ -6,9 +6,7 @@ import OpenLogin from "@toruslabs/openlogin";
 import { baseGoerli, projectId } from "../constants/base";
 import { Wallet } from "../utils/wallet";
 import { initWasm } from "@trustwallet/wallet-core";
-import SecondaryBtn from "../ui_components/SecondaryBtn";
 import { LoadChestComponent } from "../ui_components/LoadChest/LoadChestComponent";
-import LoadingTokenPage from "../ui_components/loadingTokenPage";
 
 export type THandleStep = {
     handleSteps: (step: number) => void;
