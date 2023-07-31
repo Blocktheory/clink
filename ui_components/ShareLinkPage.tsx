@@ -73,8 +73,8 @@ const ShareLink: FC<IShareLink> = (props) => {
     return (
         <div className="w-full h-full relative">
             <div className="w-full h-[70%] text-center p-4  flex flex-col gap-5 relative top-[25%] items-center">
-                <p className="text-white text-[16px]">Your chest is ready</p>
-                <div className="w-full h-[300px] rounded-lg shareLinkBg flex flex-col justify-between mb-16">
+                <p className="text-white text-[20px] font-bold">Your chest is ready</p>
+                <div className="w-full md:w-[60%] max-w-[450px] h-[300px] rounded-lg shareLinkBg flex flex-col justify-between mb-16">
                     <div className="flex gap-1 flex-col text-start ml-3">
                         <p className="text-[40px] text-[#F4EC97] font bold">{`$ ${1}`}</p>
                         <p className="text-sm text-white/50">{`~ ${0.1} ETH`}</p>
@@ -83,7 +83,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                         <img className="" src={icons.tchest.src} alt="Chest" />
                     </div>
                 </div>
-                <div className="lg:hidden block">
+                <div className="lg:hidden block w-full">
                     <PrimaryBtn
                         title="Share"
                         onClick={() => {
@@ -92,7 +92,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                         rightImage={icons.shareBtnIcon}
                     />
                 </div>
-                <div className="hidden lg:block">
+                <div className="hidden lg:block w-full max-w-[320px]">
                     <PrimaryBtn
                         title={shareText}
                         onClick={copyToClipBoard}
