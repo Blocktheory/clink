@@ -3,7 +3,7 @@ import { FC, useEffect, useMemo, useState } from "react";
 import PrimaryBtn from "./PrimaryBtn";
 import SecondaryBtn from "./SecondaryBtn";
 import { icons } from "../utils/images";
-import { useAccount, useConnect } from "wagmi";
+import { Address, useAccount, useBalance, useConnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { initWasm } from "@trustwallet/wallet-core";
 import { Wallet } from "../utils/wallet";
@@ -14,7 +14,7 @@ export interface IShareLink {
 
 const ShareLink: FC<IShareLink> = (props) => {
     const { uuid } = props;
-    const { address } = useAccount();
+    const { address: toAddress } = useAccount();
     const { connect } = useConnect({
         connector: new InjectedConnector(),
     });
@@ -37,10 +37,14 @@ const ShareLink: FC<IShareLink> = (props) => {
     }, [uuid]);
 
     useMemo(() => {
-        if (address && fromAddress) {
+        if (toAddress && fromAddress) {
+            const balance = useBalance({
+                address: fromAddress as Address,
+            });
+            console.log("balance", balance);
             //handleSendHere
         }
-    }, [address]);
+    }, [toAddress]);
 
     return (
         <div className="w-full h-full relative">
