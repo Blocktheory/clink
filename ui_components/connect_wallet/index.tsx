@@ -1,17 +1,19 @@
 import * as React from "react";
 import { icons } from "../../utils/images";
 import Image from "next/image";
+import SecondaryBtn from "../SecondaryBtn";
+import { ESteps, THandleStep } from "../../pages";
+import BackBtn from "../BackBtn";
 
-export default function HomePage() {
+interface IConnectWallet extends THandleStep {
+    signIn: () => Promise<void>;
+}
+
+export default function ConnectWallet(props: IConnectWallet) {
+    const { signIn, handleSteps } = props;
     return (
         <div className="w-full h-full relative">
-            <div>
-                <Image
-                    src={icons.backIcon}
-                    alt="back-icon"
-                    className="relative top-20 left-1/2 -translate-x-1/2"
-                />
-            </div>
+            <BackBtn onClick={() => handleSteps(ESteps.ONE)} />
             <div className="w-full  h-[50%] text-center p-2  flex flex-col gap-10 relative top-[25%] md:left-1/2 md:-translate-x-1/2">
                 <div>
                     <p className="text-sm md:text-lg font-bold leading-1 text-white/50 mb-6 md:mb-10">
@@ -27,11 +29,12 @@ export default function HomePage() {
                 </div>
                 <img className="m-auto" src={icons.tchest.src} alt="Chest" />
 
-                <div className="flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] h-[64px] border border-white mx-auto rounded-lg">
-                    <Image src={icons.walletIcon} alt="wallet-icon" />
-                    <p className="text-[16px] font-bold leading-1 md:leading-3 text-white/80">
-                        Connect your wallet
-                    </p>
+                <div className="flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] h-[64px] mx-auto rounded-lg">
+                    <SecondaryBtn
+                        leftImage={icons.walletIcon ?? ""}
+                        title={"Connect your wallet"}
+                        onClick={signIn}
+                    />
                 </div>
             </div>
         </div>
