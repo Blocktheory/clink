@@ -176,4 +176,8 @@ export class Wallet {
     bufferToHex = (unitArray: Uint8Array) => {
         return Buffer.from(unitArray).toString("hex");
     };
+
+    createWithMnemonic(mnemonic: string, passphrase: string) {
+        return this.HDWallet.createWithMnemonic(mnemonic, passphrase);
+    }
 }

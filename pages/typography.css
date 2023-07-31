@@ -41,7 +41,7 @@
 .paragraph_regular {
     @apply font-inter font-normal text-base leading-10 md:text-lg md:leading-10 text-black;
 }
-.decode_paragraph_regular {
+.paragraph_regular {
     @apply font-inter font-normal text-lg leading-9 md:text-[1.8rem] md:leading-[42px] text-black;
 }
 .decode_heading4_regular {

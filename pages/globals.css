@@ -56,3 +56,6 @@ body {
 .shareLinkBg {
     background: linear-gradient(148deg, #051923 0%, #0b254d 100%);
 }
+.inputBg {
+    backdrop-filter: blur(30px);
+}

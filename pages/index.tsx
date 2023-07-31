@@ -6,6 +6,7 @@ import { baseGoerli, projectId } from "../constants/base";
 import { Wallet } from "../utils/wallet";
 import { initWasm } from "@trustwallet/wallet-core";
 import GlobalContext from "../context/GlobalContext";
+import { LoadChestComponent } from "../ui_components/LoadChest/LoadChestComponent";
 
 export default function Home() {
     const [openlogin, setSdk] = useState<any>("");
@@ -54,8 +55,15 @@ export default function Home() {
     };
 
     return (
-        <div className="flex min-h-screen flex-row items-center justify-between p-4 relative">
-            <HomePage signIn={signIn} walletAddress={walletAddress} />
+        <div className="flex min-h-screen flex-row items-center justify-between p-4">
+            {/* <HomePage />
+            <button className="btn" type="button" onClick={signIn}>
+                SignIn
+            </button>
+            <button className="btn" type="button" onClick={signOut}>
+                SignOut
+            </button> */}
+            <LoadChestComponent />
         </div>
     );
 }
