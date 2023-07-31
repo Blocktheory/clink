@@ -5,13 +5,9 @@ import React, { FC } from "react";
 
 const Layout: FC<AppProps> = ({ Component, pageProps }) => {
     return (
-        <>
-            <div>
-                <main>
-                    <Component {...pageProps} />
-                </main>
-            </div>
-        </>
+        <main>
+            <Component {...pageProps} />
+        </main>
     );
 };
 

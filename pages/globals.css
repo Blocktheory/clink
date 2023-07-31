@@ -16,7 +16,14 @@
         --background-end-rgb: 0, 0, 0;
     }
 }
-
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+main {
+    height: 100%;
+}
 body {
     color: rgb(var(--foreground-rgb));
     background: linear-gradient(0deg, #150937, #150937),
@@ -26,7 +33,21 @@ body {
             rgba(51, 202, 175, 0) 100%
         );
 }
+body > div {
+    height: 100%;
+}
+html,
+body {
+    height: 100%;
+}
 
 .btnBg {
     background: linear-gradient(93.22deg, #44e6d2 8.1%, #26d797 93.89%);
+}
+
+.bgBlur {
+    border-radius: 445px;
+    opacity: 0.20000000298023224;
+    background: #28d799;
+    filter: blur(62px);
 }

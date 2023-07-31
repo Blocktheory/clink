@@ -51,14 +51,14 @@ export default function Home() {
     };
 
     return (
-        <div className="flex min-h-screen flex-row items-center justify-between p-4">
+        <div className="flex min-h-screen flex-row items-center justify-between p-4 realtive">
             <HomePage />
-            <button className="btn" type="button" onClick={signIn}>
+            {/* <button className="btn" type="button" onClick={signIn}>
                 SignIn
             </button>
             <button className="btn" type="button" onClick={signOut}>
                 SignOut
-            </button>
+            </button> */}
         </div>
     );
 }
