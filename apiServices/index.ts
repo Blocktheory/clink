@@ -5,6 +5,7 @@ enum ETHEREUM_REQUESTS {
     ethEstimatedGas = "eth_estimateGas",
     ethGasPrice = "eth_gasPrice",
     ethSendRawTransaction = "eth_sendRawTransaction",
+    ethGetTransactionCount = "eth_getTransactionCount",
 }
 
 export const getBalance = async (address: string) => {
@@ -37,6 +38,16 @@ export const getEstimatedGas = async (params: {
 export const getGasPrice = async () => {
     return new Promise(function (resolve, reject) {
         globalApiService(ETHEREUM_REQUESTS.ethGasPrice, [])
+            .then((response) => {
+                resolve(response);
+            })
+            .catch((e) => reject(e));
+    });
+};
+
+export const getNonce = async (address: string) => {
+    return new Promise(function (resolve, reject) {
+        globalApiService(ETHEREUM_REQUESTS.ethGetTransactionCount, [address, "latest"])
             .then((response) => {
                 resolve(response);
             })

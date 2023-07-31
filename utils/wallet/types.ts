@@ -6,9 +6,9 @@ export type TTranx = {
     amount: number;
     amountHex?: string;
     amountValue?: number;
-    gasLimit: number;
+    gasLimit?: number;
     gasLimitHex?: string;
-    gasPrice: number;
+    gasPrice?: number;
     gasPriceValue?: number;
     gasPriceHex?: string;
     contractAddress: string;
@@ -17,6 +17,7 @@ export type TTranx = {
     nonceHex?: string;
     toAddress: string;
     fromAddress: string;
+    coinType: string;
     symbol?: string;
     blockchain?: string;
     isNative?: boolean;

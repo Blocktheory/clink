@@ -5,29 +5,67 @@ import * as Bip39 from "bip39";
 import { Wallet } from "../../utils/wallet";
 import { initWasm } from "@trustwallet/wallet-core";
 import { useRouter } from "next/router";
-import { getBalance } from "../../apiServices";
+import {
+    getBalance,
+    getEstimatedGas,
+    getGasPrice,
+    getNonce,
+    getSendRawTransaction,
+} from "../../apiServices";
+import { hexToNumber, numberToHex } from "../../utils";
+import { TRANSACTION_TYPE, TTranx } from "../../utils/wallet/types";
 
 export const LoadChestComponent: FC = () => {
     const router = useRouter();
     const createWallet = async () => {
-        console.log("came to fun");
-        const walletCore = await initWasm();
-        const wallet = new Wallet(walletCore);
-        // const mnemonic: string = Bip39.generateMnemonic();
-        // if (mnemonic && Bip39.validateMnemonic(mnemonic)) {
-        //     console.log("came to condition");
-        //     const create = await wallet.createWithMnemonic(mnemonic, "");
-        //     console.log(create, "create wallet");
-        //     let generatedAddress = create.getAddressForCoin(wallet.CoinType.ethereum);
-        //     console.log(generatedAddress, "address");
-        // }
-        const link = await wallet.createPayLink();
-        console.log(link, "link");
-        const address = await wallet.getAccountFromPayLink(link);
-        console.log(address, "address");
-        const balance = await getBalance("0x77B7e897EB1ED7C5D5fd5237a5B9CB100B739f1d");
-        console.log(balance, "balance");
-        // router.push(link);
+        try {
+            console.log("came to fun");
+            const walletCore = await initWasm();
+            const wallet = new Wallet(walletCore);
+            const link = await wallet.createPayLink();
+            console.log(link, "link");
+            const address = await wallet.getAccountFromPayLink(link);
+            console.log(address, "address");
+            const balance = (await getBalance(
+                "0x77B7e897EB1ED7C5D5fd5237a5B9CB100B739f1d",
+            )) as any;
+            console.log(hexToNumber(balance.result as string), "balance");
+            const gasPrice = (await getGasPrice()) as any;
+            console.log(hexToNumber(gasPrice.result), "gasprice");
+            const value = 0.01 * Math.pow(10, 18);
+
+            const estGas = (await getEstimatedGas({
+                from: "0x77B7e897EB1ED7C5D5fd5237a5B9CB100B739f1d",
+                to: address,
+                value: String(numberToHex(value)),
+            })) as any;
+            console.log(hexToNumber(estGas.result), "est gas");
+            const nonce = (await getNonce(address)) as any;
+            console.log(hexToNumber(nonce.result), "nonce");
+            const tx: TTranx = {
+                toAddress: address,
+                chainId: "84531",
+                nonce: nonce.result,
+                chainIdHex: numberToHex("84531"),
+                nonceHex: nonce.result,
+                gasPriceHex: numberToHex("1"),
+                gasLimitHex: estGas.result,
+                amountHex: numberToHex(value),
+                amount: value,
+                contractAddress: "",
+                contractDecimals: 0,
+                fromAddress: "",
+                coinType: "",
+                transactionType: TRANSACTION_TYPE.SEND,
+                isNative: true,
+            };
+            const txData = await wallet.signEthTx(tx, "");
+            console.log(txData, "txData");
+            const rawTx = await getSendRawTransaction(txData);
+            console.log(rawTx, "raw tx");
+        } catch (e: any) {
+            console.log(e, "e");
+        }
     };
     return (
         <div className="mx-auto">

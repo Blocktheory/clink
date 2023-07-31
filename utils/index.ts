@@ -30,3 +30,16 @@ export const toastFlashMessage = (
         }, delay);
     }, 200);
 };
+
+export const numberToHex = (val: number | string, append = true) => {
+    val = Math.trunc(Number(val)).toString(16);
+    if (append) {
+        return "0x" + val;
+    } else {
+        return val;
+    }
+};
+
+export const hexToNumber = (val: string, divider = 1) => {
+    return parseInt(val, 16) / divider;
+};
