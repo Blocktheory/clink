@@ -95,8 +95,8 @@ export class Wallet {
         return "/i#" + hash;
     };
 
-    getAccountFromPayLink = (url: string) => {
-        const urlHash = this.formatUrlHash(url);
+    getAccountFromPayLink = (hash: string) => {
+        const urlHash = hash;
         try {
             const bs58Decoded = bs58.decode(urlHash);
             const account = this.HDWallet.createWithEntropy(bs58Decoded, "");
