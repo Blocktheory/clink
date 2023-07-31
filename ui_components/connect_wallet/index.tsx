@@ -1,8 +1,15 @@
 import * as React from "react";
 import { icons } from "../../utils/images";
 import Image from "next/image";
+import SecondaryBtn from "../SecondaryBtn";
+import { THandleStep } from "../../pages";
 
-export default function HomePage() {
+interface IConnectWallet extends THandleStep {
+    signIn: () => Promise<void>;
+}
+
+export default function ConnectWallet(props: IConnectWallet) {
+    const { signIn, handleSteps } = props;
     return (
         <div className="w-full h-full relative">
             <div>
@@ -29,9 +36,7 @@ export default function HomePage() {
 
                 <div className="flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] h-[64px] border border-white mx-auto rounded-lg">
                     <Image src={icons.walletIcon} alt="wallet-icon" />
-                    <p className="text-[16px] font-bold leading-1 md:leading-3 text-white/80">
-                        Connect your wallet
-                    </p>
+                    <SecondaryBtn title={"Connect your wallet"} onClick={signIn} />
                 </div>
             </div>
         </div>

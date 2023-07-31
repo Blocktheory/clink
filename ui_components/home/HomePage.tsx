@@ -1,27 +1,12 @@
 import * as React from "react";
 import PrimaryBtn from "../PrimaryBtn";
 import { icons } from "../../utils/images";
-import { ACTIONS, GlobalContext } from "../../context/GlobalContext";
+import { ESteps, THandleStep } from "../../pages";
 
-export default function HomePage(props: any) {
-    const {
-        dispatch,
-        state: { address },
-    } = React.useContext(GlobalContext);
-    const { signIn, walletAddress } = props;
+interface IHome extends THandleStep {}
 
-    React.useMemo(() => {
-        if (walletAddress) {
-            dispatch({
-                type: ACTIONS.SET_ADDRESS,
-                payload: walletAddress,
-            });
-        }
-    }, [walletAddress]);
-
-    console.log("address", address);
-    console.log("walletAddress", walletAddress);
-
+export default function HomePage(props: IHome) {
+    const { handleSteps } = props;
     return (
         <div className="w-full text-center items-center p-2 flex-col">
             <img className="m-auto" src={icons.logo.src} alt="Logo" />
@@ -33,9 +18,10 @@ export default function HomePage(props: any) {
                 share the link with
             </p>
             <img className="m-auto mb-20" src={icons.tchest.src} alt="Chest" />
-            <p className="text-red-500">{walletAddress ? walletAddress : address}</p>
-
-            <PrimaryBtn title="Setup a Tresure Chest" onClick={signIn} />
+            <PrimaryBtn
+                title="Setup a Tressure Chest"
+                onClick={() => handleSteps(ESteps.TWO)}
+            />
         </div>
     );
 }
