@@ -7,6 +7,7 @@ import { Address, useAccount, useBalance, useConnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { initWasm } from "@trustwallet/wallet-core";
 import { Wallet } from "../utils/wallet";
+import Image from "next/image";
 
 export interface IShareLink {
     uuid: string;
@@ -44,7 +45,6 @@ const ShareLink: FC<IShareLink> = (props) => {
             setShareText("Share");
         }, 4000);
     };
-    
 
     useMemo(async () => {
         if (uuid) {
@@ -80,7 +80,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                         <p className="text-sm text-white/50">{`~ ${0.1} ETH`}</p>
                     </div>
                     <div className="self-end">
-                        <img className="" src={icons.tchest.src} alt="Chest" />
+                        <Image className="" src={icons.tchest} alt="Chest" />
                     </div>
                 </div>
                 <div className="lg:hidden block w-full">

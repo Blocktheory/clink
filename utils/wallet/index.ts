@@ -92,7 +92,7 @@ export class Wallet {
         const account = this.HDWallet.create(128, "");
         const entropy = account.entropy();
         const hash = bs58.encode(entropy);
-        return "/i#" + hash;
+        return "/" + hash;
     };
 
     getAccountFromPayLink = (hash: string) => {
@@ -100,7 +100,6 @@ export class Wallet {
         try {
             const bs58Decoded = bs58.decode(urlHash);
             const account = this.HDWallet.createWithEntropy(bs58Decoded, "");
-            console.log(account.getAddressForCoin(this.CoinType.ethereum), "add fun");
             return account.getAddressForCoin(this.CoinType.ethereum);
         } catch {
             return "";

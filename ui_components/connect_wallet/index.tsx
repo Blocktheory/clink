@@ -3,6 +3,7 @@ import { icons } from "../../utils/images";
 import SecondaryBtn from "../SecondaryBtn";
 import { ESteps, THandleStep } from "../../pages";
 import BackBtn from "../BackBtn";
+import Image from "next/image";
 
 interface IConnectWallet extends THandleStep {
     signIn: () => Promise<void>;
@@ -26,7 +27,7 @@ export default function ConnectWallet(props: IConnectWallet) {
                         chest
                     </p>
                 </div>
-                <img className="m-auto" src={icons.tchest.src} alt="Chest" />
+                <Image className="m-auto" src={icons.tchest} alt="Chest" />
 
                 <div className="flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] h-[64px] mx-auto rounded-lg">
                     <SecondaryBtn

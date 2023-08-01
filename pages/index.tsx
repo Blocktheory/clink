@@ -108,9 +108,11 @@ export default function Home() {
         }
     };
 
+    const connectWallet = () => {};
+
     return (
         <div className="flex min-h-screen flex-row items-center justify-between p-4 relative">
-            <Header />
+            <Header walletAddress={walletAddress} signIn={signIn} />
             {getUIComponent(step)}
             {/* <BottomSheet isOpen={true} onClose={() => {}} /> */}
         </div>
