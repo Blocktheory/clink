@@ -3,12 +3,13 @@ import { FC, useMemo, useState } from "react";
 import PrimaryBtn from "./PrimaryBtn";
 import SecondaryBtn from "./SecondaryBtn";
 import { icons } from "../utils/images";
-import { Address, useAccount, useBalance, useConnect } from "wagmi";
+import { Address } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { initWasm } from "@trustwallet/wallet-core";
 import { Wallet } from "../utils/wallet";
 import Image from "next/image";
-import { fetchBalance } from "@wagmi/core";
+import { fetchBalance, connect } from "@wagmi/core";
+import { baseGoerli } from "wagmi/chains";
 
 export interface IShareLink {
     uuid: string;
@@ -16,14 +17,11 @@ export interface IShareLink {
 
 const ShareLink: FC<IShareLink> = (props) => {
     const { uuid } = props;
-    const { address: toAddress } = useAccount();
-    const { connect } = useConnect({
-        connector: new InjectedConnector(),
-    });
     const [amount, setAmount] = useState({
         eth: "0.1",
         dollars: "1",
     });
+    const [toAddress, setToAddress] = useState("");
     const [fromAddress, setFromAddress] = useState("");
     const [wallet, setWallet] = useState("" as unknown as Wallet);
     const [shareText, setShareText] = React.useState("Share");
@@ -31,6 +29,7 @@ const ShareLink: FC<IShareLink> = (props) => {
         text: "Here is you Gift card",
         url: typeof window !== "undefined" ? window.location.href : "",
     };
+
     const handleShareURL = () => {
         if (navigator?.share) {
             navigator
@@ -39,6 +38,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                 .catch((error) => console.log("Error sharing", error));
         }
     };
+
     const copyToClipBoard = (e: any) => {
         e.preventDefault();
         e.stopPropagation();
@@ -48,6 +48,7 @@ const ShareLink: FC<IShareLink> = (props) => {
             setShareText("Share");
         }, 4000);
     };
+
     useMemo(async () => {
         if (uuid) {
             const walletCore = await initWasm();
@@ -61,6 +62,7 @@ const ShareLink: FC<IShareLink> = (props) => {
             }
         }
     }, [uuid]);
+
     useMemo(async () => {
         if (toAddress && fromAddress) {
             const balance = await fetchBalance({
@@ -69,6 +71,14 @@ const ShareLink: FC<IShareLink> = (props) => {
             //handleSendHere
         }
     }, [toAddress]);
+
+    const handleConnect = async () => {
+        const result = await connect({
+            chainId: 84531,
+            connector: new InjectedConnector({ chains: [baseGoerli] }),
+        });
+        setToAddress(result.account);
+    };
 
     return (
         <div className="w-full h-full relative">
@@ -101,7 +111,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                 </div>
                 <SecondaryBtn
                     title="Claim"
-                    onClick={() => connect()}
+                    onClick={() => handleConnect()}
                     rightImage={icons.downloadBtnIcon}
                 />
             </div>
