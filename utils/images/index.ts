@@ -6,6 +6,12 @@ import downloadBtnIcon from "../../public/assets/images/download_btn_icon.svg";
 import backIcon from "../../public/assets/images/back_icon.png";
 import transferIcon from "../../public/assets/images/transfer_icon.svg";
 import tokensLoading from "../../public/assets/images/tokens_loading.png";
+import hamburgerBlack from "../../public/assets/images/hamburger_black.svg";
+import googleIcon from "../../public/assets/images/google_icon.svg";
+import chevronRight from "../../public/assets/images/chevron_right.svg";
+import copyBlack from "../../public/assets/images/copy_black.svg";
+import logoutIcon from "../../public/assets/images/logout_icon.svg";
+import helpIcon from "../../public/assets/images/help_icon.svg";
 
 export type TImages =
     | "logo"
@@ -15,6 +21,12 @@ export type TImages =
     | "shareBtnIcon"
     | "transferIcon"
     | "tokensLoading"
+    | "hamburgerBlack"
+    | "googleIcon"
+    | "chevronRight"
+    | "copyBlack"
+    | "logoutIcon"
+    | "helpIcon"
     | "downloadBtnIcon";
 
 export type TNextImage = {
@@ -32,4 +44,10 @@ export const icons: Record<TImages, TNextImage> = {
     transferIcon,
     downloadBtnIcon,
     tokensLoading,
+    hamburgerBlack,
+    googleIcon,
+    chevronRight,
+    copyBlack,
+    logoutIcon,
+    helpIcon,
 };
