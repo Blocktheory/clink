@@ -106,6 +106,20 @@ export class Wallet {
         }
     };
 
+    getPrivKeyFromPayLink = (hash: string) => {
+        const urlHash = this.formatUrlHash(hash);
+        try {
+            const bs58Decoded = bs58.decode(urlHash);
+            const account = this.HDWallet.createWithEntropy(bs58Decoded, "");
+            const privKey = account.getKey(this.CoinType.ethereum, "m/44'/60'/0'/0/0");
+            console.log(privKey, "private key");
+            const secret = this.bufferToHex(privKey.data());
+            return secret;
+        } catch {
+            return "";
+        }
+    };
+
     // Not required to use this
     getKeyFromPayLink = (url: string) => {
         const urlHash = this.formatUrlHash(url);
@@ -184,8 +198,7 @@ export class Wallet {
     }
 
     signEthTx = async (tx: TTranx, prvKey: string) => {
-        const _prvKey =
-            "ab4d1b6e1cad9fc5c30d775b0b1bc636af2595a0fc0024d99be62384da43dc2b";
+        const _prvKey = prvKey;
         const _tx = this.txFormat(tx);
         this.txLogger(tx);
         const signingInput = this.getEthSigningInput(_tx, _prvKey);

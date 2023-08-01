@@ -54,3 +54,9 @@ export const hexToBuffer = (hex: string) => {
 export const hexToNumber = (val: string, divider = 1) => {
     return parseInt(val, 16) / divider;
 };
+
+export const trimAddress = (val: string) => {
+    const firstFour = val.substring(0, 4);
+    const lastFour = val.substring(val.length - 4, val.length);
+    return firstFour + "..." + lastFour;
+};

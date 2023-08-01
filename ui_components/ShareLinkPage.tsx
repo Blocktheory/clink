@@ -10,6 +10,15 @@ import { Wallet } from "../utils/wallet";
 import Image from "next/image";
 import { fetchBalance, connect } from "@wagmi/core";
 import { baseGoerli } from "wagmi/chains";
+import {
+    getBalance,
+    getEstimatedGas,
+    getNonce,
+    getSendRawTransaction,
+} from "../apiServices";
+import { hexToNumber, numHex } from "../utils";
+import { Base } from "../utils/chain/base";
+import { TTranx, TRANSACTION_TYPE } from "../utils/wallet/types";
 
 export interface IShareLink {
     uuid: string;
@@ -22,6 +31,10 @@ const ShareLink: FC<IShareLink> = (props) => {
         dollars: "1",
     });
     const [toAddress, setToAddress] = useState("");
+
+    console.log(connect, "connect");
+    console.log(toAddress, "toAddress");
+
     const [fromAddress, setFromAddress] = useState("");
     const [wallet, setWallet] = useState("" as unknown as Wallet);
     const [shareText, setShareText] = React.useState("Share");
@@ -55,6 +68,7 @@ const ShareLink: FC<IShareLink> = (props) => {
             const wallet = new Wallet(walletCore);
             setWallet(wallet);
             const account = wallet.getAccountFromPayLink(uuid);
+
             if (account) {
                 setFromAddress(account);
             } else {
@@ -68,7 +82,7 @@ const ShareLink: FC<IShareLink> = (props) => {
             const balance = await fetchBalance({
                 address: fromAddress as Address,
             });
-            //TODO: handleSendHere
+            sendToken(toAddress);
         }
     }, [toAddress]);
 
@@ -78,6 +92,46 @@ const ShareLink: FC<IShareLink> = (props) => {
             connector: new InjectedConnector({ chains: [baseGoerli] }),
         });
         setToAddress(result.account);
+    };
+
+    const sendToken = async (toAdd: string) => {
+        try {
+            const walletCore = await initWasm();
+            const wallet = new Wallet(walletCore);
+            const balance = (await getBalance(fromAddress)) as any;
+            let tokenAmount = String(numHex(Number(balance.result)));
+            console.log(tokenAmount, "token amount");
+            if (!tokenAmount.startsWith("0x")) {
+                tokenAmount = "0x" + tokenAmount;
+            }
+            const gasLimitData = (await getEstimatedGas({
+                from: fromAddress,
+                to: toAdd,
+                value: tokenAmount,
+            })) as any;
+            const nonce = (await getNonce(fromAddress)) as any;
+            const tx: TTranx = {
+                toAddress: toAdd,
+                nonceHex: nonce.result,
+                chainIdHex: numHex(Number(Base.chainId)),
+                // gas price is hardcoded to pass 1 by default as of now
+                gasPriceHex: "3B9ACA00" ?? "0x1",
+                gasLimitHex: gasLimitData.result,
+                amountHex: numHex(balance.result),
+                amount: Number(tokenAmount),
+                contractDecimals: 18,
+                fromAddress: fromAddress,
+                transactionType: TRANSACTION_TYPE.SEND,
+                isNative: true,
+            };
+            const privKey = await wallet.getPrivKeyFromPayLink(uuid);
+            const txData = await wallet.signEthTx(tx, privKey);
+            console.log(txData, "tx data");
+            const rawTx = await getSendRawTransaction(txData);
+            console.log(rawTx, "raw tx");
+        } catch (e: any) {
+            console.log(e, "e");
+        }
     };
 
     return (

@@ -19,7 +19,7 @@ export default function HomePage(props: IHome) {
             </p>
             <Image className="m-auto mb-20" src={icons.tchest} alt="Chest" />
             <PrimaryBtn
-                title="Setup a Tressure Chest"
+                title="Setup a Treasure Chest"
                 onClick={() => handleSetupChest()}
             />
         </div>

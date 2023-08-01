@@ -2,6 +2,7 @@ import * as React from "react";
 import PrimaryBtn from "../PrimaryBtn";
 import Image from "next/image";
 import { icons } from "../../utils/images";
+import { trimAddress } from "../../utils";
 interface IHeader {
     walletAddress: string;
     signIn: () => Promise<void>;
@@ -15,14 +16,14 @@ const Header = (props: IHeader) => {
                 <p className="text-[16px] font-bold text-white self-center">Micropay</p>
             </div>
             <div className="flex gap-4 items-center px-4">
-                <button
-                    type="button"
-                    className="w-[90px] h-[40px] rounded-lg bg-white flex gap-2 items-center justify-center"
-                    onClick={signIn}
-                >
-                    <Image src={icons.googleIcon} alt="google login" className="w-5" />
+                <button className="w-[90px] h-[40px] rounded-lg bg-white flex gap-2 items-center justify-center">
+                    <Image
+                        src={walletAddress ? icons.ethLogo : icons.googleIcon}
+                        alt="google login"
+                        className="w-5"
+                    />
                     <span className="text-[16px] font-medium text-black/50 self-center my-auto">
-                        Login
+                        {walletAddress ? trimAddress(walletAddress) : "Login"}
                     </span>
                 </button>
                 <button
