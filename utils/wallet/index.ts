@@ -96,10 +96,11 @@ export class Wallet {
     };
 
     getAccountFromPayLink = (hash: string) => {
-        const urlHash = hash;
+        const urlHash = this.formatUrlHash(hash);
         try {
             const bs58Decoded = bs58.decode(urlHash);
             const account = this.HDWallet.createWithEntropy(bs58Decoded, "");
+            console.log(account.getAddressForCoin(this.CoinType.ethereum), "add fun");
             return account.getAddressForCoin(this.CoinType.ethereum);
         } catch {
             return "";
