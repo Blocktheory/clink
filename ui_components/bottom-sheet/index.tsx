@@ -66,6 +66,11 @@ const BottomSheet: FC<TProps> = (props) => {
                                                 alt="copy icon"
                                             />
                                         </div>
+                                        <div className="w-[95%] h-[52px] bg-white rounded-lg mx-auto flex justify-between items-center px-4 mb-6">
+                                            <p className="text-[#E11900]">
+                                                Disconnect Wallet
+                                            </p>
+                                        </div>
                                         <div className="bg-white w-full px-4">
                                             <div className="flex justify-between items-center py-6 border-b-2">
                                                 <div className="flex gap-2 items-center">

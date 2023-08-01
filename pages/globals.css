@@ -23,18 +23,18 @@
     box-sizing: border-box;
 }
 main {
-    height: 100%;
+    min-height: 100%;
 }
 body {
     color: rgb(var(--foreground-rgb));
     background: radial-gradient(61.66% 83.83% at 72.76% 81.19%, rgba(51, 202, 175, 0.44) 0%, rgba(51, 202, 175, 0.00) 100%), #150937;
 }
 body > div {
-    height: 100%;
+    min-height: 100%;
 }
 html,
 body {
-    height: 100%;
+    min-height: 100%;
 }
 
 .btnBg {
@@ -53,4 +53,10 @@ body {
 }
 .inputBg {
     backdrop-filter: blur(30px);
+}
+.header-menu-list .header-submenu {
+    display: none;
+}
+.header-menu-list:hover .header-submenu {
+    display: flex;
 }
