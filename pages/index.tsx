@@ -19,8 +19,6 @@ export enum ESteps {
     ONE = 1,
     TWO = 2,
     THREE = 3,
-    FOUR = 4,
-    FIVE = 5,
 }
 
 export default function Home() {
@@ -91,10 +89,6 @@ export default function Home() {
                 return (
                     <LoadChestComponent openLogin={openLogin} handleSteps={handleSteps} />
                 );
-            case ESteps.FOUR:
-                return <ConnectWallet signIn={signIn} handleSteps={handleSteps} />;
-            case ESteps.FIVE:
-                return <ConnectWallet signIn={signIn} handleSteps={handleSteps} />;
             default:
                 return <HomePage handleSetupChest={handleSetupChest} />;
         }

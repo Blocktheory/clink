@@ -68,13 +68,13 @@ const ShareLink: FC<IShareLink> = (props) => {
             const balance = await fetchBalance({
                 address: fromAddress as Address,
             });
-            //handleSendHere
+            //TODO: handleSendHere
         }
     }, [toAddress]);
 
     const handleConnect = async () => {
         const result = await connect({
-            chainId: 84531,
+            chainId: baseGoerli.id,
             connector: new InjectedConnector({ chains: [baseGoerli] }),
         });
         setToAddress(result.account);
