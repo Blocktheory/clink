@@ -27,12 +27,7 @@ main {
 }
 body {
     color: rgb(var(--foreground-rgb));
-    background: linear-gradient(0deg, #150937, #150937),
-        radial-gradient(
-            60.4% 60.4% at 72.76% 81.19%,
-            rgba(51, 202, 175, 0.44) 0%,
-            rgba(51, 202, 175, 0) 100%
-        );
+    background: radial-gradient(61.66% 83.83% at 72.76% 81.19%, rgba(51, 202, 175, 0.44) 0%, rgba(51, 202, 175, 0.00) 100%), #150937;
 }
 body > div {
     height: 100%;
