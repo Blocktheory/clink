@@ -7,6 +7,9 @@ import { baseGoerli, projectId } from "../constants/base";
 import { Wallet } from "../utils/wallet";
 import { initWasm } from "@trustwallet/wallet-core";
 import { LoadChestComponent } from "../ui_components/loadchest/LoadChestComponent";
+import Header from "../ui_components/header";
+import BottomSheet from "../ui_components/bottom-sheet";
+import LoadingTokenPage from "../ui_components/loadingTokenPage";
 
 export type THandleStep = {
     handleSteps: (step: number) => void;
@@ -105,7 +108,9 @@ export default function Home() {
 
     return (
         <div className="flex min-h-screen flex-row items-center justify-between p-4 relative">
+            <Header />
             {getUIComponent(step)}
+            {/* <BottomSheet isOpen={true} onClose={() => {}} /> */}
         </div>
     );
 }
