@@ -4,36 +4,32 @@ import PrimaryBtn from "./PrimaryBtn";
 import SecondaryBtn from "./SecondaryBtn";
 import { icons } from "../utils/images";
 import { Address } from "wagmi";
-import { InjectedConnector } from "wagmi/connectors/injected";
 import { initWasm } from "@trustwallet/wallet-core";
 import { Wallet } from "../utils/wallet";
 import Image from "next/image";
-import { fetchBalance, connect } from "@wagmi/core";
-import { baseGoerli } from "wagmi/chains";
 import {
     getBalance,
     getEstimatedGas,
     getNonce,
     getSendRawTransaction,
 } from "../apiServices";
-import { hexToNumber, numHex } from "../utils";
+import { numHex } from "../utils";
 import { Base } from "../utils/chain/base";
 import { TTranx, TRANSACTION_TYPE } from "../utils/wallet/types";
+import { useWagmi } from "../utils/wagmi/WagmiContext";
 
 export interface IShareLink {
     uuid: string;
 }
 
 const ShareLink: FC<IShareLink> = (props) => {
+    const { connect, fetchBalance, baseGoerli, injectConnector } = useWagmi();
     const { uuid } = props;
     const [amount, setAmount] = useState({
         eth: "0.1",
         dollars: "1",
     });
     const [toAddress, setToAddress] = useState("");
-
-    console.log(connect, "connect");
-    console.log(toAddress, "toAddress");
 
     const [fromAddress, setFromAddress] = useState("");
     const [wallet, setWallet] = useState("" as unknown as Wallet);
@@ -89,7 +85,7 @@ const ShareLink: FC<IShareLink> = (props) => {
     const handleConnect = async () => {
         const result = await connect({
             chainId: baseGoerli.id,
-            connector: new InjectedConnector({ chains: [baseGoerli] }),
+            connector: injectConnector,
         });
         setToAddress(result.account);
     };
