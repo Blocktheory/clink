@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import PrimaryBtn from "./PrimaryBtn";
 import SecondaryBtn from "./SecondaryBtn";
 import { icons } from "../utils/images";
@@ -8,6 +8,7 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { initWasm } from "@trustwallet/wallet-core";
 import { Wallet } from "../utils/wallet";
 import Image from "next/image";
+import { fetchBalance } from "@wagmi/core";
 
 export interface IShareLink {
     uuid: string;
@@ -19,10 +20,12 @@ const ShareLink: FC<IShareLink> = (props) => {
     const { connect } = useConnect({
         connector: new InjectedConnector(),
     });
-
+    const [amount, setAmount] = useState({
+        eth: "0.1",
+        dollars: "1",
+    });
     const [fromAddress, setFromAddress] = useState("");
     const [wallet, setWallet] = useState("" as unknown as Wallet);
-
     const [shareText, setShareText] = React.useState("Share");
     const shareData = {
         text: "Here is you Gift card",
@@ -45,7 +48,6 @@ const ShareLink: FC<IShareLink> = (props) => {
             setShareText("Share");
         }, 4000);
     };
-
     useMemo(async () => {
         if (uuid) {
             const walletCore = await initWasm();
@@ -59,13 +61,11 @@ const ShareLink: FC<IShareLink> = (props) => {
             }
         }
     }, [uuid]);
-
-    useMemo(() => {
+    useMemo(async () => {
         if (toAddress && fromAddress) {
-            const balance = useBalance({
+            const balance = await fetchBalance({
                 address: fromAddress as Address,
             });
-            console.log("balance", balance);
             //handleSendHere
         }
     }, [toAddress]);
@@ -76,8 +76,8 @@ const ShareLink: FC<IShareLink> = (props) => {
                 <p className="text-white text-[20px] font-bold">Your chest is ready</p>
                 <div className="w-full md:w-[60%] max-w-[450px] h-[300px] rounded-lg shareLinkBg flex flex-col justify-between mb-16">
                     <div className="flex gap-1 flex-col text-start ml-3">
-                        <p className="text-[40px] text-[#F4EC97] font bold">{`$ ${1}`}</p>
-                        <p className="text-sm text-white/50">{`~ ${0.1} ETH`}</p>
+                        <p className="text-[40px] text-[#F4EC97] font bold">{`$ ${amount.dollars}`}</p>
+                        <p className="text-sm text-white/50">{`~ ${amount.eth} ETH`}</p>
                     </div>
                     <div className="self-end">
                         <Image className="" src={icons.tchest} alt="Chest" />
