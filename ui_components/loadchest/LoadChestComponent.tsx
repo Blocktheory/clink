@@ -143,7 +143,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                                         ${price}
                                     </p>
                                     <p className="text-white/30 text-[12px] leading-[14px]">
-                                        ~{tokenValue} ETH
+                                        ~ {tokenValue} ETH
                                     </p>
                                 </div>
                             </div>
@@ -162,7 +162,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                                     name={"usd value"}
                                     style={{ caretColor: "white" }}
                                     className={`pl-0 pt-2 pb-1 backdrop-blur-xl text-[32px] border-none text-center bg-transparent text-white dark:text-textDark-900 placeholder-white dark:placeholder-textDark-300 rounded-lg block w-full focus:outline-none focus:ring-transparent`}
-                                    placeholder={"$0.00"}
+                                    placeholder={"$0"}
                                     autoFocus={true}
                                     value={value}
                                     onChange={(e) => {
