@@ -1,15 +1,32 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { FC, Fragment, ReactNode } from "react";
+import { FC, Fragment, ReactNode, useContext, useState } from "react";
 import { icons } from "../../utils/images";
 import Image from "next/image";
+import { GlobalContext } from "../../context/GlobalContext";
+import { trimAddress } from "../../utils";
 
 type TProps = {
     isOpen: boolean;
     onClose: () => void;
     walletAddress?: string;
+    signOut: () => Promise<void>;
+    signIn: () => Promise<void>;
 };
 const BottomSheet: FC<TProps> = (props) => {
-    const { isOpen = true, onClose, walletAddress } = props;
+    const { isOpen, onClose, walletAddress, signOut, signIn } = props;
+    const [copyText, setCopyText] = useState("Copy Address");
+    const {
+        state: { googleUserInfo, address, isConnected },
+    } = useContext(GlobalContext);
+    const copyToClipBoard = (e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+        navigator.clipboard.writeText(address);
+        setCopyText("Address copied");
+        setTimeout(() => {
+            setCopyText("Copy Address");
+        }, 4000);
+    };
     return (
         <Transition.Root show={isOpen} as={Fragment}>
             <Dialog as="div" className="relative z-20" onClose={onClose}>
@@ -45,14 +62,18 @@ const BottomSheet: FC<TProps> = (props) => {
                                     className={`pointer-events-auto w-full max-w-[600px]  bg-[#f5f5f5] rounded-t-2xl dark:bg-neutralDark-50`}
                                 >
                                     <div className="w-full">
-                                        {walletAddress ? (
+                                        {address ? (
                                             <>
                                                 <div className="flex justify-between items-center px-4 py-3">
                                                     <div>
                                                         <p className="text-[12px] font-medium text-[#555555]">
                                                             ACCOUNT OVERVIEW
                                                         </p>
-                                                        <p>Frontier Wallet : </p>
+                                                        <p className="text-black">
+                                                            {address
+                                                                ? trimAddress(address)
+                                                                : ""}
+                                                        </p>
                                                     </div>
                                                     <div>
                                                         <Image
@@ -62,21 +83,26 @@ const BottomSheet: FC<TProps> = (props) => {
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="w-[95%] h-[52px] bg-white rounded-lg mx-auto flex justify-between items-center px-4 mb-6">
-                                                    <p className="">Copy Address</p>
+                                                <div
+                                                    className="w-[95%] h-[52px] bg-white rounded-lg mx-auto flex justify-between items-center px-4 mb-6 cursor-pointer"
+                                                    onClick={copyToClipBoard}
+                                                >
+                                                    <p className="text-black">
+                                                        {copyText}
+                                                    </p>
                                                     <Image
                                                         src={icons.copyBlack}
                                                         alt="copy icon"
                                                     />
                                                 </div>
-                                                <div className="w-[95%] h-[52px] bg-white rounded-lg mx-auto flex justify-between items-center px-4 mb-6">
+                                                {/* <div className="w-[95%] h-[52px] bg-white rounded-lg mx-auto flex justify-between items-center px-4 mb-6">
                                                     <p className="text-[#E11900]">
                                                         Disconnect Wallet
                                                     </p>
-                                                </div>
+                                                </div> */}
                                             </>
                                         ) : null}
-                                        
+
                                         {/* <div className="flex justify-between items-center px-4 py-3">
                                             <div>
                                                 <p className="text-[12px] font-medium text-[#555555]">
@@ -105,45 +131,60 @@ const BottomSheet: FC<TProps> = (props) => {
                                             </p>
                                         </div> */}
                                         <div className="bg-white w-full px-4">
-                                            <div className="flex justify-between items-center py-6 border-b-2">
-                                                <div className="flex gap-2 items-center">
+                                            {!googleUserInfo ? (
+                                                <div
+                                                    className="flex justify-between items-center py-6 border-b-2 cursor-pointer"
+                                                    onClick={signIn}
+                                                >
+                                                    <div className="flex gap-2 items-center">
+                                                        <Image
+                                                            src={icons.googleIcon}
+                                                            alt="login with google"
+                                                        />
+                                                        <p className="text-black">
+                                                            Login with Google
+                                                        </p>
+                                                    </div>
                                                     <Image
-                                                        src={icons.googleIcon}
+                                                        src={icons.chevronRight}
                                                         alt="login with google"
                                                     />
-                                                    <p>Login with Google</p>
                                                 </div>
-                                                <Image
-                                                    src={icons.chevronRight}
-                                                    alt="login with google"
-                                                />
-                                            </div>
+                                            ) : null}
+
                                             <div className="flex justify-between items-center py-6 border-b-2">
                                                 <div className="flex gap-2 items-center">
                                                     <Image
                                                         src={icons.helpIcon}
                                                         alt="help"
                                                     />
-                                                    <p>Help</p>
+                                                    <p className="text-black">Help</p>
                                                 </div>
                                                 <Image
                                                     src={icons.chevronRight}
                                                     alt="login with google"
                                                 />
                                             </div>
-                                            <div className="flex justify-between items-center py-6">
-                                                <div className="flex gap-2 items-center">
+                                            {isConnected ? (
+                                                <div
+                                                    className="flex justify-between items-center py-6 cursor-pointer"
+                                                    onClick={signOut}
+                                                >
+                                                    <div className="flex gap-2 items-center">
+                                                        <Image
+                                                            src={icons.googleIcon}
+                                                            alt="login with google"
+                                                        />
+                                                        <p className="text-black">
+                                                            Logout
+                                                        </p>
+                                                    </div>
                                                     <Image
-                                                        src={icons.googleIcon}
-                                                        alt="login with google"
+                                                        src={icons.logoutIcon}
+                                                        alt="logout"
                                                     />
-                                                    <p>Logout</p>
                                                 </div>
-                                                <Image
-                                                    src={icons.logoutIcon}
-                                                    alt="logout"
-                                                />
-                                            </div>
+                                            ) : null}
                                         </div>
                                     </div>
                                 </Dialog.Panel>

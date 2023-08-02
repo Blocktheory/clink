@@ -7,6 +7,7 @@ export enum ACTIONS {
     HIDE_TOAST = "HIDE_TOAST",
     SET_ADDRESS = "SET_ADDRESS",
     GOOGLE_USER_INFO = "GOOGLE_USER_INFO",
+    LOGOUT = "LOGOUT",
 }
 
 export type TInitialStateType = {
@@ -103,10 +104,19 @@ function reducer(state: TInitialStateType, action: TActionType) {
             };
         }
         case ACTIONS.GOOGLE_USER_INFO: {
+            const { googleUserInfo, isConnected } = action.payload as any;
             return {
                 ...state,
-                googleUserInfo: action.payload as any,
-                isConnected: action.payload as boolean,
+                googleUserInfo: googleUserInfo,
+                isConnected: isConnected,
+            };
+        }
+        case ACTIONS.LOGOUT: {
+            return {
+                ...state,
+                googleUserInfo: {},
+                isConnected: false,
+                address: "",
             };
         }
         default:

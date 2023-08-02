@@ -54,7 +54,7 @@ export default function Home() {
                 type: ACTIONS.GOOGLE_USER_INFO,
                 payload: {
                     googleUserInfo: sdkInstance.state.userInfo,
-                    isConnected: true,
+                    isConnected: sdkInstance.privKey ? true : false,
                 },
             });
         }
@@ -82,6 +82,8 @@ export default function Home() {
         } catch (error) {
             console.log("error", error);
         }
+
+        setOpenBottomSheet(false);
     };
 
     const getAddress = async (prvKey: string) => {
@@ -98,6 +100,12 @@ export default function Home() {
 
     const signOut = async () => {
         await openLogin.logout();
+        setStep(ESteps.ONE);
+        dispatch({
+            type: ACTIONS.LOGOUT,
+            payload: "",
+        });
+        setOpenBottomSheet(false);
     };
 
     const handleSteps = (step: number) => {
@@ -134,9 +142,6 @@ export default function Home() {
     const {
         state: { googleUserInfo, address, isConnected },
     } = useContext(GlobalContext);
-    console.log(googleUserInfo, "google");
-    console.log(address, "address");
-    console.log(isConnected, "isConnected");
 
     return (
         <>
@@ -155,6 +160,8 @@ export default function Home() {
                         setOpenBottomSheet(false);
                     }}
                     walletAddress={walletAddress}
+                    signOut={signOut}
+                    signIn={signIn}
                 />
             </div>
         </>

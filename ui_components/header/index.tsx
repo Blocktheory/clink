@@ -44,11 +44,12 @@ const Header = (props: IHeader) => {
                     <div className="flex gap-4 items-center px-4">
                         <button
                             className={`px-4 h-[40px] rounded-lg bg-white flex gap-2 items-center justify-center`}
+                            onClick={signIn}
                         >
                             <Image
                                 src={
                                     isConnected
-                                        ? googleUserInfo.googleUserInfo.profileImage
+                                        ? googleUserInfo.profileImage
                                         : icons.googleIcon
                                 }
                                 alt="google login"
@@ -57,7 +58,7 @@ const Header = (props: IHeader) => {
                                 className="w-5 rounded-full"
                             />
                             <span className="text-[16px] font-medium text-black/50 self-center my-auto">
-                                {walletAddress ? trimAddress(walletAddress) : "Login"}
+                                {address ? trimAddress(address) : "Login"}
                             </span>
                         </button>
                         <div className="header-menu-list relative">
