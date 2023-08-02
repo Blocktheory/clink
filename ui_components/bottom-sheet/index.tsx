@@ -6,9 +6,10 @@ import Image from "next/image";
 type TProps = {
     isOpen: boolean;
     onClose: () => void;
+    walletAddress?: string;
 };
 const BottomSheet: FC<TProps> = (props) => {
-    const { isOpen = true, onClose } = props;
+    const { isOpen = true, onClose, walletAddress } = props;
     return (
         <Transition.Root show={isOpen} as={Fragment}>
             <Dialog as="div" className="relative z-20" onClose={onClose}>
@@ -41,10 +42,42 @@ const BottomSheet: FC<TProps> = (props) => {
                                             isFullscreen === "true" ? "" : "grow"
                                         } */}
                                 <Dialog.Panel
-                                    className={`pointer-events-auto w-full bg-[#f5f5f5] rounded-t-2xl dark:bg-neutralDark-50`}
+                                    className={`pointer-events-auto w-full max-w-[600px]  bg-[#f5f5f5] rounded-t-2xl dark:bg-neutralDark-50`}
                                 >
                                     <div className="w-full">
-                                        <div className="flex justify-between items-center px-4 py-3">
+                                        {walletAddress ? (
+                                            <>
+                                                <div className="flex justify-between items-center px-4 py-3">
+                                                    <div>
+                                                        <p className="text-[12px] font-medium text-[#555555]">
+                                                            ACCOUNT OVERVIEW
+                                                        </p>
+                                                        <p>Frontier Wallet : </p>
+                                                    </div>
+                                                    <div>
+                                                        <Image
+                                                            src={icons.chevronRight}
+                                                            alt="more options"
+                                                            className="w-full"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="w-[95%] h-[52px] bg-white rounded-lg mx-auto flex justify-between items-center px-4 mb-6">
+                                                    <p className="">Copy Address</p>
+                                                    <Image
+                                                        src={icons.copyBlack}
+                                                        alt="copy icon"
+                                                    />
+                                                </div>
+                                                <div className="w-[95%] h-[52px] bg-white rounded-lg mx-auto flex justify-between items-center px-4 mb-6">
+                                                    <p className="text-[#E11900]">
+                                                        Disconnect Wallet
+                                                    </p>
+                                                </div>
+                                            </>
+                                        ) : null}
+                                        
+                                        {/* <div className="flex justify-between items-center px-4 py-3">
                                             <div>
                                                 <p className="text-[12px] font-medium text-[#555555]">
                                                     ACCOUNT OVERVIEW
@@ -70,7 +103,7 @@ const BottomSheet: FC<TProps> = (props) => {
                                             <p className="text-[#E11900]">
                                                 Disconnect Wallet
                                             </p>
-                                        </div>
+                                        </div> */}
                                         <div className="bg-white w-full px-4">
                                             <div className="flex justify-between items-center py-6 border-b-2">
                                                 <div className="flex gap-2 items-center">

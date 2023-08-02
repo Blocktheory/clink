@@ -6,11 +6,14 @@ export enum ACTIONS {
     SHOW_TOAST = "SHOW_TOAST",
     HIDE_TOAST = "HIDE_TOAST",
     SET_ADDRESS = "SET_ADDRESS",
+    GOOGLE_USER_INFO = "GOOGLE_USER_INFO",
 }
 
 export type TInitialStateType = {
     toastLists: Array<TToastType> | [];
     address: string;
+    googleUserInfo: any;
+    isConnected: boolean;
 };
 
 export type TActionType = {
@@ -35,6 +38,8 @@ export type TGlobalContextType = {
 const initialState: TInitialStateType = {
     toastLists: [],
     address: "",
+    googleUserInfo: {},
+    isConnected: false,
 };
 
 export const GlobalContext = createContext<TGlobalContextType>({
@@ -95,6 +100,13 @@ function reducer(state: TInitialStateType, action: TActionType) {
             return {
                 ...state,
                 address: action.payload as string,
+            };
+        }
+        case ACTIONS.GOOGLE_USER_INFO: {
+            return {
+                ...state,
+                googleUserInfo: action.payload as any,
+                isConnected: action.payload as boolean,
             };
         }
         default:

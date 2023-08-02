@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import HomePage from "../ui_components/home/HomePage";
 import ConnectWallet from "../ui_components/connect_wallet/";
 import "./globals.css";
@@ -10,6 +10,8 @@ import { LoadChestComponent } from "../ui_components/loadchest/LoadChestComponen
 import Header from "../ui_components/header";
 import BottomSheet from "../ui_components/bottom-sheet";
 import LoadingTokenPage from "../ui_components/loadingTokenPage";
+import { getStore } from "../store/GlobalStore";
+import { ACTIONS, GlobalContext } from "../context/GlobalContext";
 
 export type THandleStep = {
     handleSteps: (step: number) => void;
@@ -22,10 +24,12 @@ export enum ESteps {
 }
 
 export default function Home() {
+    const { dispatch } = useContext(GlobalContext);
     const [loader, setLoader] = useState(true);
     const [openLogin, setSdk] = useState<any>("");
     const [walletAddress, setWalletAddress] = useState<string>("");
     const [step, setStep] = useState<number>(ESteps.ONE);
+    const [openBottomSheet, setOpenBottomSheet] = useState(false);
 
     useMemo(async () => {
         async function initializeOpenLogin() {
@@ -46,9 +50,26 @@ export default function Home() {
                 setLoader(false);
             }
             setSdk(sdkInstance);
+            dispatch({
+                type: ACTIONS.GOOGLE_USER_INFO,
+                payload: {
+                    googleUserInfo: sdkInstance.state.userInfo,
+                    isConnected: true,
+                },
+            });
         }
         initializeOpenLogin();
     }, []);
+
+    // const { dispatch } = getStore();
+    // setTimeout(function () {
+    //     dispatch({
+    //         type: ACTIONS.GOOGLE_USER_INFO,
+    //         payload: {
+    //             googleUserInfo: openLogin.state,
+    //         },
+    //     });
+    // }, 200);
 
     const signIn = async () => {
         localStorage.setItem("loginAttempted", "true");
@@ -68,6 +89,10 @@ export default function Home() {
         const wallet = new Wallet(walletCore);
         const address = await wallet.importWithPrvKey(prvKey);
         setWalletAddress(address);
+        dispatch({
+            type: ACTIONS.SET_ADDRESS,
+            payload: address,
+        });
         setLoader(false);
     };
 
@@ -101,16 +126,37 @@ export default function Home() {
             handleSteps(ESteps.TWO);
         }
     };
+    const onHamburgerClick = () => {
+        setOpenBottomSheet(true);
+    };
 
     const connectWallet = () => {};
+    const {
+        state: { googleUserInfo, address, isConnected },
+    } = useContext(GlobalContext);
+    console.log(googleUserInfo, "google");
+    console.log(address, "address");
+    console.log(isConnected, "isConnected");
 
     return (
         <>
-        <Header walletAddress={walletAddress} signIn={signIn} />
-        <div className="flex min-h-screen flex-row items-center justify-between p-4 relative">
-            {getUIComponent(step)}
-            {/* <BottomSheet isOpen={true} onClose={() => {}} /> */}
-        </div>
+            <Header
+                walletAddress={walletAddress}
+                signIn={signIn}
+                step={step}
+                handleSteps={handleSteps}
+                onHamburgerClick={onHamburgerClick}
+            />
+            <div className="p-4 relative">
+                {getUIComponent(step)}
+                <BottomSheet
+                    isOpen={openBottomSheet}
+                    onClose={() => {
+                        setOpenBottomSheet(false);
+                    }}
+                    walletAddress={walletAddress}
+                />
+            </div>
         </>
     );
 }
