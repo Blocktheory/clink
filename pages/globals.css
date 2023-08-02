@@ -48,6 +48,12 @@ body {
     filter: blur(62px);
 }
 
+.dollorInput[type="number"]::-webkit-inner-spin-button,
+.dollorInput[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .shareLinkBg {
     background: linear-gradient(148deg, #051923 0%, #0b254d 100%);
 }

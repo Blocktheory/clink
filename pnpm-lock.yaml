@@ -77,6 +77,9 @@ dependencies:
   postcss:
     specifier: 8.4.27
     version: 8.4.27
+  qr-code-styling:
+    specifier: ^1.6.0-rc.1
+    version: 1.6.0-rc.1
   react:
     specifier: 18.2.0
     version: 18.2.0
@@ -6785,6 +6788,12 @@ packages:
   /punycode@2.3.0:
     resolution: {integrity: sha512-rRV+zQD8tVFys26lAGR9WUuS4iUAngJScM+ZRSKtvl5tKeZ2t5bvdNFdNHBW9FWR4guGHlgmsZ1G7BSm2wTbuA==}
     engines: {node: '>=6'}
+    dev: false
+
+  /qr-code-styling@1.6.0-rc.1:
+    resolution: {integrity: sha512-ModRIiW6oUnsP18QzrRYZSc/CFKFKIdj7pUs57AEVH20ajlglRpN3HukjHk0UbNMTlKGuaYl7Gt6/O5Gg2NU2Q==}
+    dependencies:
+      qrcode-generator: 1.4.4
     dev: false
 
   /qrcode-generator@1.4.4:

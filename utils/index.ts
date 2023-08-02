@@ -165,3 +165,7 @@ export const getExponentialFixedNumber = (num: number) => {
         ? num.toFixed(20).replace(/(\.0*|(?<=(\..*))0*)$/, "")
         : num.toFixed(6).replace(/(\.0*|(?<=(\..*))0*)$/, "");
 };
+
+export const copyToClipBoard = (val: string) => {
+    navigator.clipboard.writeText(`https://blocktheory.com/blog/${val}`);
+};
