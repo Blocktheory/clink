@@ -105,6 +105,7 @@ export default function Home() {
             type: ACTIONS.LOGOUT,
             payload: "",
         });
+        setWalletAddress("");
         setOpenBottomSheet(false);
     };
 

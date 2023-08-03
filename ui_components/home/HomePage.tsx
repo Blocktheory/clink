@@ -11,7 +11,6 @@ interface IHome {
 export default function HomePage(props: IHome) {
     const { handleSetupChest } = props;
     const { chain, chains } = getNetwork();
-    console.log("chain", chain);
     return (
         <div className="w-full text-center items-center p-2 flex-col">
             <h1 className="hero_text mt-12 text-[32px] leading-3 font-bold">
