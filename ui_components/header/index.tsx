@@ -217,7 +217,8 @@ const Header = (props: IHeader) => {
                                                         />
                                                     </div>
                                                 </Link>
-                                                {isConnected ? (
+                                                {isConnected &&
+                                                loggedInVia === LOGGED_IN.GOOGLE ? (
                                                     <div
                                                         className="flex justify-between items-center py-6 cursor-pointer"
                                                         onClick={handleLogout}
