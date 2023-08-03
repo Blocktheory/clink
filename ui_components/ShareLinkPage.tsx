@@ -23,7 +23,7 @@ export interface IShareLink {
 }
 
 const ShareLink: FC<IShareLink> = (props) => {
-    const { connect, fetchBalance, baseGoerli, injectConnector } = useWagmi();
+    const { connect, fetchBalance, baseGoerli, injectConnector, getAccount } = useWagmi();
     const { uuid } = props;
     const [amount, setAmount] = useState({
         eth: "0.1",
@@ -63,6 +63,7 @@ const ShareLink: FC<IShareLink> = (props) => {
             const walletCore = await initWasm();
             const wallet = new Wallet(walletCore);
             setWallet(wallet);
+            console.log(uuid, "uuid");
             const account = wallet.getAccountFromPayLink(uuid);
 
             if (account) {
@@ -74,6 +75,7 @@ const ShareLink: FC<IShareLink> = (props) => {
     }, [uuid]);
 
     useMemo(async () => {
+        console.log("cam to memo");
         if (toAddress && fromAddress) {
             const balance = await fetchBalance({
                 address: fromAddress as Address,
@@ -83,11 +85,17 @@ const ShareLink: FC<IShareLink> = (props) => {
     }, [toAddress]);
 
     const handleConnect = async () => {
-        const result = await connect({
-            chainId: baseGoerli.id,
-            connector: injectConnector,
-        });
-        setToAddress(result.account);
+        const account = await getAccount();
+        console.log(account, "account");
+        if (account.isConnected) {
+            setToAddress(account.address);
+        } else {
+            const result = await connect({
+                chainId: baseGoerli.id,
+                connector: injectConnector,
+            });
+            setToAddress(result.account);
+        }
     };
 
     const sendToken = async (toAdd: string) => {

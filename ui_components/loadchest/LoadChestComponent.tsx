@@ -100,7 +100,9 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 const walletCore = await initWasm();
                 const wallet = new Wallet(walletCore);
                 const link = await wallet.createPayLink();
+                console.log(link, "link");
                 const address = await wallet.getAccountFromPayLink(link);
+                console.log("address", address);
                 const tokenAmount = dollorToToken(value) * Math.pow(10, 18);
                 console.log(tokenAmount, "token amount");
                 let valueHex = String(numHex(Number(value)));
