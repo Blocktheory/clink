@@ -12,6 +12,7 @@ import BottomSheet from "../ui_components/bottom-sheet";
 import LoadingTokenPage from "../ui_components/loadingTokenPage";
 import { getStore } from "../store/GlobalStore";
 import { ACTIONS, GlobalContext } from "../context/GlobalContext";
+import { useWagmi } from "../utils/wagmi/WagmiContext";
 
 export type THandleStep = {
     handleSteps: (step: number) => void;
@@ -22,6 +23,10 @@ export enum ESteps {
     TWO = 2,
     THREE = 3,
 }
+export enum LOGGED_IN {
+    GOOGLE = "google",
+    EXTERNAL_WALLET = "external_wallet",
+}
 
 export default function Home() {
     const { dispatch } = useContext(GlobalContext);
@@ -30,6 +35,8 @@ export default function Home() {
     const [walletAddress, setWalletAddress] = useState<string>("");
     const [step, setStep] = useState<number>(ESteps.ONE);
     const [openBottomSheet, setOpenBottomSheet] = useState(false);
+    const { connect, fetchBalance, injectConnector, sendTransaction, getAccount } =
+        useWagmi();
 
     useMemo(async () => {
         async function initializeOpenLogin() {
@@ -50,6 +57,11 @@ export default function Home() {
                 setLoader(false);
             }
             setSdk(sdkInstance);
+
+            dispatch({
+                type: ACTIONS.LOGGED_IN_VIA,
+                payload: LOGGED_IN.GOOGLE,
+            });
             dispatch({
                 type: ACTIONS.GOOGLE_USER_INFO,
                 payload: {
@@ -59,6 +71,22 @@ export default function Home() {
             });
         }
         initializeOpenLogin();
+    }, []);
+
+    useMemo(async () => {
+        const account = await getAccount();
+        if (account.isConnected) {
+            dispatch({
+                type: ACTIONS.SET_ADDRESS,
+                payload: account.address,
+            });
+            dispatch({
+                type: ACTIONS.LOGGED_IN_VIA,
+                payload: LOGGED_IN.EXTERNAL_WALLET,
+            });
+            setWalletAddress(account.address);
+            // handleSteps(ESteps.THREE);
+        }
     }, []);
 
     // const { dispatch } = getStore();
@@ -118,7 +146,13 @@ export default function Home() {
             case ESteps.ONE:
                 return <HomePage handleSetupChest={handleSetupChest} />;
             case ESteps.TWO:
-                return <ConnectWallet signIn={signIn} handleSteps={handleSteps} />;
+                return (
+                    <ConnectWallet
+                        signIn={signIn}
+                        handleSteps={handleSteps}
+                        connectWallet={connectWallet}
+                    />
+                );
             case ESteps.THREE:
                 return (
                     <LoadChestComponent openLogin={openLogin} handleSteps={handleSteps} />
@@ -128,7 +162,8 @@ export default function Home() {
         }
     };
 
-    const handleSetupChest = () => {
+    const handleSetupChest = async () => {
+        console.log(walletAddress, "address");
         if (walletAddress) {
             handleSteps(ESteps.THREE);
         } else {
@@ -139,7 +174,30 @@ export default function Home() {
         setOpenBottomSheet(true);
     };
 
-    const connectWallet = () => {};
+    const connectWallet = async () => {
+        const account = await getAccount();
+        console.log(account, "account");
+        try {
+            const result = await connect({
+                chainId: baseGoerli.chainId,
+                connector: injectConnector,
+            });
+            console.log(result, "result");
+
+            dispatch({
+                type: ACTIONS.SET_ADDRESS,
+                payload: result.account,
+            });
+            dispatch({
+                type: ACTIONS.LOGGED_IN_VIA,
+                payload: LOGGED_IN.EXTERNAL_WALLET,
+            });
+            setWalletAddress(result.account);
+            handleSteps(ESteps.THREE);
+        } catch (e) {
+            console.log(e, "error");
+        }
+    };
     const {
         state: { googleUserInfo, address, isConnected },
     } = useContext(GlobalContext);

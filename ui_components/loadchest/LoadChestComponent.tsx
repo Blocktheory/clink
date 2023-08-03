@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { FC, MouseEvent, useEffect, useState } from "react";
+import { FC, MouseEvent, useContext, useEffect, useState } from "react";
 import { icons } from "../../utils/images";
 import * as Bip39 from "bip39";
 import { Wallet } from "../../utils/wallet";
@@ -23,17 +23,26 @@ import {
 import { TRANSACTION_TYPE, TTranx } from "../../utils/wallet/types";
 import { Base } from "../../utils/chain/base";
 import BackBtn from "../BackBtn";
-import { ESteps, THandleStep } from "../../pages";
+import { ESteps, LOGGED_IN, THandleStep } from "../../pages";
 import Lottie from "lottie-react";
 import PrimaryBtn from "../PrimaryBtn";
 import DepositAmountModal from "./DepositAmountModal";
+import { GlobalContext } from "../../context/GlobalContext";
+import { useWagmi } from "../../utils/wagmi/WagmiContext";
+import { parseEther } from "viem";
 
 export interface ILoadChestComponent extends THandleStep {
     openLogin?: any;
 }
 export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
-    const router = useRouter();
     const { openLogin, handleSteps } = props;
+
+    const {
+        state: { loggedInVia, address },
+    } = useContext(GlobalContext);
+
+    const router = useRouter();
+
     const [value, setValue] = useState("");
     const [price, setPrice] = useState("");
     const [inputValue, setInputValue] = useState("");
@@ -43,15 +52,16 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     const [loading, setLoading] = useState(false);
     const [transactionLoading, setTransactionLoading] = useState(false);
     const [open, setOpen] = useState(false);
+
     useEffect(() => {
         setLoading(true);
         getUsdPrice()
             .then(async (res: any) => {
                 console.log(res, "price");
                 setTokenPrice(res.data.ethereum.usd);
-                const walletCore = await initWasm();
-                const wallet = new Wallet(walletCore);
-                const address = await wallet.importWithPrvKey(openLogin.privKey);
+                // const walletCore = await initWasm();
+                // const wallet = new Wallet(walletCore);
+                // const address = await wallet.importWithPrvKey(openLogin.privKey);
                 console.log(address, "address");
                 setFromAddress(address);
                 const balance = (await getBalance(address)) as any;
@@ -93,6 +103,8 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         return Number(val) / Number(tokenPrice);
     };
 
+    const { sendTransaction } = useWagmi();
+
     const createWallet = async () => {
         if (value) {
             setTransactionLoading(true);
@@ -101,46 +113,68 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 const wallet = new Wallet(walletCore);
                 const link = await wallet.createPayLink();
                 console.log(link, "link");
-                const address = await wallet.getAccountFromPayLink(link);
-                console.log("address", address);
-                const tokenAmount = dollorToToken(value) * Math.pow(10, 18);
-                console.log(tokenAmount, "token amount");
-                let valueHex = String(numHex(Number(value)));
-                if (!valueHex.startsWith("0x")) {
-                    valueHex = "0x" + valueHex;
-                }
-                const gasLimitData = (await getEstimatedGas({
-                    from: fromAddress,
-                    to: address,
-                    value: valueHex,
-                })) as any;
-                const nonce = (await getNonce(fromAddress)) as any;
-                const tx: TTranx = {
-                    toAddress: address,
-                    nonceHex: nonce.result,
-                    chainIdHex: numHex(Number(Base.chainId)),
-                    // gas price is hardcoded to pass 1 by default as of now
-                    gasPriceHex: "3B9ACA00" ?? "0x1",
-                    gasLimitHex: gasLimitData.result,
-                    amountHex: numHex(tokenAmount),
-                    amount: tokenAmount,
-                    contractDecimals: 18,
-                    fromAddress: fromAddress,
-                    transactionType: TRANSACTION_TYPE.SEND,
-                    isNative: true,
-                };
-                const txData = await wallet.signEthTx(tx, openLogin.privKey);
-                console.log(txData, "tx data");
-                const rawTx = await getSendRawTransaction(txData);
-                console.log(rawTx, "raw tx");
-                console.log(link, "link");
+                const toAddress = await wallet.getAccountFromPayLink(link);
+                console.log("address", toAddress);
+                const tokenAmount = Number(inputValue) * Math.pow(10, 18);
 
-                router.push(link);
+                const etheresd = parseEther(inputValue);
+                console.log(etheresd, "etheresd");
+                console.log(numHex(Number(etheresd)), "etheresd hex");
+
+                if (loggedInVia === LOGGED_IN.GOOGLE) {
+                    console.log(tokenAmount, "token amount");
+                    let valueHex = String(
+                        numHex(parseInt(tokenAmount as unknown as string)),
+                    );
+
+                    if (!valueHex.startsWith("0x")) {
+                        valueHex = "0x" + valueHex;
+                    }
+
+                    const gasLimitData = (await getEstimatedGas({
+                        from: fromAddress,
+                        to: toAddress,
+                        value: valueHex,
+                    })) as any;
+
+                    const nonce = (await getNonce(fromAddress)) as any;
+
+                    const tx: TTranx = {
+                        toAddress: toAddress,
+                        nonceHex: nonce.result,
+                        chainIdHex: numHex(Number(Base.chainId)),
+                        // gas price is hardcoded to pass 1 by default as of now
+                        gasPriceHex: "3B9ACA00" ?? "0x1",
+                        gasLimitHex: gasLimitData.result,
+                        amountHex: numHex(tokenAmount),
+                        amount: tokenAmount,
+                        contractDecimals: 18,
+                        fromAddress: fromAddress,
+                        transactionType: TRANSACTION_TYPE.SEND,
+                        isNative: true,
+                    };
+
+                    const txData = await wallet.signEthTx(tx, openLogin.privKey);
+                    console.log(txData, "tx data");
+                    const rawTx = await getSendRawTransaction(txData);
+                    console.log(rawTx, "raw tx");
+                    console.log(link, "link");
+                    router.push(link);
+                } else {
+                    const sendAmount = await sendTransaction({
+                        to: toAddress,
+                        value: parseEther(inputValue),
+                    });
+
+                    console.log(sendAmount, "sendAmount");
+                    router.push(link);
+                }
             } catch (e: any) {
                 console.log(e, "e");
             }
         }
     };
+    console.log(loggedInVia, "loggedin");
     return (
         <div className="mx-auto relative max-w-[400px]">
             {!transactionLoading ? (
@@ -176,16 +210,18 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                                 </p>
                             </div>
                         </div>
-                        <div
-                            className="bg-white/80 py-2 rounded-b-lg cursor-pointer"
-                            onClick={() => {
-                                setOpen(true);
-                            }}
-                        >
-                            <p className="text-[#010101] text-[14px] leading-[18px] font-medium text-center">
-                                + Add funds to your account
-                            </p>
-                        </div>
+                        {loggedInVia === LOGGED_IN.GOOGLE && (
+                            <div
+                                className="bg-white/80 py-2 rounded-b-lg cursor-pointer"
+                                onClick={() => {
+                                    setOpen(true);
+                                }}
+                            >
+                                <p className="text-[#010101] text-[14px] leading-[18px] font-medium text-center">
+                                    + Add funds to your account
+                                </p>
+                            </div>
+                        )}
                     </div>
                     <div className="w-full mt-5 ">
                         <div className="relative rounded-lg border bg-white/5 border-gray-500  h-auto  p-4">
@@ -247,14 +283,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                         </div>
                     </div>
                     <div className="relative mt-5">
-                        <div
-                            className={`absolute left-1/2 top-5 -translate-x-1/2 z-0 ${
-                                value ? "opacity-50" : "opacity-100"
-                            }`}
-                        >
-                            <Image src={icons.tchest} alt="chest" />
-                        </div>
-                        <div className={`${value ? "opacity-100" : "opacity-0"}`}>
+                        <div className={`${value ? "opacity-100" : "opacity-50"}`}>
                             <PrimaryBtn title={"Load Chest"} onClick={createWallet} />
                         </div>
                     </div>

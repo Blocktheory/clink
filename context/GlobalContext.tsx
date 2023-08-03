@@ -7,6 +7,7 @@ export enum ACTIONS {
     HIDE_TOAST = "HIDE_TOAST",
     SET_ADDRESS = "SET_ADDRESS",
     GOOGLE_USER_INFO = "GOOGLE_USER_INFO",
+    LOGGED_IN_VIA = "LOGGED_IN_VIA",
     LOGOUT = "LOGOUT",
 }
 
@@ -14,6 +15,7 @@ export type TInitialStateType = {
     toastLists: Array<TToastType> | [];
     address: string;
     googleUserInfo: any;
+    loggedInVia: string;
     isConnected: boolean;
 };
 
@@ -40,6 +42,7 @@ const initialState: TInitialStateType = {
     toastLists: [],
     address: "",
     googleUserInfo: {},
+    loggedInVia: "",
     isConnected: false,
 };
 
@@ -109,6 +112,12 @@ function reducer(state: TInitialStateType, action: TActionType) {
                 ...state,
                 googleUserInfo: googleUserInfo,
                 isConnected: isConnected,
+            };
+        }
+        case ACTIONS.LOGGED_IN_VIA: {
+            return {
+                ...state,
+                loggedInVia: action.payload as string,
             };
         }
         case ACTIONS.LOGOUT: {

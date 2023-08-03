@@ -7,10 +7,11 @@ import Image from "next/image";
 
 interface IConnectWallet extends THandleStep {
     signIn: () => Promise<void>;
+    connectWallet: () => Promise<void>;
 }
 
 export default function ConnectWallet(props: IConnectWallet) {
-    const { signIn, handleSteps } = props;
+    const { signIn, handleSteps, connectWallet } = props;
     return (
         <div className="w-full relative pt-[100px] lg:pt-10">
             <div className="w-full text-center p-2 relative">
@@ -36,7 +37,9 @@ export default function ConnectWallet(props: IConnectWallet) {
                     <SecondaryBtn
                         leftImage={icons.walletIcon ?? ""}
                         title={"Connect your wallet"}
-                        onClick={signIn}
+                        onClick={() => {
+                            connectWallet();
+                        }}
                     />
                 </div>
                 <p className="text-[16px] leading-[18px] text-center text-white/50 mb-6 lg:mb-4">
