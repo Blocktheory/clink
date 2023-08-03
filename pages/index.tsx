@@ -210,8 +210,9 @@ export default function Home() {
                 step={step}
                 handleSteps={handleSteps}
                 onHamburgerClick={onHamburgerClick}
+                signOut={signOut}
             />
-            <div className="p-4 relative">
+            <div className="p-4 relative z-0">
                 {getUIComponent(step)}
                 <BottomSheet
                     isOpen={openBottomSheet}

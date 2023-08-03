@@ -4,6 +4,7 @@ import { icons } from "../../utils/images";
 import Image from "next/image";
 import { GlobalContext } from "../../context/GlobalContext";
 import { trimAddress } from "../../utils";
+import Link from "next/link";
 
 type TProps = {
     isOpen: boolean;
@@ -29,7 +30,7 @@ const BottomSheet: FC<TProps> = (props) => {
     };
     return (
         <Transition.Root show={isOpen} as={Fragment}>
-            <Dialog as="div" className="relative z-20" onClose={onClose}>
+            <Dialog as="div" className="relative z-20 block lg:hidden" onClose={onClose}>
                 <Transition.Child
                     as={Fragment}
                     enter="ease-in-out duration-500"
@@ -74,13 +75,6 @@ const BottomSheet: FC<TProps> = (props) => {
                                                                 ? trimAddress(address)
                                                                 : ""}
                                                         </p>
-                                                    </div>
-                                                    <div>
-                                                        <Image
-                                                            src={icons.chevronRight}
-                                                            alt="more options"
-                                                            className="w-full"
-                                                        />
                                                     </div>
                                                 </div>
                                                 <div
@@ -151,20 +145,24 @@ const BottomSheet: FC<TProps> = (props) => {
                                                     />
                                                 </div>
                                             ) : null}
-
-                                            <div className="flex justify-between items-center py-6 border-b-2">
-                                                <div className="flex gap-2 items-center">
+                                            <Link
+                                                href="mailto:contact@blocktheory.com"
+                                                target="_blank"
+                                            >
+                                                <div className="flex justify-between items-center py-6 border-b-2">
+                                                    <div className="flex gap-2 items-center">
+                                                        <Image
+                                                            src={icons.helpIcon}
+                                                            alt="help"
+                                                        />
+                                                        <p className="text-black">Help</p>
+                                                    </div>
                                                     <Image
-                                                        src={icons.helpIcon}
-                                                        alt="help"
+                                                        src={icons.chevronRight}
+                                                        alt="login with google"
                                                     />
-                                                    <p className="text-black">Help</p>
                                                 </div>
-                                                <Image
-                                                    src={icons.chevronRight}
-                                                    alt="login with google"
-                                                />
-                                            </div>
+                                            </Link>
                                             {isConnected ? (
                                                 <div
                                                     className="flex justify-between items-center py-6 cursor-pointer"

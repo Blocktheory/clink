@@ -27,7 +27,12 @@ main {
 }
 body {
     color: rgb(var(--foreground-rgb));
-    background: radial-gradient(61.66% 83.83% at 72.76% 81.19%, rgba(51, 202, 175, 0.44) 0%, rgba(51, 202, 175, 0.00) 100%), #150937;
+    background: radial-gradient(
+            61.66% 83.83% at 72.76% 81.19%,
+            rgba(51, 202, 175, 0.44) 0%,
+            rgba(51, 202, 175, 0) 100%
+        ),
+        #150937;
 }
 body > div {
     min-height: 100%;
@@ -62,7 +67,4 @@ body {
 }
 .header-menu-list .header-submenu {
     display: none;
-}
-.header-menu-list:hover .header-submenu {
-    display: flex;
 }
