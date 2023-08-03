@@ -1,3 +1,5 @@
+import "react-toastify/dist/ReactToastify.css";
+import { serializeError } from "eth-rpc-errors";
 import * as React from "react";
 import { FC, useContext, useEffect, useMemo, useState } from "react";
 import PrimaryBtn from "./PrimaryBtn";
@@ -7,6 +9,7 @@ import { Address } from "wagmi";
 import { initWasm } from "@trustwallet/wallet-core";
 import { Wallet } from "../utils/wallet";
 import Image from "next/image";
+import { toast } from "react-toastify";
 import {
     getBalance,
     getEstimatedGas,
@@ -24,6 +27,7 @@ import { Base } from "../utils/chain/base";
 import { TTranx, TRANSACTION_TYPE } from "../utils/wallet/types";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
 import { GlobalContext } from "../context/GlobalContext";
+import { ToastContainer } from "react-toastify";
 
 export interface IShareLink {
     uuid: string;
@@ -50,6 +54,7 @@ const ShareLink: FC<IShareLink> = (props) => {
     const [linkValueUsd, setLinkValueUsd] = useState("");
     const [isRedirected, setIsRedirected] = useState(false);
 
+    const [processing, setProcessing] = useState(false);
     const shareData = {
         text: "Here is you Gift card",
         url: typeof window !== "undefined" ? window.location.href : "",
@@ -118,25 +123,38 @@ const ShareLink: FC<IShareLink> = (props) => {
             const balance = await fetchBalance({
                 address: fromAddress as Address,
             });
-            sendToken(toAddress);
+            // sendToken(toAddress);
         }
     }, [toAddress]);
 
     const handleConnect = async () => {
+        setProcessing(true);
         const account = await getAccount();
         console.log(account, "account");
         if (account.isConnected) {
             setToAddress(account.address);
+            sendToken(account.address);
         } else {
-            const result = await connect({
-                chainId: baseGoerli.id,
-                connector: injectConnector,
-            });
-            setToAddress(result.account);
+            try {
+                const result = await connect({
+                    chainId: baseGoerli.id,
+                    connector: injectConnector,
+                });
+                setToAddress(result.account);
+                toast.success(`Wallet Connected`);
+                sendToken(result.account);
+            } catch (e: any) {
+                const err = serializeError(e);
+                console.log(err, "err");
+                setProcessing(false);
+                toast.error(e.message);
+                console.log(e, "e");
+            }
         }
     };
 
     const sendToken = async (toAdd: string) => {
+        setProcessing(true);
         try {
             const walletCore = await initWasm();
             const wallet = new Wallet(walletCore);
@@ -149,7 +167,7 @@ const ShareLink: FC<IShareLink> = (props) => {
             const gasLimitData = (await getEstimatedGas({
                 from: fromAddress,
                 to: toAdd,
-                value: tokenAmount,
+                value: balance.result,
             })) as any;
             const nonce = (await getNonce(fromAddress)) as any;
             const tx: TTranx = {
@@ -159,7 +177,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                 // gas price is hardcoded to pass 1 by default as of now
                 gasPriceHex: "3B9ACA00" ?? "0x1",
                 gasLimitHex: gasLimitData.result,
-                amountHex: numHex(balance.result),
+                amountHex: balance.result,
                 amount: Number(tokenAmount),
                 contractDecimals: 18,
                 fromAddress: fromAddress,
@@ -169,9 +187,20 @@ const ShareLink: FC<IShareLink> = (props) => {
             const privKey = await wallet.getPrivKeyFromPayLink(uuid);
             const txData = await wallet.signEthTx(tx, privKey);
             console.log(txData, "tx data");
-            const rawTx = await getSendRawTransaction(txData);
+            const rawTx = (await getSendRawTransaction(txData)) as any;
             console.log(rawTx, "raw tx");
+            if (rawTx.error) {
+                setProcessing(false);
+                const err = serializeError(rawTx.error.message);
+                toast.error(err.message);
+            } else {
+                setProcessing(false);
+                toast.error("Claimed Successfully");
+            }
+            setProcessing(false);
         } catch (e: any) {
+            setProcessing(false);
+            toast.error(e.message);
             console.log(e, "e");
         }
     };
@@ -186,6 +215,18 @@ const ShareLink: FC<IShareLink> = (props) => {
 
     return (
         <div className="w-full h-screen relative flex items-center">
+            <ToastContainer
+                toastStyle={{ backgroundColor: "#282B30" }}
+                className={`w-50`}
+                style={{ width: "600px" }}
+                position="bottom-center"
+                autoClose={6000}
+                hideProgressBar={true}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                theme="dark"
+            />
             <div className="w-full h-[70%] text-center p-4  flex flex-col gap-5 items-center">
                 <p className="text-white text-[20px] font-bold">{headingText}</p>
                 <div className="w-full md:w-[60%] max-w-[450px] h-[300px] rounded-lg shareLinkBg flex flex-col justify-between mb-16">
@@ -217,17 +258,17 @@ const ShareLink: FC<IShareLink> = (props) => {
                             />
                         </div>
                         <SecondaryBtn
-                            title="Claim"
+                            title={processing ? "Processing..." : "Claim"}
                             onClick={() => handleConnect()}
-                            rightImage={icons.downloadBtnIcon}
+                            rightImage={processing ? undefined : icons.downloadBtnIcon}
                         />
                     </>
                 ) : (
                     <>
                         <SecondaryBtn
-                            title="Claim"
+                            title={processing ? "Processing..." : "Claim"}
                             onClick={() => handleConnect()}
-                            rightImage={icons.downloadBtnIcon}
+                            rightImage={processing ? undefined : icons.downloadBtnIcon}
                         />
                         <div className="lg:hidden block w-full">
                             <PrimaryBtn

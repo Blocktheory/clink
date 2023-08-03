@@ -3,7 +3,7 @@ import PrimaryBtn from "../PrimaryBtn";
 import Image from "next/image";
 import { icons } from "../../utils/images";
 import { trimAddress } from "../../utils";
-import { ESteps } from "../../pages";
+import { ESteps, LOGGED_IN } from "../../pages";
 import BackBtn from "../BackBtn";
 import { useContext, useState, useRef, useEffect, useMemo } from "react";
 import { GlobalContext } from "../../context/GlobalContext";
@@ -21,7 +21,7 @@ const Header = (props: IHeader) => {
     const menuRef = useRef<HTMLDivElement>(null);
     const { walletAddress, signIn, step, handleSteps, onHamburgerClick, signOut } = props;
     const {
-        state: { googleUserInfo, address, isConnected },
+        state: { googleUserInfo, address, isConnected, loggedInVia },
     } = useContext(GlobalContext);
     const [copyText, setCopyText] = useState("Copy Address");
     const [opacity, setOpacity] = useState(false);
@@ -60,6 +60,8 @@ const Header = (props: IHeader) => {
         };
     }, []);
 
+    console.log(isConnected, "isconnected");
+
     return (
         <header className="relative z-[9]">
             <div className="h-[80px] hidden md:block"></div>
@@ -88,9 +90,11 @@ const Header = (props: IHeader) => {
                         >
                             <Image
                                 src={
-                                    isConnected && googleUserInfo?.profileImage
+                                    !isConnected
+                                        ? icons.googleIcon
+                                        : loggedInVia === LOGGED_IN.GOOGLE
                                         ? googleUserInfo.profileImage
-                                        : icons.googleIcon
+                                        : icons.ethLogo
                                 }
                                 alt="google login"
                                 width={20}
