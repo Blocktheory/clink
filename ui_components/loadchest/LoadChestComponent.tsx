@@ -134,8 +134,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 const tokenAmount = Number(inputValue) * Math.pow(10, 18);
 
                 const amountParsed = numHex(Number(parseEther(inputValue)));
-                // console.log(etheresd, "etheresd");
-                // console.log(numHex(Number(etheresd)), "etheresd hex");
                 const nonStrtZero = removeLeadingZeros(amountParsed);
 
                 if (loggedInVia === LOGGED_IN.GOOGLE) {

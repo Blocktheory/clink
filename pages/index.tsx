@@ -90,6 +90,22 @@ export default function Home() {
         }
     }, []);
 
+    useMemo(async () => {
+        const account = await getAccount();
+        if (account.isConnected) {
+            dispatch({
+                type: ACTIONS.SET_ADDRESS,
+                payload: account.address,
+            });
+            dispatch({
+                type: ACTIONS.LOGGED_IN_VIA,
+                payload: LOGGED_IN.EXTERNAL_WALLET,
+            });
+            setWalletAddress(account.address);
+            // handleSteps(ESteps.THREE);
+        }
+    }, []);
+
     // const { dispatch } = getStore();
     // setTimeout(function () {
     //     dispatch({
