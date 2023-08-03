@@ -14,14 +14,19 @@ import {
     getSendRawTransaction,
     getUsdPrice,
 } from "../../apiServices";
-import { hexToNumber, numHex } from "../../utils";
+import {
+    getCurrencyFormattedNumber,
+    getTokenFormattedNumber,
+    hexToNumber,
+    numHex,
+} from "../../utils";
 import { TRANSACTION_TYPE, TTranx } from "../../utils/wallet/types";
 import { Base } from "../../utils/chain/base";
-import { data } from "autoprefixer";
 import BackBtn from "../BackBtn";
 import { ESteps, THandleStep } from "../../pages";
 import Lottie from "lottie-react";
 import PrimaryBtn from "../PrimaryBtn";
+import DepositAmountModal from "./DepositAmountModal";
 
 export interface ILoadChestComponent extends THandleStep {
     openLogin?: any;
@@ -31,11 +36,13 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     const { openLogin, handleSteps } = props;
     const [value, setValue] = useState("");
     const [price, setPrice] = useState("");
+    const [inputValue, setInputValue] = useState("");
     const [tokenPrice, setTokenPrice] = useState("");
     const [tokenValue, setTokenValue] = useState(0);
     const [fromAddress, setFromAddress] = useState("");
     const [loading, setLoading] = useState(false);
     const [transactionLoading, setTransactionLoading] = useState(false);
+    const [open, setOpen] = useState(false);
     useEffect(() => {
         setLoading(true);
         getUsdPrice()
@@ -48,16 +55,17 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 console.log(address, "address");
                 setFromAddress(address);
                 const balance = (await getBalance(address)) as any;
-                setTokenValue(hexToNumber(balance.result) / Math.pow(10, 18));
+                setTokenValue(
+                    getTokenFormattedNumber(
+                        hexToNumber(balance.result) as unknown as string,
+                        18,
+                    ),
+                );
                 const formatBal = (
                     (hexToNumber(balance.result) / Math.pow(10, 18)) *
                     res.data.ethereum.usd
                 ).toFixed(3);
-                setPrice(
-                    Number(formatBal) < 0.001
-                        ? "<0.001"
-                        : (formatBal as unknown as string),
-                );
+                setPrice(getCurrencyFormattedNumber(formatBal));
                 setLoading(false);
             })
             .catch((e) => {
@@ -66,7 +74,19 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     }, []);
 
     const handleValueClick = (val: string) => {
-        setValue(val);
+        setValue(`${val}`);
+        const valueWithoutDollarSign = val.replace(/\$/g, "");
+        const tokenIputValue = Number(valueWithoutDollarSign) / Number(tokenPrice);
+        console.log(tokenIputValue, "input value");
+        setInputValue(String(tokenIputValue));
+    };
+
+    const handleInputChange = (val: string) => {
+        const valueWithoutDollarSign = val.replace(/\$/g, "");
+        setValue(`${valueWithoutDollarSign}`);
+        const tokenIputValue = Number(valueWithoutDollarSign) / Number(tokenPrice);
+        console.log(tokenIputValue, "input value");
+        setInputValue(String(tokenIputValue));
     };
 
     const dollorToToken = (val: string) => {
@@ -80,7 +100,9 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 const walletCore = await initWasm();
                 const wallet = new Wallet(walletCore);
                 const link = await wallet.createPayLink();
+                console.log(link, "link");
                 const address = await wallet.getAccountFromPayLink(link);
+                console.log("address", address);
                 const tokenAmount = dollorToToken(value) * Math.pow(10, 18);
                 console.log(tokenAmount, "token amount");
                 let valueHex = String(numHex(Number(value)));
@@ -114,7 +136,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 console.log(link, "link");
 
                 router.push(link);
-                setTransactionLoading(false);
             } catch (e: any) {
                 console.log(e, "e");
             }
@@ -130,48 +151,72 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                             Enter the amount to store in the chest
                         </p>
                     </div>
-                    <div className="flex items-center justify-between rounded-lg border border-white/40 bg-white/5 py-2 px-4">
-                        <div>
-                            <p className="paragraph font-normal text-white/40">
-                                YOUR BALANCE
-                            </p>
-                            <div className="flex items-start gap-3 my-2">
-                                <Image src={icons.transferIcon} alt="transferIcon" />
-                                <div>
-                                    <p className="text-white text-[24px] font-semibold leading-10 mb-2">
-                                        ${price}
-                                    </p>
-                                    <p className="text-white/30 text-[12px] leading-[14px]">
-                                        ~ {tokenValue} ETH
-                                    </p>
+                    <div className="rounded-lg border border-white/40 bg-white/5 ">
+                        <div className="flex items-center justify-between py-2 px-4">
+                            <div>
+                                <p className="paragraph font-normal text-white/40">
+                                    YOUR BALANCE
+                                </p>
+                                <div className="flex items-start gap-3 my-2">
+                                    <Image src={icons.transferIcon} alt="transferIcon" />
+                                    <div>
+                                        <p className="text-white text-[24px] font-semibold leading-10 mb-2">
+                                            {price}
+                                        </p>
+                                        <p className="text-white/30 text-[12px] leading-[14px]">
+                                            ~ {tokenValue} ETH
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
+                            <div className="flex items-center gap-2">
+                                <Image src={icons.ethLogo} alt="transferIcon" />
+                                <p className="text-white text-[24px] font-normal leading-9">
+                                    ETH
+                                </p>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <Image src={icons.ethLogo} alt="transferIcon" />
-                            <p className="text-white text-[24px] font-normal leading-9">
-                                ETH
+                        <div
+                            className="bg-white/80 py-2 rounded-b-lg cursor-pointer"
+                            onClick={() => {
+                                setOpen(true);
+                            }}
+                        >
+                            <p className="text-[#010101] text-[14px] leading-[18px] font-medium text-center">
+                                + Add funds to your account
                             </p>
                         </div>
                     </div>
                     <div className="w-full mt-5 ">
                         <div className="relative rounded-lg border bg-white/5 border-gray-500  h-auto  p-4">
                             <div className="flex items-center justify-center">
-                                <input
-                                    name={"usd value"}
-                                    style={{ caretColor: "white" }}
-                                    className={`pl-0 pt-2 pb-1 backdrop-blur-xl text-[32px] border-none text-center bg-transparent text-white dark:text-textDark-900 placeholder-white dark:placeholder-textDark-300 rounded-lg block w-full focus:outline-none focus:ring-transparent`}
-                                    placeholder={"$0"}
-                                    autoFocus={true}
-                                    value={value}
-                                    onChange={(e) => {
-                                        setValue(e.target.value);
-                                    }}
-                                    disabled={loading}
-                                    onWheel={() =>
-                                        (document.activeElement as HTMLElement).blur()
-                                    }
-                                />
+                                <div>
+                                    <div className="flex items-center justify-center">
+                                        <p className="text-[32px] text-white">$</p>
+                                        <input
+                                            name={"usd value"}
+                                            style={{ caretColor: "white" }}
+                                            inputMode="decimal"
+                                            type="number"
+                                            className={`dollorInput pl-0 pt-2 pb-1 backdrop-blur-xl text-[32px] border-none text-center bg-transparent text-white dark:text-textDark-900 placeholder-white dark:placeholder-textDark-300 rounded-lg block w-full focus:outline-none focus:ring-transparent`}
+                                            placeholder={"0"}
+                                            autoFocus={true}
+                                            value={value}
+                                            onChange={(e) => {
+                                                handleInputChange(`${e.target.value}`);
+                                            }}
+                                            disabled={loading}
+                                            onWheel={() =>
+                                                (
+                                                    document.activeElement as HTMLElement
+                                                ).blur()
+                                            }
+                                        />
+                                    </div>
+                                    <p className="text-white/30 text-[12px] leading-[14px] text-center">
+                                        ~ {inputValue} ETH
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -220,6 +265,12 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                     <Lottie animationData={loaderAnimation} />
                 </div>
             )}
+            <DepositAmountModal
+                open={open}
+                setOpen={setOpen}
+                walletAddress={fromAddress}
+                tokenPrice={tokenPrice}
+            />
         </div>
     );
 };

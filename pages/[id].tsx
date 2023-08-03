@@ -42,7 +42,8 @@ const config = createConfig({
 
 export default function claim() {
     const router = useRouter();
-    const uuid = router?.query?.id as string;
+    const uuid = router.asPath;
+    console.log(uuid, "pathname");
     return (
         <WagmiConfig config={config}>
             <ShareLink uuid={uuid} />

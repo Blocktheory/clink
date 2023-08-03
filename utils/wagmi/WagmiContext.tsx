@@ -1,7 +1,7 @@
 import { ReactNode, createContext, useContext } from "react";
 import { WagmiHoc } from ".";
-import { ConnectArgs } from "wagmi/actions";
-import { fetchBalance, connect } from "@wagmi/core";
+import { ConnectArgs, sendTransaction } from "wagmi/actions";
+import { fetchBalance, connect, getAccount } from "@wagmi/core";
 import { baseGoerli } from "wagmi/chains";
 import { InjectedConnector } from "wagmi/connectors/injected";
 
@@ -14,6 +14,7 @@ export type TGlobalContextType = {
     fetchBalance?: any;
     baseGoerli?: any;
     InjectedConnector?: any;
+    getAccount?: any;
 };
 
 export const WalletContext = createContext<TGlobalContextType>({
@@ -23,7 +24,7 @@ export const WalletContext = createContext<TGlobalContextType>({
 const WagmiProvider = ({ children }: IProps) => {
     return (
         <WalletContext.Provider
-            value={{ connect, fetchBalance, baseGoerli, InjectedConnector }}
+            value={{ connect, fetchBalance, baseGoerli, InjectedConnector, getAccount }}
         >
             {children}
         </WalletContext.Provider>
@@ -39,10 +40,18 @@ const WagmiWrapper = ({ children }: IProps) => {
 };
 
 const useWagmi = () => {
-    const { connect, fetchBalance, baseGoerli, InjectedConnector } =
+    const { connect, fetchBalance, baseGoerli, InjectedConnector, getAccount } =
         useContext(WalletContext);
     const injectConnector = new InjectedConnector({ chains: [baseGoerli] });
-    return { connect, fetchBalance, baseGoerli, InjectedConnector, injectConnector };
+    return {
+        connect,
+        fetchBalance,
+        baseGoerli,
+        InjectedConnector,
+        injectConnector,
+        sendTransaction,
+        getAccount,
+    };
 };
 
 export { useWagmi, WagmiWrapper };
