@@ -2,22 +2,27 @@ import { Dialog, Transition } from "@headlessui/react";
 import { FC, Fragment, ReactNode, useContext, useState } from "react";
 import { icons } from "../../utils/images";
 import Image from "next/image";
-import { GlobalContext } from "../../context/GlobalContext";
+import { ACTIONS, GlobalContext } from "../../context/GlobalContext";
 import { trimAddress } from "../../utils";
 import Link from "next/link";
+import { ESteps, LOGGED_IN } from "../../pages";
+import { useWagmi } from "../../utils/wagmi/WagmiContext";
 
 type TProps = {
     isOpen: boolean;
     onClose: () => void;
     walletAddress?: string;
+    handleSteps: (step: number) => void;
     signOut: () => Promise<void>;
     signIn: () => Promise<void>;
 };
 const BottomSheet: FC<TProps> = (props) => {
-    const { isOpen, onClose, walletAddress, signOut, signIn } = props;
+    const { isOpen, onClose, walletAddress, signOut, signIn, handleSteps } = props;
     const [copyText, setCopyText] = useState("Copy Address");
+    const { disconnect } = useWagmi();
     const {
-        state: { googleUserInfo, address, isConnected },
+        dispatch,
+        state: { googleUserInfo, address, isConnected, loggedInVia },
     } = useContext(GlobalContext);
     const copyToClipBoard = (e: any) => {
         e.preventDefault();
@@ -27,6 +32,14 @@ const BottomSheet: FC<TProps> = (props) => {
         setTimeout(() => {
             setCopyText("Copy Address");
         }, 4000);
+    };
+    const handleDisConnect = async () => {
+        await disconnect();
+        handleSteps(ESteps.ONE);
+        dispatch({
+            type: ACTIONS.LOGOUT,
+            payload: "",
+        });
     };
     return (
         <Transition.Root show={isOpen} as={Fragment}>
@@ -89,11 +102,20 @@ const BottomSheet: FC<TProps> = (props) => {
                                                         alt="copy icon"
                                                     />
                                                 </div>
-                                                {/* <div className="w-[95%] h-[52px] bg-white rounded-lg mx-auto flex justify-between items-center px-4 mb-6">
-                                                    <p className="text-[#E11900]">
-                                                        Disconnect Wallet
-                                                    </p>
-                                                </div> */}
+                                                {isConnected &&
+                                                    loggedInVia ===
+                                                        LOGGED_IN.EXTERNAL_WALLET && (
+                                                        <div
+                                                            className="w-[95%] h-[52px] bg-white rounded-lg mx-auto flex justify-between items-center px-4 mb-6"
+                                                            onClick={() => {
+                                                                handleDisConnect();
+                                                            }}
+                                                        >
+                                                            <p className="text-[#E11900]">
+                                                                Disconnect Wallet
+                                                            </p>
+                                                        </div>
+                                                    )}
                                             </>
                                         ) : null}
 

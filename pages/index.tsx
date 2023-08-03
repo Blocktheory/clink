@@ -200,14 +200,13 @@ export default function Home() {
     const connectWallet = async () => {
         setConnecting(true);
         try {
+            debugger;
             const result = await connect({
                 chainId: baseGoerli.chainId,
                 connector: injectConnector,
             });
             setWalletAddress(result.account);
-            setStep(ESteps.THREE);
             setConnecting(false);
-
             dispatch({
                 type: ACTIONS.SET_ADDRESS,
                 payload: result.account,
@@ -216,6 +215,7 @@ export default function Home() {
                 type: ACTIONS.LOGGED_IN_VIA,
                 payload: LOGGED_IN.EXTERNAL_WALLET,
             });
+            setStep(ESteps.THREE);
         } catch (e: any) {
             const err = serializeError(e);
             console.log(err, "err");
@@ -257,6 +257,7 @@ export default function Home() {
                     walletAddress={walletAddress}
                     signOut={signOut}
                     signIn={signIn}
+                    handleSteps={handleSteps}
                 />
             </div>
         </>
