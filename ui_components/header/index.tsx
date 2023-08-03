@@ -5,7 +5,7 @@ import { icons } from "../../utils/images";
 import { trimAddress } from "../../utils";
 import { ESteps } from "../../pages";
 import BackBtn from "../BackBtn";
-import { useContext, useState } from "react";
+import { useContext, useState, useRef, useEffect, useMemo } from "react";
 import { GlobalContext } from "../../context/GlobalContext";
 import Link from "next/link";
 interface IHeader {
@@ -18,6 +18,7 @@ interface IHeader {
 }
 
 const Header = (props: IHeader) => {
+    const menuRef = useRef<HTMLDivElement>(null);
     const { walletAddress, signIn, step, handleSteps, onHamburgerClick, signOut } = props;
     const {
         state: { googleUserInfo, address, isConnected },
@@ -45,6 +46,19 @@ const Header = (props: IHeader) => {
         onHamburgerClick();
     };
     console.log(opacity, "opacity");
+
+    const handleClickOutside = (e: any) => {
+        if (menuRef.current && !menuRef?.current?.contains(e.target)) {
+            setOpacity(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener("click", handleClickOutside);
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, []);
 
     return (
         <header className="relative z-[9]">
@@ -74,7 +88,7 @@ const Header = (props: IHeader) => {
                         >
                             <Image
                                 src={
-                                    isConnected
+                                    isConnected && googleUserInfo?.profileImage
                                         ? googleUserInfo.profileImage
                                         : icons.googleIcon
                                 }
@@ -87,7 +101,7 @@ const Header = (props: IHeader) => {
                                 {address ? trimAddress(address) : "Login"}
                             </span>
                         </button>
-                        <div className="relative">
+                        <div className="relative" ref={menuRef}>
                             <button
                                 type="button"
                                 className="w-[40px] h-[40px] rounded-lg bg-white flex items-center justify-center "

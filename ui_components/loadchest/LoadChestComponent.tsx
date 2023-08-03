@@ -174,6 +174,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                     const rawTx = await getSendRawTransaction(txData);
                     console.log(rawTx, "raw tx");
                     console.log(link, "link");
+                    localStorage.setItem("chestRedirect", "true");
                     router.push(link);
                 } else {
                     const sendAmount = await sendTransaction({

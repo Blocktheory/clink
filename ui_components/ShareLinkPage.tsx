@@ -48,6 +48,7 @@ const ShareLink: FC<IShareLink> = (props) => {
     const [tokenValue, setTokenValue] = useState(0);
     const [headingText, setHeadingText] = useState("Your chest is ready");
     const [linkValueUsd, setLinkValueUsd] = useState("");
+    const [isRedirected, setIsRedirected] = useState(false);
 
     const shareData = {
         text: "Here is you Gift card",
@@ -175,6 +176,14 @@ const ShareLink: FC<IShareLink> = (props) => {
         }
     };
 
+    useEffect(() => {
+        const redirected = localStorage.getItem("chestRedirect") ? true : false;
+        setIsRedirected(redirected);
+        return () => {
+            localStorage.removeItem("chestRedirect");
+        };
+    }, []);
+
     return (
         <div className="w-full h-screen relative flex items-center">
             <div className="w-full h-[70%] text-center p-4  flex flex-col gap-5 items-center">
@@ -188,7 +197,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                         <Image className="" src={icons.tchest} alt="Chest" />
                     </div>
                 </div>
-                {isConnected ? (
+                {isRedirected ? (
                     <>
                         <div className="lg:hidden block w-full">
                             <PrimaryBtn
