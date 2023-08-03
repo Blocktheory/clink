@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FC, useMemo, useState } from "react";
+import { FC, useContext, useEffect, useMemo, useState } from "react";
 import PrimaryBtn from "./PrimaryBtn";
 import SecondaryBtn from "./SecondaryBtn";
 import { icons } from "../utils/images";
@@ -12,11 +12,18 @@ import {
     getEstimatedGas,
     getNonce,
     getSendRawTransaction,
+    getUsdPrice,
 } from "../apiServices";
-import { numHex } from "../utils";
+import {
+    getCurrencyFormattedNumber,
+    getTokenFormattedNumber,
+    hexToNumber,
+    numHex,
+} from "../utils";
 import { Base } from "../utils/chain/base";
 import { TTranx, TRANSACTION_TYPE } from "../utils/wallet/types";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
+import { GlobalContext } from "../context/GlobalContext";
 
 export interface IShareLink {
     uuid: string;
@@ -24,16 +31,25 @@ export interface IShareLink {
 
 const ShareLink: FC<IShareLink> = (props) => {
     const { connect, fetchBalance, baseGoerli, injectConnector, getAccount } = useWagmi();
+    const {
+        state: { googleUserInfo, isConnected },
+    } = useContext(GlobalContext);
     const { uuid } = props;
     const [amount, setAmount] = useState({
         eth: "0.1",
         dollars: "1",
     });
     const [toAddress, setToAddress] = useState("");
-
+    const [walletBalance, setWalletBalance] = useState(0);
     const [fromAddress, setFromAddress] = useState("");
     const [wallet, setWallet] = useState("" as unknown as Wallet);
     const [shareText, setShareText] = useState("Share");
+    const [showShareIcon, setShowShareIcon] = useState(true);
+    const [tokenValue, setTokenValue] = useState(0);
+    const [headingText, setHeadingText] = useState("Your chest is ready");
+    const [linkValueUsd, setLinkValueUsd] = useState("");
+    const [isRedirected, setIsRedirected] = useState(false);
+
     const shareData = {
         text: "Here is you Gift card",
         url: typeof window !== "undefined" ? window.location.href : "",
@@ -47,14 +63,21 @@ const ShareLink: FC<IShareLink> = (props) => {
                 .catch((error) => console.log("Error sharing", error));
         }
     };
+    useMemo(async () => {
+        if (!isConnected) {
+            setHeadingText("Claim your Chest");
+        }
+    }, [isConnected]);
 
     const copyToClipBoard = (e: any) => {
         e.preventDefault();
         e.stopPropagation();
         navigator.clipboard.writeText(window.location.href);
         setShareText("Link Copied!");
+        setShowShareIcon(false);
         setTimeout(() => {
             setShareText("Share");
+            setShowShareIcon(true);
         }, 4000);
     };
 
@@ -65,12 +88,27 @@ const ShareLink: FC<IShareLink> = (props) => {
             setWallet(wallet);
             console.log(uuid, "uuid");
             const account = wallet.getAccountFromPayLink(uuid);
-
             if (account) {
                 setFromAddress(account);
             } else {
                 console.log("error", "invalid identifier");
             }
+            getUsdPrice().then(async (res: any) => {
+                const balance = (await getBalance(account)) as any;
+                setTokenValue(
+                    getTokenFormattedNumber(
+                        hexToNumber(balance.result) as unknown as string,
+                        18,
+                    ),
+                );
+                const formatBal = (
+                    (hexToNumber(balance.result) / Math.pow(10, 18)) *
+                    res.data.ethereum.usd
+                ).toFixed(3);
+                setLinkValueUsd(getCurrencyFormattedNumber(formatBal));
+                console.log(balance, "balance");
+                console.log(tokenValue, "token value");
+            });
         }
     }, [uuid]);
 
@@ -138,40 +176,78 @@ const ShareLink: FC<IShareLink> = (props) => {
         }
     };
 
+    useEffect(() => {
+        const redirected = localStorage.getItem("chestRedirect") ? true : false;
+        setIsRedirected(redirected);
+        return () => {
+            localStorage.removeItem("chestRedirect");
+        };
+    }, []);
+
     return (
-        <div className="w-full h-full relative">
-            <div className="w-full h-[70%] text-center p-4  flex flex-col gap-5 relative top-[25%] items-center">
-                <p className="text-white text-[20px] font-bold">Your chest is ready</p>
+        <div className="w-full h-screen relative flex items-center">
+            <div className="w-full h-[70%] text-center p-4  flex flex-col gap-5 items-center">
+                <p className="text-white text-[20px] font-bold">{headingText}</p>
                 <div className="w-full md:w-[60%] max-w-[450px] h-[300px] rounded-lg shareLinkBg flex flex-col justify-between mb-16">
                     <div className="flex gap-1 flex-col text-start ml-3">
-                        <p className="text-[40px] text-[#F4EC97] font bold">{`$ ${amount.dollars}`}</p>
-                        <p className="text-sm text-white/50">{`~ ${amount.eth} ETH`}</p>
+                        <p className="text-[40px] text-[#F4EC97] font bold">{`${linkValueUsd}`}</p>
+                        <p className="text-sm text-white/50">{`~ ${tokenValue} ETH`}</p>
                     </div>
                     <div className="self-end">
                         <Image className="" src={icons.tchest} alt="Chest" />
                     </div>
                 </div>
-                <div className="lg:hidden block w-full">
-                    <PrimaryBtn
-                        title="Share"
-                        onClick={() => {
-                            handleShareURL();
-                        }}
-                        rightImage={icons.shareBtnIcon}
-                    />
-                </div>
-                <div className="hidden lg:block w-full max-w-[320px]">
-                    <PrimaryBtn
-                        title={shareText}
-                        onClick={copyToClipBoard}
-                        rightImage={icons.shareBtnIcon}
-                    />
-                </div>
-                <SecondaryBtn
-                    title="Claim"
-                    onClick={() => handleConnect()}
-                    rightImage={icons.downloadBtnIcon}
-                />
+                {isRedirected ? (
+                    <>
+                        <div className="lg:hidden block w-full">
+                            <PrimaryBtn
+                                title="Share"
+                                onClick={() => {
+                                    handleShareURL();
+                                }}
+                                rightImage={showShareIcon ? icons.shareBtnIcon : ""}
+                                showShareIcon={showShareIcon}
+                            />
+                        </div>
+                        <div className="hidden lg:block w-full max-w-[320px]">
+                            <PrimaryBtn
+                                title={shareText}
+                                onClick={copyToClipBoard}
+                                rightImage={showShareIcon ? icons.shareBtnIcon : ""}
+                            />
+                        </div>
+                        <SecondaryBtn
+                            title="Claim"
+                            onClick={() => handleConnect()}
+                            rightImage={icons.downloadBtnIcon}
+                        />
+                    </>
+                ) : (
+                    <>
+                        <SecondaryBtn
+                            title="Claim"
+                            onClick={() => handleConnect()}
+                            rightImage={icons.downloadBtnIcon}
+                        />
+                        <div className="lg:hidden block w-full">
+                            <PrimaryBtn
+                                title="Share"
+                                onClick={() => {
+                                    handleShareURL();
+                                }}
+                                rightImage={showShareIcon ? icons.shareBtnIcon : ""}
+                                showShareIcon={showShareIcon}
+                            />
+                        </div>
+                        <div className="hidden lg:block w-full max-w-[320px]">
+                            <PrimaryBtn
+                                title={shareText}
+                                onClick={copyToClipBoard}
+                                rightImage={showShareIcon ? icons.shareBtnIcon : ""}
+                            />
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
