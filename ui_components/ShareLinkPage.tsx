@@ -51,7 +51,7 @@ const ShareLink: FC<IShareLink> = (props) => {
     const copyToClipBoard = (e: any) => {
         e.preventDefault();
         e.stopPropagation();
-        navigator.clipboard.writeText(`test URL`);
+        navigator.clipboard.writeText(`http://localhost:3000/${uuid}`);
         setShareText("Link Copied!");
         setTimeout(() => {
             setShareText("Share");

@@ -136,7 +136,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 console.log(link, "link");
 
                 router.push(link);
-                setTransactionLoading(false);
             } catch (e: any) {
                 console.log(e, "e");
             }
