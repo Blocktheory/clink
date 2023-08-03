@@ -14,7 +14,12 @@ import {
     getSendRawTransaction,
     getUsdPrice,
 } from "../apiServices";
-import { getTokenFormattedNumber, hexToNumber, numHex } from "../utils";
+import {
+    getCurrencyFormattedNumber,
+    getTokenFormattedNumber,
+    hexToNumber,
+    numHex,
+} from "../utils";
 import { Base } from "../utils/chain/base";
 import { TTranx, TRANSACTION_TYPE } from "../utils/wallet/types";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
@@ -42,6 +47,7 @@ const ShareLink: FC<IShareLink> = (props) => {
     const [showShareIcon, setShowShareIcon] = useState(true);
     const [tokenValue, setTokenValue] = useState(0);
     const [headingText, setHeadingText] = useState("Your chest is ready");
+    const [linkValueUsd, setLinkValueUsd] = useState("");
 
     const shareData = {
         text: "Here is you Gift card",
@@ -86,9 +92,22 @@ const ShareLink: FC<IShareLink> = (props) => {
             } else {
                 console.log("error", "invalid identifier");
             }
-            const balance = (await getBalance(account)) as any;
-            console.log(balance, "balance");
-            debugger;
+            getUsdPrice().then(async (res: any) => {
+                const balance = (await getBalance(account)) as any;
+                setTokenValue(
+                    getTokenFormattedNumber(
+                        hexToNumber(balance.result) as unknown as string,
+                        18,
+                    ),
+                );
+                const formatBal = (
+                    (hexToNumber(balance.result) / Math.pow(10, 18)) *
+                    res.data.ethereum.usd
+                ).toFixed(3);
+                setLinkValueUsd(getCurrencyFormattedNumber(formatBal));
+                console.log(balance, "balance");
+                console.log(tokenValue, "token value");
+            });
         }
     }, [uuid]);
 
@@ -162,8 +181,8 @@ const ShareLink: FC<IShareLink> = (props) => {
                 <p className="text-white text-[20px] font-bold">{headingText}</p>
                 <div className="w-full md:w-[60%] max-w-[450px] h-[300px] rounded-lg shareLinkBg flex flex-col justify-between mb-16">
                     <div className="flex gap-1 flex-col text-start ml-3">
-                        <p className="text-[40px] text-[#F4EC97] font bold">{`$ ${amount.dollars}`}</p>
-                        <p className="text-sm text-white/50">{`~ ${amount.eth} ETH`}</p>
+                        <p className="text-[40px] text-[#F4EC97] font bold">{`${linkValueUsd}`}</p>
+                        <p className="text-sm text-white/50">{`~ ${tokenValue} ETH`}</p>
                     </div>
                     <div className="self-end">
                         <Image className="" src={icons.tchest} alt="Chest" />
