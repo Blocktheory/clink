@@ -105,6 +105,22 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
 
     const { sendTransaction } = useWagmi();
 
+    function removeLeadingZeros(value: string): string {
+        // Check if the input value is empty or null
+        if (!value || value.length === 0) {
+            return value;
+        }
+
+        // Find the index of the first non-zero digit
+        let nonZeroIndex = 0;
+        while (value[nonZeroIndex] === "0" && nonZeroIndex < value.length - 1) {
+            nonZeroIndex++;
+        }
+
+        // Remove leading zeros and return the result
+        return value.substring(nonZeroIndex);
+    }
+
     const createWallet = async () => {
         if (value) {
             setTransactionLoading(true);
@@ -117,15 +133,14 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 console.log("address", toAddress);
                 const tokenAmount = Number(inputValue) * Math.pow(10, 18);
 
-                const etheresd = parseEther(inputValue);
-                console.log(etheresd, "etheresd");
-                console.log(numHex(Number(etheresd)), "etheresd hex");
+                const amountParsed = numHex(Number(parseEther(inputValue)));
+                // console.log(etheresd, "etheresd");
+                // console.log(numHex(Number(etheresd)), "etheresd hex");
+                const nonStrtZero = removeLeadingZeros(amountParsed);
 
                 if (loggedInVia === LOGGED_IN.GOOGLE) {
                     console.log(tokenAmount, "token amount");
-                    let valueHex = String(
-                        numHex(parseInt(tokenAmount as unknown as string)),
-                    );
+                    let valueHex = String(nonStrtZero);
 
                     if (!valueHex.startsWith("0x")) {
                         valueHex = "0x" + valueHex;
