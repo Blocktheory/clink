@@ -61,9 +61,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         setLoading(true);
         getUsdPrice()
             .then(async (res: any) => {
-                console.log(res, "price");
                 setTokenPrice(res.data.ethereum.usd);
-                console.log(address, "address");
                 setFromAddress(address);
                 const balance = (await getBalance(address)) as any;
                 setTokenValue(
@@ -88,7 +86,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         setValue(`${val}`);
         const valueWithoutDollarSign = val.replace(/\$/g, "");
         const tokenIputValue = Number(valueWithoutDollarSign) / Number(tokenPrice);
-        console.log(tokenIputValue, "input value");
         setInputValue(String(tokenIputValue));
     };
 
@@ -96,7 +93,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         const valueWithoutDollarSign = val.replace(/\$/g, "");
         setValue(`${valueWithoutDollarSign}`);
         const tokenIputValue = Number(valueWithoutDollarSign) / Number(tokenPrice);
-        console.log(tokenIputValue, "input value");
         setInputValue(String(tokenIputValue));
     };
 
@@ -129,16 +125,13 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 const walletCore = await initWasm();
                 const wallet = new Wallet(walletCore);
                 const link = await wallet.createPayLink();
-                console.log(link, "link");
                 const toAddress = await wallet.getAccountFromPayLink(link);
-                console.log("address", toAddress);
                 const tokenAmount = Number(inputValue) * Math.pow(10, 18);
 
                 const amountParsed = numHex(Number(parseEther(inputValue)));
                 const nonStrtZero = removeLeadingZeros(amountParsed);
 
                 if (loggedInVia === LOGGED_IN.GOOGLE) {
-                    console.log(tokenAmount, "token amount");
                     try {
                         let valueHex = String(nonStrtZero);
 
@@ -170,10 +163,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                         };
 
                         const txData = await wallet.signEthTx(tx, openLogin.privKey);
-                        console.log(txData, "tx data");
                         const rawTx = await getSendRawTransaction(txData);
-                        console.log(rawTx, "raw tx");
-                        console.log(link, "link");
                         router.push(link);
                     } catch (e: any) {
                         setTransactionLoading(false);
@@ -187,8 +177,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                             to: toAddress,
                             value: parseEther(inputValue),
                         });
-
-                        console.log(sendAmount, "sendAmount");
                         router.push(link);
                     } catch (e: any) {
                         setTransactionLoading(false);
@@ -205,7 +193,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
             }
         }
     };
-    console.log(loggedInVia, "loggedin");
     return (
         <div className="mx-auto relative max-w-[400px]">
             <ToastContainer
@@ -325,9 +312,13 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                             <p className="text-center text-white">$5</p>
                         </div>
                     </div>
-                    <div className="relative mt-5">
+                    <div className="relative mt-10">
                         <div className={`${value ? "opacity-100" : "opacity-50"}`}>
-                            <PrimaryBtn title={"Load Chest"} onClick={createWallet} />
+                            <PrimaryBtn
+                                className="lg:w-[400px] max-w-[400px]"
+                                title={"Load Chest"}
+                                onClick={createWallet}
+                            />
                         </div>
                     </div>
                 </div>

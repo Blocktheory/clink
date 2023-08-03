@@ -121,14 +121,11 @@ export const DepositAmountModal: FC<IDepositAmountModal> = (props) => {
     };
     const handleExternalWalletClick = async () => {
         const account = await getAccount();
-        console.log("account", account);
-        console.log("injectConnector", injectConnector);
         await connect({
             chainId: baseGoerli.id,
             connector: injectConnector,
         });
         setIsConnectedToWallet(account.isConnected);
-        console.log(account.status, "isconnected");
         setShowOptions(false);
         setShowQr(false);
         setShowDeposit(true);

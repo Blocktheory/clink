@@ -18,6 +18,8 @@ import { useWagmi } from "../utils/wagmi/WagmiContext";
 import { ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
 
+import { connect } from "@wagmi/core";
+
 export type THandleStep = {
     handleSteps: (step: number) => void;
 };
@@ -40,8 +42,7 @@ export default function Home() {
     const [step, setStep] = useState<number>(ESteps.ONE);
     const [openBottomSheet, setOpenBottomSheet] = useState(false);
     const [connecting, setConnecting] = useState(false);
-    const { connect, fetchBalance, injectConnector, sendTransaction, getAccount } =
-        useWagmi();
+    const { fetchBalance, injectConnector, sendTransaction, getAccount } = useWagmi();
 
     useMemo(async () => {
         async function initializeOpenLogin() {
@@ -186,7 +187,6 @@ export default function Home() {
     };
 
     const handleSetupChest = async () => {
-        console.log(walletAddress, "address");
         if (walletAddress) {
             handleSteps(ESteps.THREE);
         } else {
@@ -200,22 +200,23 @@ export default function Home() {
     const connectWallet = async () => {
         setConnecting(true);
         try {
-            debugger;
-            const result = await connect({
+            connect({
                 chainId: baseGoerli.chainId,
                 connector: injectConnector,
+            }).then((result: any) => {
+                
+                setWalletAddress(result.account);
+                setConnecting(false);
+                dispatch({
+                    type: ACTIONS.SET_ADDRESS,
+                    payload: result.account,
+                });
+                dispatch({
+                    type: ACTIONS.LOGGED_IN_VIA,
+                    payload: LOGGED_IN.EXTERNAL_WALLET,
+                });
+                setStep(ESteps.THREE);
             });
-            setWalletAddress(result.account);
-            setConnecting(false);
-            dispatch({
-                type: ACTIONS.SET_ADDRESS,
-                payload: result.account,
-            });
-            dispatch({
-                type: ACTIONS.LOGGED_IN_VIA,
-                payload: LOGGED_IN.EXTERNAL_WALLET,
-            });
-            setStep(ESteps.THREE);
         } catch (e: any) {
             const err = serializeError(e);
             console.log(err, "err");

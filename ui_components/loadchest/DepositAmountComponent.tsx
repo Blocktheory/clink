@@ -25,7 +25,6 @@ export const DepositAmountComponent: FC<IDepositAmountComponent> = (props) => {
     const handleInputChange = (val: string) => {
         setValue(val);
         const tokenIputValue = Number(val) / Number(tokenPrice);
-        console.log(tokenIputValue, "input value");
         setInputValue(String(tokenIputValue));
     };
 
@@ -45,7 +44,6 @@ export const DepositAmountComponent: FC<IDepositAmountComponent> = (props) => {
                   chainId: baseGoerli.id,
                   connector: injectConnector,
               });
-        console.log(result, "result");
     };
 
     return (

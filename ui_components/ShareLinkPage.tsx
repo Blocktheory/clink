@@ -53,6 +53,7 @@ const ShareLink: FC<IShareLink> = (props) => {
     const [headingText, setHeadingText] = useState("Your chest is ready");
     const [linkValueUsd, setLinkValueUsd] = useState("");
     const [isRedirected, setIsRedirected] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const [processing, setProcessing] = useState(false);
     const shareData = {
@@ -91,7 +92,6 @@ const ShareLink: FC<IShareLink> = (props) => {
             const walletCore = await initWasm();
             const wallet = new Wallet(walletCore);
             setWallet(wallet);
-            console.log(uuid, "uuid");
             const account = wallet.getAccountFromPayLink(uuid);
             if (account) {
                 setFromAddress(account);
@@ -106,19 +106,17 @@ const ShareLink: FC<IShareLink> = (props) => {
                         18,
                     ),
                 );
+                setIsLoading(false);
                 const formatBal = (
                     (hexToNumber(balance.result) / Math.pow(10, 18)) *
                     res.data.ethereum.usd
                 ).toFixed(3);
                 setLinkValueUsd(getCurrencyFormattedNumber(formatBal));
-                console.log(balance, "balance");
-                console.log(tokenValue, "token value");
             });
         }
     }, [uuid]);
 
     useMemo(async () => {
-        console.log("cam to memo");
         if (toAddress && fromAddress) {
             const balance = await fetchBalance({
                 address: fromAddress as Address,
@@ -130,7 +128,6 @@ const ShareLink: FC<IShareLink> = (props) => {
     const handleConnect = async () => {
         setProcessing(true);
         const account = await getAccount();
-        console.log(account, "account");
         if (account.isConnected) {
             setToAddress(account.address);
             sendToken(account.address);
@@ -148,7 +145,6 @@ const ShareLink: FC<IShareLink> = (props) => {
                 console.log(err, "err");
                 setProcessing(false);
                 toast.error(e.message);
-                console.log(e, "e");
             }
         }
     };
@@ -160,7 +156,6 @@ const ShareLink: FC<IShareLink> = (props) => {
             const wallet = new Wallet(walletCore);
             const balance = (await getBalance(fromAddress)) as any;
             let tokenAmount = String(numHex(Number(balance.result)));
-            console.log(tokenAmount, "token amount");
             if (!tokenAmount.startsWith("0x")) {
                 tokenAmount = "0x" + tokenAmount;
             }
@@ -186,9 +181,7 @@ const ShareLink: FC<IShareLink> = (props) => {
             };
             const privKey = await wallet.getPrivKeyFromPayLink(uuid);
             const txData = await wallet.signEthTx(tx, privKey);
-            console.log(txData, "tx data");
             const rawTx = (await getSendRawTransaction(txData)) as any;
-            console.log(rawTx, "raw tx");
             if (rawTx.error) {
                 setProcessing(false);
                 const err = serializeError(rawTx.error.message);
@@ -230,10 +223,17 @@ const ShareLink: FC<IShareLink> = (props) => {
             <div className="w-full h-[70%] text-center p-4  flex flex-col gap-5 items-center">
                 <p className="text-white text-[20px] font-bold">{headingText}</p>
                 <div className="w-full md:w-[60%] max-w-[450px] h-[300px] rounded-lg shareLinkBg flex flex-col justify-between mb-16">
-                    <div className="flex gap-1 flex-col text-start ml-3">
-                        <p className="text-[40px] text-[#F4EC97] font bold">{`${linkValueUsd}`}</p>
-                        <p className="text-sm text-white/50">{`~ ${tokenValue} ETH`}</p>
-                    </div>
+                    {isLoading ? (
+                        <div className="w-full h-full mt-5 ml-5">
+                            <div className="w-[15%] h-[20%] bg-white/10 animate-pulse rounded-lg mb-2"></div>
+                            <div className="w-[10%] h-[12%] bg-white/10 animate-pulse rounded-lg "></div>
+                        </div>
+                    ) : (
+                        <div className="flex gap-1 flex-col text-start ml-3">
+                            <p className="text-[40px] text-[#F4EC97] font bold">{`$ ${amount.dollars}`}</p>
+                            <p className="text-sm text-white/50">{`~ ${amount.eth} ETH`}</p>
+                        </div>
+                    )}
                     <div className="self-end">
                         <Image className="" src={icons.tchest} alt="Chest" />
                     </div>

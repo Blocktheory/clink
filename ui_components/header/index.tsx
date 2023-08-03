@@ -48,7 +48,6 @@ const Header = (props: IHeader) => {
         setOpacity(!opacity);
         onHamburgerClick();
     };
-    console.log(opacity, "opacity");
 
     const handleClickOutside = (e: any) => {
         if (menuRef.current && !menuRef?.current?.contains(e.target)) {
