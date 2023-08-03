@@ -124,8 +124,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         <div className="mx-auto relative max-w-[400px]">
             {!transactionLoading ? (
                 <div>
-                    <BackBtn onClick={() => handleSteps(ESteps.ONE)} />
-                    <div className="text-center mb-6">
+                    <div className="text-center mb-6 mt-12">
                         <p className="paragraph text-white/40">STEP 2</p>
                         <p className="paragraph_regular text-white">
                             Enter the amount to store in the chest

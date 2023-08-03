@@ -33,7 +33,7 @@ const ShareLink: FC<IShareLink> = (props) => {
 
     const [fromAddress, setFromAddress] = useState("");
     const [wallet, setWallet] = useState("" as unknown as Wallet);
-    const [shareText, setShareText] = React.useState("Share");
+    const [shareText, setShareText] = useState("Share");
     const shareData = {
         text: "Here is you Gift card",
         url: typeof window !== "undefined" ? window.location.href : "",
