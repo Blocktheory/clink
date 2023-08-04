@@ -68,11 +68,6 @@ const ShareLink: FC<IShareLink> = (props) => {
                 .catch((error) => console.log("Error sharing", error));
         }
     };
-    useMemo(async () => {
-        if (!isRedirected) {
-            setHeadingText("Claim your Chest");
-        }
-    }, [isRedirected]);
 
     const copyToClipBoard = (e: any) => {
         e.preventDefault();
@@ -193,12 +188,13 @@ const ShareLink: FC<IShareLink> = (props) => {
             console.log(e, "e");
         }
     };
+
     useEffect(() => {
-        const redirected = localStorage.getItem("chestRedirect") ? true : false;
-        setIsRedirected(redirected);
-        return () => {
-            localStorage.removeItem("chestRedirect");
-        };
+        if (window.history.length <= 2) {
+            setIsRedirected(false);
+        } else {
+            setIsRedirected(true);
+        }
     }, []);
     return (
         <div className="w-full h-screen relative flex items-center">
