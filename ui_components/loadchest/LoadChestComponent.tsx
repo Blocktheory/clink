@@ -128,8 +128,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     }
 
     const createWallet = async () => {
-        console.log("value ", value)
-        console.log("inputValue ", inputValue)
         const _inputValue = inputValue.replace(/[^\d.]/g, "")
         if (_inputValue) {
             setTransactionLoading(true);
@@ -137,9 +135,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 const walletCore = await initWasm();
                 const wallet = new Wallet(walletCore);
                 const payData = await wallet.createPayLink();
-                console.log("link ", payData)
                 const toAddress = payData.address;
-                console.log("toAddress ", toAddress)
                 const tokenAmount = Number(_inputValue) * Math.pow(10, 18);
 
                 const amountParsed = numHex(Number(parseEther(_inputValue)));
