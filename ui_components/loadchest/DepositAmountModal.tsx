@@ -20,6 +20,9 @@ import { copyToClipBoard, trimAddress } from "../../utils";
 import { QRComponent } from "./QRComponent";
 import { DepositAmountComponent } from "./DepositAmountComponent";
 import { useWagmi } from "../../utils/wagmi/WagmiContext";
+import { toast } from "react-toastify";
+import { serializeError } from "eth-rpc-errors";
+import { fetchBalance } from "wagmi/actions";
 
 export default dynamic(() => Promise.resolve(DepositAmountModal), {
     ssr: false,
@@ -29,6 +32,7 @@ export interface IDepositAmountModal {
     setOpen: (val: boolean) => void;
     walletAddress: string;
     tokenPrice: string;
+    fetchBalance: () => void;
 }
 export declare type QRCodeStylingOptions = {
     type?: DrawType;
@@ -80,9 +84,11 @@ const useQRCodeStyling = (options: QRCodeStylingOptions): QRCodeStyling | null =
     return null;
 };
 export const DepositAmountModal: FC<IDepositAmountModal> = (props) => {
-    const { open, setOpen, walletAddress, tokenPrice } = props;
+    const { open, setOpen, walletAddress, tokenPrice, fetchBalance } = props;
 
     const { getAccount, injectConnector, connect, baseGoerli } = useWagmi();
+
+    const [connecting, setConnecting] = useState(false);
 
     const [options] = useState<Options>({
         width: 240,
@@ -112,25 +118,39 @@ export const DepositAmountModal: FC<IDepositAmountModal> = (props) => {
     const [showQR, setShowQr] = useState(false);
     const [showDeposit, setShowDeposit] = useState(false);
     const [showOptions, setShowOptions] = useState(true);
-    const [isConnectedToWallet, setIsConnectedToWallet] = useState(false);
 
     const handlePublicKeyClick = () => {
         setShowOptions(false);
         setShowDeposit(false);
         setShowQr(true);
     };
-    const handleExternalWalletClick = async () => {
-        const account = await getAccount();
-        if (!account || !account.isConnected) {
-            await connect({
-                chainId: baseGoerli.id,
-                connector: injectConnector,
-            });
-        }
-        setIsConnectedToWallet(account.isConnected);
+
+    const handleWalletConnectFlow = () => {
         setShowOptions(false);
         setShowQr(false);
         setShowDeposit(true);
+    };
+
+    const handleExternalWalletClick = async () => {
+        try {
+            const account = await getAccount();
+            if (!account || !account.isConnected) {
+                setConnecting(true);
+                await connect({
+                    chainId: baseGoerli.id,
+                    connector: injectConnector,
+                });
+                handleWalletConnectFlow();
+                toast.success("Wallet Connected Successfully");
+            } else {
+                handleWalletConnectFlow();
+            }
+        } catch (e: any) {
+            setConnecting(false);
+            const err = serializeError(e);
+            toast.error(err.message);
+            console.log(e, "error");
+        }
     };
     const handleClose = () => {
         setShowDeposit(false);
@@ -178,7 +198,9 @@ export const DepositAmountModal: FC<IDepositAmountModal> = (props) => {
                                                 }}
                                             >
                                                 <p className="text-center text-white">
-                                                    External Wallet
+                                                    {connecting
+                                                        ? "Connecting..."
+                                                        : "External Wallet"}
                                                 </p>
                                             </div>
                                             <div
@@ -200,7 +222,8 @@ export const DepositAmountModal: FC<IDepositAmountModal> = (props) => {
                                             <DepositAmountComponent
                                                 tokenPrice={tokenPrice}
                                                 walletAddress={walletAddress}
-                                                isConnectedToWallet={isConnectedToWallet}
+                                                handleClose={handleClose}
+                                                fetchBalance={fetchBalance}
                                             />
                                         )
                                     )}

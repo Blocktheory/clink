@@ -35,7 +35,10 @@ export enum LOGGED_IN {
 }
 
 export default function Home() {
-    const { dispatch } = useContext(GlobalContext);
+    const {
+        dispatch,
+        state: { loggedInVia },
+    } = useContext(GlobalContext);
     const [loader, setLoader] = useState(true);
     const [openLogin, setSdk] = useState<any>("");
     const [walletAddress, setWalletAddress] = useState<string>("");
@@ -82,7 +85,7 @@ export default function Home() {
 
     useMemo(async () => {
         const account = await getAccount();
-        if (account.isConnected) {
+        if (account.isConnected && loggedInVia === LOGGED_IN.EXTERNAL_WALLET) {
             dispatch({
                 type: ACTIONS.SET_ADDRESS,
                 payload: account.address,
@@ -98,7 +101,7 @@ export default function Home() {
 
     useMemo(async () => {
         const account = await getAccount();
-        if (account.isConnected) {
+        if (account.isConnected && loggedInVia === LOGGED_IN.EXTERNAL_WALLET) {
             dispatch({
                 type: ACTIONS.SET_ADDRESS,
                 payload: account.address,

@@ -65,8 +65,13 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     const handleToggle = () => {
         setToggle(!toggle);
     };
+    const [balLoading, setBalLoading] = useState(false);
 
     useEffect(() => {
+        fetchBalance();
+    }, [address]);
+
+    const fetchBalance = async () => {
         setLoading(true);
         getUsdPrice()
             .then(async (res: any) => {
@@ -90,7 +95,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
             .catch((e) => {
                 console.log(e);
             });
-    }, []);
+    };
 
     const handleValueClick = (val: string) => {
         setValue(`$${val}`);
@@ -221,7 +226,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                     const status = Number(res.result.status);
                     if (status === 1) {
                         router.push(link);
-                        console.log(res, "res");
                     } else {
                         setTransactionLoading(false);
                         toast.error("Failed to Load Chest. Try Again");
@@ -269,13 +273,25 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                                         className="cursor-pointer"
                                     />
                                     {toggle ? (
-                                        <div>
-                                            <p className="text-white/80 text-[24px] font-semibold leading-10 mb-2">
-                                                {price}
-                                            </p>
-                                            <p className="text-white/30 text-[12px] leading-[14px]">
-                                                ~ {tokenValue} ETH
-                                            </p>
+                                        loading ? (
+                                            <div className="w-full h-full">
+                                                <div className="w-[40px] h-[10px] bg-white/10 animate-pulse rounded-lg mb-2"></div>
+                                                <div className="w[40px] h-[10px] bg-white/10 animate-pulse rounded-lg "></div>
+                                            </div>
+                                        ) : (
+                                            <div>
+                                                <p className="text-white/80 text-[24px] font-semibold leading-10 mb-2">
+                                                    {price}
+                                                </p>
+                                                <p className="text-white/30 text-[12px] leading-[14px]">
+                                                    ~ {tokenValue} ETH
+                                                </p>
+                                            </div>
+                                        )
+                                    ) : loading ? (
+                                        <div className="w-full h-full">
+                                            <div className="w-[40px] h-[10px] bg-white/10 animate-pulse rounded-lg mb-2"></div>
+                                            <div className="w[40px] h-[10px] bg-white/10 animate-pulse rounded-lg "></div>
                                         </div>
                                     ) : (
                                         <div>
@@ -398,6 +414,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 setOpen={setOpen}
                 walletAddress={fromAddress}
                 tokenPrice={tokenPrice}
+                fetchBalance={fetchBalance}
             />
         </div>
     );

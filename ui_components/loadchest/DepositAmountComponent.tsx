@@ -2,48 +2,76 @@ import { FC, useEffect, useMemo, useState } from "react";
 import PrimaryBtn from "../PrimaryBtn";
 import { useWagmi } from "../../utils/wagmi/WagmiContext";
 import { parseEther } from "viem";
+import { getSendTransactionStatus } from "../../apiServices";
+import { toast } from "react-toastify";
+import { serializeError } from "eth-rpc-errors";
+import { getTokenFormattedNumber } from "../../utils";
 export interface IDepositAmountComponent {
     tokenPrice: string;
     walletAddress: string;
-    isConnectedToWallet: boolean;
+    handleClose: () => void;
+    fetchBalance: () => void;
 }
 export const DepositAmountComponent: FC<IDepositAmountComponent> = (props) => {
-    const { tokenPrice, walletAddress } = props;
-    const {
-        connect,
-        fetchBalance,
-        baseGoerli,
-        injectConnector,
-        sendTransaction,
-        getAccount,
-    } = useWagmi();
+    const { tokenPrice, walletAddress, handleClose, fetchBalance } = props;
+    const { sendTransaction } = useWagmi();
 
     const [value, setValue] = useState("");
     const [inputValue, setInputValue] = useState("");
-    const [isConnectedToWallet, setIsConnectedToWallet] = useState(false);
+    const [transactionLoading, setTransactionLoading] = useState(false);
 
     const handleInputChange = (val: string) => {
         setValue(val);
         const tokenIputValue = Number(val) / Number(tokenPrice);
-        setInputValue(String(tokenIputValue));
+        const tokenVal = tokenIputValue * Math.pow(10, 18);
+        setInputValue(String(getTokenFormattedNumber(String(tokenVal), 18)));
     };
 
-    useMemo(async () => {
-        const account = await getAccount();
-        setIsConnectedToWallet(account.isConnected);
-    }, []);
-
     const handleDepositClick = async () => {
+        setTransactionLoading(true);
         const toAmount = Number(inputValue) * Math.pow(10, 18);
-        const result = isConnectedToWallet
-            ? await sendTransaction({
-                  to: walletAddress,
-                  value: parseEther(inputValue),
-              })
-            : await connect({
-                  chainId: baseGoerli.id,
-                  connector: injectConnector,
-              });
+        try {
+            const result = await sendTransaction({
+                to: walletAddress,
+                value: parseEther(inputValue),
+            });
+            handleTransactionStatus(result.hash);
+        } catch (e: any) {
+            setTransactionLoading(false);
+            const err = serializeError(e);
+            toast.error(err.message);
+            console.log(e, "error");
+        }
+    };
+
+    const handleTransactionStatus = (hash: string) => {
+        const intervalInMilliseconds = 2000;
+        const interval = setInterval(() => {
+            getSendTransactionStatus(hash)
+                .then((res: any) => {
+                    if (res.result) {
+                        const status = Number(res.result.status);
+                        if (status === 1) {
+                            setTransactionLoading(false);
+                            fetchBalance();
+                            handleClose();
+                            toast.success("Depositted Successfully");
+                        } else {
+                            setTransactionLoading(false);
+                            toast.error("Failed to Deposit Amount. Try Again");
+                        }
+                        if (interval !== null) {
+                            clearInterval(interval);
+                        }
+                    }
+                })
+                .catch((e) => {
+                    setTransactionLoading(false);
+                    const err = serializeError(e);
+                    toast.error(err.message);
+                    console.log(e, "error");
+                });
+        }, intervalInMilliseconds);
     };
 
     return (
@@ -56,7 +84,7 @@ export const DepositAmountComponent: FC<IDepositAmountComponent> = (props) => {
                                 <p className="text-[32px] text-white">$</p>
                                 <input
                                     name={"usd value"}
-                                    style={{ caretColor: "black" }}
+                                    style={{ caretColor: "white" }}
                                     inputMode="decimal"
                                     type="number"
                                     className={`dollorInput pl-0 pt-2 pb-1 backdrop-blur-xl text-[32px] border-none text-center bg-transparent text-white placeholder-white rounded-lg block w-full focus:outline-none focus:ring-transparent`}
@@ -78,9 +106,9 @@ export const DepositAmountComponent: FC<IDepositAmountComponent> = (props) => {
                     </div>
                 </div>
 
-                <div className="mt-5">
+                <div className="mt-5 cursor-pointer">
                     <PrimaryBtn
-                        title={isConnectedToWallet ? "Deposit Amount" : "Connect Wallet"}
+                        title={transactionLoading ? "Processing.." : "Deposit Amount"}
                         onClick={() => handleDepositClick()}
                     />
                 </div>

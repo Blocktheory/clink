@@ -16,6 +16,7 @@ import {
     getEstimatedGas,
     getNonce,
     getSendRawTransaction,
+    getSendTransactionStatus,
     getUsdPrice,
 } from "../apiServices";
 import {
@@ -36,7 +37,7 @@ export interface IShareLink {
 }
 
 const ShareLink: FC<IShareLink> = (props) => {
-    const { connect, fetchBalance, baseGoerli, injectConnector, getAccount } = useWagmi();
+    const { connect, baseGoerli, injectConnector, getAccount } = useWagmi();
     const {
         state: { isConnected },
     } = useContext(GlobalContext);
@@ -97,28 +98,23 @@ const ShareLink: FC<IShareLink> = (props) => {
             } else {
                 console.log("error", "invalid identifier");
             }
-            const balance = (await getBalance(account)) as any;
-            const hexValue = balance.result;
-            const bgBal = BigNumber(hexValue);
-            const bgNum = bgBal.dividedBy(Math.pow(10, 18)).toNumber();
-            setWalletBalanceHex(hexValue);
-            getUsdPrice().then(async (res: any) => {
-                setTokenValue(getTokenValueFormatted(bgNum));
-                setIsLoading(false);
-                const formatBal = bgNum * res.data.ethereum.usd;
-                setLinkValueUsd(getCurrencyFormattedNumber(formatBal));
-            });
+            await fetchBalance(account);
         }
     }, [uuid]);
 
-    useMemo(async () => {
-        if (toAddress && fromAddress) {
-            // const balance = await fetchBalance({
-            //     address: fromAddress as Address,
-            // });
-            // sendToken(toAddress);
-        }
-    }, [toAddress]);
+    const fetchBalance = async (address: string) => {
+        const balance = (await getBalance(address)) as any;
+        const hexValue = balance.result;
+        const bgBal = BigNumber(hexValue);
+        const bgNum = bgBal.dividedBy(Math.pow(10, 18)).toNumber();
+        setWalletBalanceHex(hexValue);
+        getUsdPrice().then(async (res: any) => {
+            setTokenValue(getTokenValueFormatted(bgNum));
+            setIsLoading(false);
+            const formatBal = bgNum * res.data.ethereum.usd;
+            setLinkValueUsd(getCurrencyFormattedNumber(formatBal));
+        });
+    };
 
     const handleConnect = async () => {
         setProcessing(true);
@@ -183,16 +179,44 @@ const ShareLink: FC<IShareLink> = (props) => {
                 const err = serializeError(rawTx.error.message);
                 toast.error(err.message);
             } else {
-                setProcessing(false);
-                toast.success("Claimed Successfully");
+                handleTransactionStatus(rawTx.result);
             }
-            setProcessing(false);
         } catch (e: any) {
             setProcessing(false);
             toast.error(e.message);
             console.log(e, "e");
         }
     };
+
+    const handleTransactionStatus = (hash: string) => {
+        const intervalInMilliseconds = 2000;
+        const interval = setInterval(() => {
+            getSendTransactionStatus(hash)
+                .then((res: any) => {
+                    if (res.result) {
+                        const status = Number(res.result.status);
+                        if (status === 1) {
+                            setProcessing(false);
+                            toast.success("Claimed Successfully");
+                            fetchBalance(fromAddress);
+                        } else {
+                            setProcessing(false);
+                            const err = serializeError("Failed to Claim!");
+                            toast.error(err.message);
+                        }
+                        if (interval !== null) {
+                            clearInterval(interval);
+                        }
+                    }
+                })
+                .catch((e) => {
+                    setProcessing(false);
+                    toast.error(e.message);
+                    console.log(e, "e");
+                });
+        }, intervalInMilliseconds);
+    };
+
     useEffect(() => {
         const redirected = localStorage.getItem("chestRedirect") ? true : false;
         setIsRedirected(redirected);
