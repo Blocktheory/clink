@@ -108,7 +108,7 @@ export default function Home() {
                 payload: LOGGED_IN.EXTERNAL_WALLET,
             });
             setWalletAddress(account.address);
-            // handleSteps(ESteps.THREE);
+            handleSteps(ESteps.THREE);
         }
     }, []);
 
@@ -203,20 +203,27 @@ export default function Home() {
             connect({
                 chainId: baseGoerli.chainId,
                 connector: injectConnector,
-            }).then((result: any) => {
-                
-                setWalletAddress(result.account);
-                setConnecting(false);
-                dispatch({
-                    type: ACTIONS.SET_ADDRESS,
-                    payload: result.account,
+            })
+                .then((result: any) => {
+                    setWalletAddress(result.account);
+                    setConnecting(false);
+                    dispatch({
+                        type: ACTIONS.SET_ADDRESS,
+                        payload: result.account,
+                    });
+                    dispatch({
+                        type: ACTIONS.LOGGED_IN_VIA,
+                        payload: LOGGED_IN.EXTERNAL_WALLET,
+                    });
+                    setStep(ESteps.THREE);
+                })
+                .catch((e) => {
+                    const err = serializeError(e);
+                    console.log(err, "err");
+                    setConnecting(false);
+                    toast.error(err.message);
+                    console.log(e, "error");
                 });
-                dispatch({
-                    type: ACTIONS.LOGGED_IN_VIA,
-                    payload: LOGGED_IN.EXTERNAL_WALLET,
-                });
-                setStep(ESteps.THREE);
-            });
         } catch (e: any) {
             const err = serializeError(e);
             console.log(err, "err");

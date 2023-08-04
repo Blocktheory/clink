@@ -98,18 +98,13 @@ const ShareLink: FC<IShareLink> = (props) => {
             }
             const balance = (await getBalance(account)) as any;
             const hexValue = balance.result;
-            const bgBal = BigNumber(hexValue)
+            const bgBal = BigNumber(hexValue);
             const bgNum = bgBal.dividedBy(Math.pow(10, 18)).toNumber();
-            setWalletBalanceHex(hexValue)
+            setWalletBalanceHex(hexValue);
             getUsdPrice().then(async (res: any) => {
-                setTokenValue(
-                    getTokenValueFormatted(bgNum),
-                );
+                setTokenValue(getTokenValueFormatted(bgNum));
                 setIsLoading(false);
-                const formatBal = (
-                    (bgNum) *
-                    res.data.ethereum.usd
-                );
+                const formatBal = bgNum * res.data.ethereum.usd;
                 setLinkValueUsd(getCurrencyFormattedNumber(formatBal));
             });
         }
@@ -163,8 +158,8 @@ const ShareLink: FC<IShareLink> = (props) => {
             let bgBal = BigNumber(walletBalanceHex);
             const bgGasPirce = BigNumber("0x" + gasPirce);
             const bgGasLimit = BigNumber(gasLimit);
-            const gasFee = bgGasPirce.multipliedBy(bgGasLimit).multipliedBy(2) ;
-            bgBal = bgBal.minus(gasFee)
+            const gasFee = bgGasPirce.multipliedBy(bgGasLimit).multipliedBy(2);
+            bgBal = bgBal.minus(gasFee);
             const amountToSend = hexFormatter(bgBal.toString(16));
             const nonce = (await getNonce(fromAddress)) as any;
             const tx: TTranx = {

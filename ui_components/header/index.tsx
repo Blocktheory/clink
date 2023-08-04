@@ -172,7 +172,7 @@ const Header = (props: IHeader) => {
                                             ) : null}
 
                                             <div className="bg-white w-full px-4">
-                                                {!googleUserInfo ? (
+                                                {!isConnected ? (
                                                     <div
                                                         className="flex justify-between items-center py-6 border-b-2 cursor-pointer"
                                                         onClick={signIn}
