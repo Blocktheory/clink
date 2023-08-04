@@ -15,6 +15,7 @@ import {
     getGasPrice,
     getNonce,
     getSendRawTransaction,
+    getSendTransactionStatus,
     getUsdPrice,
 } from "../../apiServices";
 import {
@@ -87,22 +88,18 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         setValue(`$${val}`);
         const valueWithoutDollarSign = val.replace(/[^\d.]/g, "");
         const tokenIputValue = Number(valueWithoutDollarSign) / Number(tokenPrice);
-        setInputValue(getTokenValueFormatted(
-            Number(tokenIputValue),
-        ));
+        setInputValue(getTokenValueFormatted(Number(tokenIputValue)));
     };
 
     const handleInputChange = (val: string) => {
         const valueWithoutDollarSign = val.replace(/[^\d.]/g, "");
-        let appendDollar = ""
+        let appendDollar = "";
         if (Number(valueWithoutDollarSign) > 0) {
-            appendDollar = "$"
+            appendDollar = "$";
         }
         setValue(`${appendDollar}${valueWithoutDollarSign}`);
         const tokenIputValue = Number(valueWithoutDollarSign) / Number(tokenPrice);
-        setInputValue(getTokenValueFormatted(
-            Number(tokenIputValue),
-        ));
+        setInputValue(getTokenValueFormatted(Number(tokenIputValue)));
     };
 
     const dollorToToken = (val: string) => {
@@ -172,8 +169,8 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                         };
 
                         const txData = await wallet.signEthTx(tx, openLogin.privKey);
-                        const rawTx = await getSendRawTransaction(txData);
-                        router.push(payData.link);
+                        const rawTx = await getSendRawTransaction(txData) as any;
+                        handleTransactionStatus(rawTx.result, payData.link);
                     } catch (e: any) {
                         setTransactionLoading(false);
                         const err = serializeError(e);
@@ -186,7 +183,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                             to: toAddress,
                             value: parseEther(inputValue),
                         });
-                        router.push(payData.link);
+                        handleTransactionStatus(sendAmount.hash, payData.link);
                     } catch (e: any) {
                         setTransactionLoading(false);
                         const err = serializeError(e);
@@ -202,6 +199,26 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
             }
         }
     };
+    const handleTransactionStatus = (hash :string, link:string) => {
+        const intervalInMilliseconds = 2000;
+        const interval = setInterval(() => {
+            getSendTransactionStatus(hash).then((res: any) => {
+                if(res.result){
+                const status = Number(res.result.status);
+                if (status === 1) {
+                    router.push(link);
+                    console.log(res, "res");
+                } else {
+                    setTransactionLoading(false);
+                    toast.error("Failed to Load Chest. Try Again");
+                }
+                if (interval !== null) {
+                    clearInterval(interval);
+                }
+            }
+            });
+        }, intervalInMilliseconds);
+    }
     return (
         <div className="mx-auto relative max-w-[400px]">
             <ToastContainer
@@ -281,12 +298,18 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                                                 handleInputChange(e.target.value);
                                             }}
                                             disabled={loading}
-                                            onWheel={() => (document.activeElement as HTMLElement).blur()}
+                                            onWheel={() =>
+                                                (
+                                                    document.activeElement as HTMLElement
+                                                ).blur()
+                                            }
                                         />
                                     </div>
-                                    {Number(inputValue) > 0 && <p className="text-white/30 text-[12px] leading-[14px] text-center">
-                                        ~ {inputValue} ETH
-                                    </p>}
+                                    {Number(inputValue) > 0 && (
+                                        <p className="text-white/30 text-[12px] leading-[14px] text-center">
+                                            ~ {inputValue} ETH
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>
