@@ -38,7 +38,7 @@ export interface IShareLink {
 const ShareLink: FC<IShareLink> = (props) => {
     const { connect, fetchBalance, baseGoerli, injectConnector, getAccount } = useWagmi();
     const {
-        state: { googleUserInfo, isConnected },
+        state: { isConnected },
     } = useContext(GlobalContext);
     const { uuid } = props;
     const [toAddress, setToAddress] = useState("");
@@ -48,14 +48,15 @@ const ShareLink: FC<IShareLink> = (props) => {
     const [shareText, setShareText] = useState("Share");
     const [showShareIcon, setShowShareIcon] = useState(true);
     const [tokenValue, setTokenValue] = useState("");
-    const [headingText, setHeadingText] = useState("Your chest is ready");
+    const [headingText, setHeadingText] = useState("Your Chest is ready");
     const [linkValueUsd, setLinkValueUsd] = useState("");
     const [isRedirected, setIsRedirected] = useState(false);
+
     const [isLoading, setIsLoading] = useState(true);
 
     const [processing, setProcessing] = useState(false);
     const shareData = {
-        text: "Here is you Gift card",
+        text: "Here is you Gifted Chest",
         url: typeof window !== "undefined" ? window.location.href : "",
     };
 
@@ -68,10 +69,10 @@ const ShareLink: FC<IShareLink> = (props) => {
         }
     };
     useMemo(async () => {
-        if (!isConnected) {
+        if (!isRedirected) {
             setHeadingText("Claim your Chest");
         }
-    }, [isConnected]);
+    }, [isRedirected]);
 
     const copyToClipBoard = (e: any) => {
         e.preventDefault();
@@ -192,7 +193,6 @@ const ShareLink: FC<IShareLink> = (props) => {
             console.log(e, "e");
         }
     };
-
     useEffect(() => {
         const redirected = localStorage.getItem("chestRedirect") ? true : false;
         setIsRedirected(redirected);
@@ -200,7 +200,6 @@ const ShareLink: FC<IShareLink> = (props) => {
             localStorage.removeItem("chestRedirect");
         };
     }, []);
-
     return (
         <div className="w-full h-screen relative flex items-center">
             <ToastContainer
@@ -245,7 +244,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                                 showShareIcon={showShareIcon}
                             />
                         </div>
-                        <div className="hidden lg:block w-full max-w-[320px]">
+                        <div className="hidden lg:block w-full max-w-[400px]">
                             <PrimaryBtn
                                 title={shareText}
                                 onClick={copyToClipBoard}
@@ -260,26 +259,28 @@ const ShareLink: FC<IShareLink> = (props) => {
                     </>
                 ) : (
                     <>
-                        <SecondaryBtn
+                        <PrimaryBtn
                             title={processing ? "Processing..." : "Claim"}
                             onClick={() => handleConnect()}
-                            rightImage={processing ? undefined : icons.downloadBtnIcon}
+                            rightImage={
+                                processing ? undefined : icons.downloadBtnIconBlack
+                            }
                         />
                         <div className="lg:hidden block w-full">
-                            <PrimaryBtn
+                            <SecondaryBtn
                                 title="Share"
                                 onClick={() => {
                                     handleShareURL();
                                 }}
-                                rightImage={showShareIcon ? icons.shareBtnIcon : ""}
+                                rightImage={showShareIcon ? icons.shareBtnIconWhite : ""}
                                 showShareIcon={showShareIcon}
                             />
                         </div>
-                        <div className="hidden lg:block w-full max-w-[320px]">
-                            <PrimaryBtn
+                        <div className="hidden lg:block w-full max-w-[400px]">
+                            <SecondaryBtn
                                 title={shareText}
                                 onClick={copyToClipBoard}
-                                rightImage={showShareIcon ? icons.shareBtnIcon : ""}
+                                rightImage={showShareIcon ? icons.shareBtnIconWhite : ""}
                             />
                         </div>
                     </>

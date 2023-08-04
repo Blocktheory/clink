@@ -58,6 +58,13 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     const [loading, setLoading] = useState(false);
     const [transactionLoading, setTransactionLoading] = useState(false);
     const [open, setOpen] = useState(false);
+    const [toggle, setToggle] = useState(true);
+    const [btnDisable, setBtnDisable] = useState(true);
+    const [balanceInUsd, setBalanceInUsd] = useState("");
+
+    const handleToggle = () => {
+        setToggle(!toggle);
+    };
 
     useEffect(() => {
         setLoading(true);
@@ -77,6 +84,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                     res.data.ethereum.usd
                 ).toFixed(3);
                 setPrice(getCurrencyFormattedNumber(formatBal));
+                setBalanceInUsd(formatBal);
                 setLoading(false);
             })
             .catch((e) => {
@@ -100,6 +108,12 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         setValue(`${appendDollar}${valueWithoutDollarSign}`);
         const tokenIputValue = Number(valueWithoutDollarSign) / Number(tokenPrice);
         setInputValue(getTokenValueFormatted(Number(tokenIputValue)));
+        if (Number(valueWithoutDollarSign) < Number(balanceInUsd)) {
+            setBtnDisable(false);
+        } else {
+            setBtnDisable(true);
+        }
+        console.log(btnDisable);
     };
 
     const dollorToToken = (val: string) => {
@@ -125,7 +139,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     }
 
     const createWallet = async () => {
-        const _inputValue = inputValue.replace(/[^\d.]/g, "")
+        const _inputValue = inputValue.replace(/[^\d.]/g, "");
         if (_inputValue) {
             setTransactionLoading(true);
             try {
@@ -169,7 +183,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                         };
 
                         const txData = await wallet.signEthTx(tx, openLogin.privKey);
-                        const rawTx = await getSendRawTransaction(txData) as any;
+                        const rawTx = (await getSendRawTransaction(txData)) as any;
                         handleTransactionStatus(rawTx.result, payData.link);
                     } catch (e: any) {
                         setTransactionLoading(false);
@@ -199,26 +213,26 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
             }
         }
     };
-    const handleTransactionStatus = (hash :string, link:string) => {
+    const handleTransactionStatus = (hash: string, link: string) => {
         const intervalInMilliseconds = 2000;
         const interval = setInterval(() => {
             getSendTransactionStatus(hash).then((res: any) => {
-                if(res.result){
-                const status = Number(res.result.status);
-                if (status === 1) {
-                    router.push(link);
-                    console.log(res, "res");
-                } else {
-                    setTransactionLoading(false);
-                    toast.error("Failed to Load Chest. Try Again");
+                if (res.result) {
+                    const status = Number(res.result.status);
+                    if (status === 1) {
+                        router.push(link);
+                        console.log(res, "res");
+                    } else {
+                        setTransactionLoading(false);
+                        toast.error("Failed to Load Chest. Try Again");
+                    }
+                    if (interval !== null) {
+                        clearInterval(interval);
+                    }
                 }
-                if (interval !== null) {
-                    clearInterval(interval);
-                }
-            }
             });
         }, intervalInMilliseconds);
-    }
+    };
     return (
         <div className="mx-auto relative max-w-[400px]">
             <ToastContainer
@@ -248,15 +262,31 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                                     YOUR BALANCE
                                 </p>
                                 <div className="flex items-start gap-3 my-2">
-                                    <Image src={icons.transferIcon} alt="transferIcon" />
-                                    <div>
-                                        <p className="text-white/80 text-[24px] font-semibold leading-10 mb-2">
-                                            {price}
-                                        </p>
-                                        <p className="text-white/30 text-[12px] leading-[14px]">
-                                            ~ {tokenValue} ETH
-                                        </p>
-                                    </div>
+                                    <Image
+                                        src={icons.transferIcon}
+                                        alt="transferIcon"
+                                        onClick={handleToggle}
+                                        className="cursor-pointer"
+                                    />
+                                    {toggle ? (
+                                        <div>
+                                            <p className="text-white/80 text-[24px] font-semibold leading-10 mb-2">
+                                                {price}
+                                            </p>
+                                            <p className="text-white/30 text-[12px] leading-[14px]">
+                                                ~ {tokenValue} ETH
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <p className="text-white/80 text-[24px] font-semibold leading-10 mb-2">
+                                                ~ {tokenValue} ETH
+                                            </p>
+                                            <p className="text-white/30 text-[12px] leading-[14px]">
+                                                {price}
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
@@ -341,11 +371,18 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                         </div>
                     </div>
                     <div className="relative mt-10">
-                        <div className={`${value ? "opacity-100" : "opacity-50"}`}>
+                        <div
+                            className={`${
+                                !btnDisable && value ? "opacity-100" : "opacity-50"
+                            }`}
+                        >
                             <PrimaryBtn
-                                className="lg:w-[400px] max-w-[400px]"
+                                className={`lg:w-[400px] max-w-[400px] ${
+                                    btnDisable || !value ? "cursor-not-allowed" : ""
+                                }`}
                                 title={"Load Chest"}
                                 onClick={createWallet}
+                                btnDisable={btnDisable || !value}
                             />
                         </div>
                     </div>

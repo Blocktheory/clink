@@ -75,7 +75,7 @@ const Header = (props: IHeader) => {
         <header className="relative z-[9]">
             <div className="h-[80px] hidden md:block"></div>
             <div className="sticky top-0 flex items-center justify-center">
-                <div className="w-[90%] max-w-[600px] h-[64px] rounded-2xl bg-[#0C0421] text-center flex items-center justify-between relative z-[9]">
+                <div className="w-[95%] max-w-[600px] h-[64px] rounded-2xl bg-[#0C0421] text-center flex items-center justify-between relative z-[9]">
                     {step > 1 ? (
                         <div className="ml-4">
                             <BackBtn
@@ -83,7 +83,7 @@ const Header = (props: IHeader) => {
                             />
                         </div>
                     ) : (
-                        <div className="flex gap-2 px-4">
+                        <div className="flex gap-2 pl-2">
                             <Image src={icons.logo} alt="logo" className="w-12" />
                             <p className="text-[16px] font-bold text-white self-center">
                                 Micropay
@@ -91,7 +91,7 @@ const Header = (props: IHeader) => {
                         </div>
                     )}
 
-                    <div className="flex gap-4 items-center px-4">
+                    <div className="flex gap-4 items-center pr-2">
                         <button
                             className={`px-4 h-[40px] rounded-lg bg-white flex gap-2 items-center justify-center`}
                             onClick={signIn}
