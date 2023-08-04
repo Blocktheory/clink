@@ -3,11 +3,12 @@ import PrimaryBtn from "../PrimaryBtn";
 import Image from "next/image";
 import { icons } from "../../utils/images";
 import { trimAddress } from "../../utils";
-import { ESteps } from "../../pages";
+import { ESteps, LOGGED_IN } from "../../pages";
 import BackBtn from "../BackBtn";
 import { useContext, useState, useRef, useEffect, useMemo } from "react";
-import { GlobalContext } from "../../context/GlobalContext";
+import { ACTIONS, GlobalContext } from "../../context/GlobalContext";
 import Link from "next/link";
+import { useWagmi } from "../../utils/wagmi/WagmiContext";
 interface IHeader {
     walletAddress: string;
     signIn: () => Promise<void>;
@@ -21,10 +22,12 @@ const Header = (props: IHeader) => {
     const menuRef = useRef<HTMLDivElement>(null);
     const { walletAddress, signIn, step, handleSteps, onHamburgerClick, signOut } = props;
     const {
-        state: { googleUserInfo, address, isConnected },
+        dispatch,
+        state: { googleUserInfo, address, isConnected, loggedInVia },
     } = useContext(GlobalContext);
     const [copyText, setCopyText] = useState("Copy Address");
     const [opacity, setOpacity] = useState(false);
+    const { disconnect } = useWagmi();
 
     const copyToClipBoard = (e: any) => {
         e.preventDefault();
@@ -45,7 +48,6 @@ const Header = (props: IHeader) => {
         setOpacity(!opacity);
         onHamburgerClick();
     };
-    console.log(opacity, "opacity");
 
     const handleClickOutside = (e: any) => {
         if (menuRef.current && !menuRef?.current?.contains(e.target)) {
@@ -59,6 +61,15 @@ const Header = (props: IHeader) => {
             document.removeEventListener("click", handleClickOutside);
         };
     }, []);
+
+    const handleDisConnect = async () => {
+        await disconnect();
+        handleSteps(ESteps.ONE);
+        dispatch({
+            type: ACTIONS.LOGOUT,
+            payload: "",
+        });
+    };
 
     return (
         <header className="relative z-[9]">
@@ -88,9 +99,11 @@ const Header = (props: IHeader) => {
                         >
                             <Image
                                 src={
-                                    isConnected && googleUserInfo?.profileImage
+                                    !isConnected
+                                        ? icons.googleIcon
+                                        : loggedInVia === LOGGED_IN.GOOGLE
                                         ? googleUserInfo.profileImage
-                                        : icons.googleIcon
+                                        : icons.ethLogo
                                 }
                                 alt="google login"
                                 width={20}
@@ -141,11 +154,20 @@ const Header = (props: IHeader) => {
                                                             alt="copy icon"
                                                         />
                                                     </div>
-                                                    {/* <div className="w-[95%] h-[52px] bg-white rounded-lg mx-auto flex justify-between items-center px-4 mb-6">
-                                                    <p className="text-[#E11900]">
-                                                        Disconnect Wallet
-                                                    </p>
-                                                </div> */}
+                                                    {isConnected &&
+                                                        loggedInVia ===
+                                                            LOGGED_IN.EXTERNAL_WALLET && (
+                                                            <div
+                                                                className="w-[95%] h-[52px] bg-white rounded-lg mx-auto flex justify-between items-center px-4 mb-6"
+                                                                onClick={() => {
+                                                                    handleDisConnect();
+                                                                }}
+                                                            >
+                                                                <p className="text-[#E11900]">
+                                                                    Disconnect Wallet
+                                                                </p>
+                                                            </div>
+                                                        )}
                                                 </>
                                             ) : null}
 
@@ -194,7 +216,8 @@ const Header = (props: IHeader) => {
                                                         />
                                                     </div>
                                                 </Link>
-                                                {isConnected ? (
+                                                {isConnected &&
+                                                loggedInVia === LOGGED_IN.GOOGLE ? (
                                                     <div
                                                         className="flex justify-between items-center py-6 cursor-pointer"
                                                         onClick={handleLogout}

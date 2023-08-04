@@ -1,3 +1,5 @@
+import "react-toastify/dist/ReactToastify.css";
+import { serializeError } from "eth-rpc-errors";
 import React, { useContext, useMemo, useState } from "react";
 import HomePage from "../ui_components/home/HomePage";
 import ConnectWallet from "../ui_components/connect_wallet/";
@@ -13,6 +15,10 @@ import LoadingTokenPage from "../ui_components/loadingTokenPage";
 import { getStore } from "../store/GlobalStore";
 import { ACTIONS, GlobalContext } from "../context/GlobalContext";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
+import { ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
+
+import { connect } from "@wagmi/core";
 
 export type THandleStep = {
     handleSteps: (step: number) => void;
@@ -35,8 +41,8 @@ export default function Home() {
     const [walletAddress, setWalletAddress] = useState<string>("");
     const [step, setStep] = useState<number>(ESteps.ONE);
     const [openBottomSheet, setOpenBottomSheet] = useState(false);
-    const { connect, fetchBalance, injectConnector, sendTransaction, getAccount } =
-        useWagmi();
+    const [connecting, setConnecting] = useState(false);
+    const { fetchBalance, injectConnector, sendTransaction, getAccount } = useWagmi();
 
     useMemo(async () => {
         async function initializeOpenLogin() {
@@ -73,6 +79,22 @@ export default function Home() {
         initializeOpenLogin();
         localStorage.removeItem("chestRedirect");
     }, []);
+
+    useMemo(async () => {
+        const account = await getAccount();
+        if (account.isConnected) {
+            dispatch({
+                type: ACTIONS.SET_ADDRESS,
+                payload: account.address,
+            });
+            dispatch({
+                type: ACTIONS.LOGGED_IN_VIA,
+                payload: LOGGED_IN.EXTERNAL_WALLET,
+            });
+            setWalletAddress(account.address);
+            handleSteps(ESteps.THREE);
+        }
+    }, [walletAddress]);
 
     useMemo(async () => {
         const account = await getAccount();
@@ -152,6 +174,7 @@ export default function Home() {
                         signIn={signIn}
                         handleSteps={handleSteps}
                         connectWallet={connectWallet}
+                        connecting={connecting}
                     />
                 );
             case ESteps.THREE:
@@ -164,7 +187,6 @@ export default function Home() {
     };
 
     const handleSetupChest = async () => {
-        console.log(walletAddress, "address");
         if (walletAddress) {
             handleSteps(ESteps.THREE);
         } else {
@@ -176,32 +198,33 @@ export default function Home() {
     };
 
     const connectWallet = async () => {
-        const account = await getAccount();
-        console.log(account, "account");
+        setConnecting(true);
         try {
-            const result = await connect({
+            connect({
                 chainId: baseGoerli.chainId,
                 connector: injectConnector,
+            }).then((result: any) => {
+                
+                setWalletAddress(result.account);
+                setConnecting(false);
+                dispatch({
+                    type: ACTIONS.SET_ADDRESS,
+                    payload: result.account,
+                });
+                dispatch({
+                    type: ACTIONS.LOGGED_IN_VIA,
+                    payload: LOGGED_IN.EXTERNAL_WALLET,
+                });
+                setStep(ESteps.THREE);
             });
-            console.log(result, "result");
-
-            dispatch({
-                type: ACTIONS.SET_ADDRESS,
-                payload: result.account,
-            });
-            dispatch({
-                type: ACTIONS.LOGGED_IN_VIA,
-                payload: LOGGED_IN.EXTERNAL_WALLET,
-            });
-            setWalletAddress(result.account);
-            handleSteps(ESteps.THREE);
-        } catch (e) {
+        } catch (e: any) {
+            const err = serializeError(e);
+            console.log(err, "err");
+            setConnecting(false);
+            toast.error(err.message);
             console.log(e, "error");
         }
     };
-    const {
-        state: { googleUserInfo, address, isConnected },
-    } = useContext(GlobalContext);
 
     return (
         <>
@@ -213,7 +236,19 @@ export default function Home() {
                 onHamburgerClick={onHamburgerClick}
                 signOut={signOut}
             />
-            <div className="p-4 relative z-0">
+            <div className="p-4 relative">
+                <ToastContainer
+                    toastStyle={{ backgroundColor: "#282B30" }}
+                    className={`w-50`}
+                    style={{ width: "600px" }}
+                    position="bottom-center"
+                    autoClose={6000}
+                    hideProgressBar={true}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    theme="dark"
+                />
                 {getUIComponent(step)}
                 <BottomSheet
                     isOpen={openBottomSheet}
@@ -223,6 +258,7 @@ export default function Home() {
                     walletAddress={walletAddress}
                     signOut={signOut}
                     signIn={signIn}
+                    handleSteps={handleSteps}
                 />
             </div>
         </>

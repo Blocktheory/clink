@@ -104,6 +104,7 @@ function reducer(state: TInitialStateType, action: TActionType) {
             return {
                 ...state,
                 address: action.payload as string,
+                isConnected: true,
             };
         }
         case ACTIONS.GOOGLE_USER_INFO: {

@@ -9,13 +9,14 @@ interface IPrimaryBtn {
     leftImage?: Record<TImages, TNextImage>;
     rightImage?: TNextImage | TImages | string;
     showShareIcon?: boolean;
+    className?: string;
 }
 
 export default function PrimaryBtn(props: IPrimaryBtn) {
-    const { title, onClick, rightImage, showShareIcon } = props;
+    const { title, onClick, rightImage, showShareIcon, className } = props;
     return (
         <button
-            className="py-4 btnBg support_text_bold rounded-lg flex gap-1 items-center w-[90%] md:w-[60%] lg:w-[320px] justify-center my-0 mx-auto max-w-[320px] relative z-10"
+            className={`${className} py-4 btnBg support_text_bold rounded-lg flex gap-1 items-center w-[90%] md:w-[60%] lg:w-[320px] justify-center my-0 mx-auto max-w-[320px] relative z-10`}
             onClick={onClick}
         >
             {title}

@@ -1,3 +1,5 @@
+import "react-toastify/dist/ReactToastify.css";
+import { serializeError } from "eth-rpc-errors";
 import Image from "next/image";
 import { FC, MouseEvent, useContext, useEffect, useState } from "react";
 import { icons } from "../../utils/images";
@@ -6,6 +8,7 @@ import { Wallet } from "../../utils/wallet";
 import { initWasm } from "@trustwallet/wallet-core";
 import { useRouter } from "next/router";
 import * as loaderAnimation from "../../public/lottie/loader.json";
+import { toast } from "react-toastify";
 import {
     getBalance,
     getEstimatedGas,
@@ -30,6 +33,7 @@ import DepositAmountModal from "./DepositAmountModal";
 import { GlobalContext } from "../../context/GlobalContext";
 import { useWagmi } from "../../utils/wagmi/WagmiContext";
 import { parseEther } from "viem";
+import { ToastContainer } from "react-toastify";
 
 export interface ILoadChestComponent extends THandleStep {
     openLogin?: any;
@@ -57,12 +61,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         setLoading(true);
         getUsdPrice()
             .then(async (res: any) => {
-                console.log(res, "price");
                 setTokenPrice(res.data.ethereum.usd);
-                // const walletCore = await initWasm();
-                // const wallet = new Wallet(walletCore);
-                // const address = await wallet.importWithPrvKey(openLogin.privKey);
-                console.log(address, "address");
                 setFromAddress(address);
                 const balance = (await getBalance(address)) as any;
                 setTokenValue(
@@ -87,7 +86,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         setValue(`${val}`);
         const valueWithoutDollarSign = val.replace(/\$/g, "");
         const tokenIputValue = Number(valueWithoutDollarSign) / Number(tokenPrice);
-        console.log(tokenIputValue, "input value");
         setInputValue(String(tokenIputValue));
     };
 
@@ -95,7 +93,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         const valueWithoutDollarSign = val.replace(/\$/g, "");
         setValue(`${valueWithoutDollarSign}`);
         const tokenIputValue = Number(valueWithoutDollarSign) / Number(tokenPrice);
-        console.log(tokenIputValue, "input value");
         setInputValue(String(tokenIputValue));
     };
 
@@ -128,71 +125,88 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 const walletCore = await initWasm();
                 const wallet = new Wallet(walletCore);
                 const link = await wallet.createPayLink();
-                console.log(link, "link");
                 const toAddress = await wallet.getAccountFromPayLink(link);
-                console.log("address", toAddress);
                 const tokenAmount = Number(inputValue) * Math.pow(10, 18);
 
                 const amountParsed = numHex(Number(parseEther(inputValue)));
-                // console.log(etheresd, "etheresd");
-                // console.log(numHex(Number(etheresd)), "etheresd hex");
                 const nonStrtZero = removeLeadingZeros(amountParsed);
 
                 if (loggedInVia === LOGGED_IN.GOOGLE) {
-                    console.log(tokenAmount, "token amount");
-                    let valueHex = String(nonStrtZero);
+                    try {
+                        let valueHex = String(nonStrtZero);
 
-                    if (!valueHex.startsWith("0x")) {
-                        valueHex = "0x" + valueHex;
+                        if (!valueHex.startsWith("0x")) {
+                            valueHex = "0x" + valueHex;
+                        }
+
+                        const gasLimitData = (await getEstimatedGas({
+                            from: fromAddress,
+                            to: toAddress,
+                            value: valueHex,
+                        })) as any;
+
+                        const nonce = (await getNonce(fromAddress)) as any;
+
+                        const tx: TTranx = {
+                            toAddress: toAddress,
+                            nonceHex: nonce.result,
+                            chainIdHex: numHex(Number(Base.chainId)),
+                            // gas price is hardcoded to pass 1 by default as of now
+                            gasPriceHex: "3B9ACA00" ?? "0x1",
+                            gasLimitHex: gasLimitData.result,
+                            amountHex: numHex(tokenAmount),
+                            amount: tokenAmount,
+                            contractDecimals: 18,
+                            fromAddress: fromAddress,
+                            transactionType: TRANSACTION_TYPE.SEND,
+                            isNative: true,
+                        };
+
+                        const txData = await wallet.signEthTx(tx, openLogin.privKey);
+                        const rawTx = await getSendRawTransaction(txData);
+                        router.push(link);
+                    } catch (e: any) {
+                        setTransactionLoading(false);
+                        const err = serializeError(e);
+                        toast.error(err.message);
+                        console.log(e, "error");
                     }
-
-                    const gasLimitData = (await getEstimatedGas({
-                        from: fromAddress,
-                        to: toAddress,
-                        value: valueHex,
-                    })) as any;
-
-                    const nonce = (await getNonce(fromAddress)) as any;
-
-                    const tx: TTranx = {
-                        toAddress: toAddress,
-                        nonceHex: nonce.result,
-                        chainIdHex: numHex(Number(Base.chainId)),
-                        // gas price is hardcoded to pass 1 by default as of now
-                        gasPriceHex: "3B9ACA00" ?? "0x1",
-                        gasLimitHex: gasLimitData.result,
-                        amountHex: numHex(tokenAmount),
-                        amount: tokenAmount,
-                        contractDecimals: 18,
-                        fromAddress: fromAddress,
-                        transactionType: TRANSACTION_TYPE.SEND,
-                        isNative: true,
-                    };
-
-                    const txData = await wallet.signEthTx(tx, openLogin.privKey);
-                    console.log(txData, "tx data");
-                    const rawTx = await getSendRawTransaction(txData);
-                    console.log(rawTx, "raw tx");
-                    console.log(link, "link");
-                    localStorage.setItem("chestRedirect", "true");
-                    router.push(link);
                 } else {
-                    const sendAmount = await sendTransaction({
-                        to: toAddress,
-                        value: parseEther(inputValue),
-                    });
-
-                    console.log(sendAmount, "sendAmount");
-                    router.push(link);
+                    try {
+                        const sendAmount = await sendTransaction({
+                            to: toAddress,
+                            value: parseEther(inputValue),
+                        });
+                        router.push(link);
+                    } catch (e: any) {
+                        setTransactionLoading(false);
+                        const err = serializeError(e);
+                        toast.error(err.message);
+                        console.log(e, "error");
+                    }
                 }
             } catch (e: any) {
+                setTransactionLoading(false);
+                const err = serializeError(e);
+                toast.error(err.message);
                 console.log(e, "e");
             }
         }
     };
-    console.log(loggedInVia, "loggedin");
     return (
         <div className="mx-auto relative max-w-[400px]">
+            <ToastContainer
+                toastStyle={{ backgroundColor: "#282B30" }}
+                className={`w-50`}
+                style={{ width: "600px" }}
+                position="bottom-center"
+                autoClose={6000}
+                hideProgressBar={true}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                theme="dark"
+            />
             {!transactionLoading ? (
                 <div>
                     <div className="text-center mb-6 mt-12">
@@ -298,14 +312,18 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                             <p className="text-center text-white">$5</p>
                         </div>
                     </div>
-                    <div className="relative mt-5">
+                    <div className="relative mt-10">
                         <div className={`${value ? "opacity-100" : "opacity-50"}`}>
-                            <PrimaryBtn title={"Load Chest"} onClick={createWallet} />
+                            <PrimaryBtn
+                                className="lg:w-[400px] max-w-[400px]"
+                                title={"Load Chest"}
+                                onClick={createWallet}
+                            />
                         </div>
                     </div>
                 </div>
             ) : (
-                <div className="w-full max-w-[600px] h-full relative flex flex-col text-center items-center gap-20 mx-auto mt-32">
+                <div className="w-full max-w-[600px] h-full relative flex flex-col text-center items-center gap-5 mx-auto mt-20">
                     <p className="text-white heading2 text-[32px] ">Loading Chest...</p>
                     <Lottie animationData={loaderAnimation} />
                 </div>
