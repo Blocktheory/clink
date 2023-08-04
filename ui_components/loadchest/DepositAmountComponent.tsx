@@ -53,13 +53,13 @@ export const DepositAmountComponent: FC<IDepositAmountComponent> = (props) => {
                     <div className="flex items-center justify-center">
                         <div>
                             <div className="flex items-center justify-center">
-                                <p className="text-[32px] text-black">$</p>
+                                <p className="text-[32px] text-white">$</p>
                                 <input
                                     name={"usd value"}
                                     style={{ caretColor: "black" }}
                                     inputMode="decimal"
                                     type="number"
-                                    className={`dollorInput pl-0 pt-2 pb-1 backdrop-blur-xl text-[32px] border-none text-center bg-transparent text-black dark:text-textDark-900 placeholder-black dark:placeholder-textDark-300 rounded-lg block w-full focus:outline-none focus:ring-transparent`}
+                                    className={`dollorInput pl-0 pt-2 pb-1 backdrop-blur-xl text-[32px] border-none text-center bg-transparent text-white placeholder-white rounded-lg block w-full focus:outline-none focus:ring-transparent`}
                                     placeholder={"0"}
                                     autoFocus={true}
                                     value={value}
@@ -71,7 +71,7 @@ export const DepositAmountComponent: FC<IDepositAmountComponent> = (props) => {
                                     }
                                 />
                             </div>
-                            <p className="text-black text-[12px] leading-[14px] text-center">
+                            <p className="text-white text-[12px] leading-[14px] text-center">
                                 ~ {inputValue} ETH
                             </p>
                         </div>

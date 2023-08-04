@@ -118,14 +118,14 @@ export const QRComponent: FC<IQRComponent> = (props) => {
     };
     return (
         <div>
-            <p className="text-black text-[20px] text-center m-2">
+            <p className="text-white text-[20px] text-center m-2">
                 You can deposit crypto into your account via this public key:
             </p>
             <div className="flex items-center justify-center" ref={ref} />
             <div>
                 <div className="flex items-center justify-center">
                     <div className="w-fit mt-[15px] border-dashed border border-secondary-300 dark:border-secondaryDark-300 rounded-[10px] flex justify-center items-start md:items-center p-2">
-                        <div className=" text-black text-[14px] break-all">
+                        <div className=" text-white text-[14px] break-all">
                             {trimAddress(walletAddress)}
                         </div>
                         <button className="ml-1 w-6 h-6" onClick={() => handleCopy()}>

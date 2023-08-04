@@ -121,10 +121,12 @@ export const DepositAmountModal: FC<IDepositAmountModal> = (props) => {
     };
     const handleExternalWalletClick = async () => {
         const account = await getAccount();
-        await connect({
-            chainId: baseGoerli.id,
-            connector: injectConnector,
-        });
+        if (!account || !account.isConnected) {
+            await connect({
+                chainId: baseGoerli.id,
+                connector: injectConnector,
+            });
+        }
         setIsConnectedToWallet(account.isConnected);
         setShowOptions(false);
         setShowQr(false);
@@ -165,7 +167,7 @@ export const DepositAmountModal: FC<IDepositAmountModal> = (props) => {
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
                                 <Dialog.Panel
-                                    className={` bg-white lg:min-w-[400px] rounded-[12px] w-full lg:w-[400px]  py-5`}
+                                    className={`bg-black lg:min-w-[400px] rounded-[12px] w-full lg:w-[400px]  py-5`}
                                 >
                                     {open && showOptions ? (
                                         <div className="px-4">
@@ -175,7 +177,7 @@ export const DepositAmountModal: FC<IDepositAmountModal> = (props) => {
                                                     handleExternalWalletClick();
                                                 }}
                                             >
-                                                <p className="text-center text-black">
+                                                <p className="text-center text-white">
                                                     External Wallet
                                                 </p>
                                             </div>
@@ -185,7 +187,7 @@ export const DepositAmountModal: FC<IDepositAmountModal> = (props) => {
                                                     handlePublicKeyClick();
                                                 }}
                                             >
-                                                <p className="text-center text-black">
+                                                <p className="text-center text-white">
                                                     Public Key
                                                 </p>
                                             </div>
