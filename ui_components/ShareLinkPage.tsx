@@ -10,6 +10,7 @@ import { initWasm } from "@trustwallet/wallet-core";
 import { Wallet } from "../utils/wallet";
 import Image from "next/image";
 import { toast } from "react-toastify";
+import { BigNumber } from "bignumber.js";
 import {
     getBalance,
     getEstimatedGas,
@@ -19,7 +20,8 @@ import {
 } from "../apiServices";
 import {
     getCurrencyFormattedNumber,
-    getTokenFormattedNumber,
+    getTokenValueFormatted,
+    hexFormatter,
     hexToNumber,
     numHex,
 } from "../utils";
@@ -39,17 +41,13 @@ const ShareLink: FC<IShareLink> = (props) => {
         state: { googleUserInfo, isConnected },
     } = useContext(GlobalContext);
     const { uuid } = props;
-    const [amount, setAmount] = useState({
-        eth: "0.1",
-        dollars: "1",
-    });
     const [toAddress, setToAddress] = useState("");
-    const [walletBalance, setWalletBalance] = useState(0);
+    const [walletBalanceHex, setWalletBalanceHex] = useState("");
     const [fromAddress, setFromAddress] = useState("");
     const [wallet, setWallet] = useState("" as unknown as Wallet);
     const [shareText, setShareText] = useState("Share");
     const [showShareIcon, setShowShareIcon] = useState(true);
-    const [tokenValue, setTokenValue] = useState(0);
+    const [tokenValue, setTokenValue] = useState("");
     const [headingText, setHeadingText] = useState("Your chest is ready");
     const [linkValueUsd, setLinkValueUsd] = useState("");
     const [isRedirected, setIsRedirected] = useState(false);
@@ -88,7 +86,7 @@ const ShareLink: FC<IShareLink> = (props) => {
     };
 
     useMemo(async () => {
-        if (uuid) {
+        if (uuid && uuid != "/[id]") {
             const walletCore = await initWasm();
             const wallet = new Wallet(walletCore);
             setWallet(wallet);
@@ -98,19 +96,20 @@ const ShareLink: FC<IShareLink> = (props) => {
             } else {
                 console.log("error", "invalid identifier");
             }
+            const balance = (await getBalance(account)) as any;
+            const hexValue = balance.result;
+            const bgBal = BigNumber(hexValue)
+            const bgNum = bgBal.dividedBy(Math.pow(10, 18)).toNumber();
+            setWalletBalanceHex(hexValue)
             getUsdPrice().then(async (res: any) => {
-                const balance = (await getBalance(account)) as any;
                 setTokenValue(
-                    getTokenFormattedNumber(
-                        hexToNumber(balance.result) as unknown as string,
-                        18,
-                    ),
+                    getTokenValueFormatted(bgNum),
                 );
                 setIsLoading(false);
                 const formatBal = (
-                    (hexToNumber(balance.result) / Math.pow(10, 18)) *
+                    (bgNum) *
                     res.data.ethereum.usd
-                ).toFixed(3);
+                );
                 setLinkValueUsd(getCurrencyFormattedNumber(formatBal));
             });
         }
@@ -118,9 +117,9 @@ const ShareLink: FC<IShareLink> = (props) => {
 
     useMemo(async () => {
         if (toAddress && fromAddress) {
-            const balance = await fetchBalance({
-                address: fromAddress as Address,
-            });
+            // const balance = await fetchBalance({
+            //     address: fromAddress as Address,
+            // });
             // sendToken(toAddress);
         }
     }, [toAddress]);
@@ -154,26 +153,27 @@ const ShareLink: FC<IShareLink> = (props) => {
         try {
             const walletCore = await initWasm();
             const wallet = new Wallet(walletCore);
-            const balance = (await getBalance(fromAddress)) as any;
-            let tokenAmount = String(numHex(Number(balance.result)));
-            if (!tokenAmount.startsWith("0x")) {
-                tokenAmount = "0x" + tokenAmount;
-            }
             const gasLimitData = (await getEstimatedGas({
                 from: fromAddress,
                 to: toAdd,
-                value: balance.result,
+                value: walletBalanceHex,
             })) as any;
+            const gasLimit = gasLimitData?.result ?? "0x5208";
+            const gasPirce = "3B9ACA00";
+            let bgBal = BigNumber(walletBalanceHex);
+            const bgGasPirce = BigNumber("0x" + gasPirce);
+            const bgGasLimit = BigNumber(gasLimit);
+            const gasFee = bgGasPirce.multipliedBy(bgGasLimit).multipliedBy(2) ;
+            bgBal = bgBal.minus(gasFee)
+            const amountToSend = hexFormatter(bgBal.toString(16));
             const nonce = (await getNonce(fromAddress)) as any;
             const tx: TTranx = {
                 toAddress: toAdd,
                 nonceHex: nonce.result,
                 chainIdHex: numHex(Number(Base.chainId)),
-                // gas price is hardcoded to pass 1 by default as of now
-                gasPriceHex: "3B9ACA00" ?? "0x1",
-                gasLimitHex: gasLimitData.result,
-                amountHex: balance.result,
-                amount: Number(tokenAmount),
+                gasPriceHex: gasPirce,
+                gasLimitHex: gasLimit,
+                amountHex: amountToSend,
                 contractDecimals: 18,
                 fromAddress: fromAddress,
                 transactionType: TRANSACTION_TYPE.SEND,
@@ -188,7 +188,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                 toast.error(err.message);
             } else {
                 setProcessing(false);
-                toast.error("Claimed Successfully");
+                toast.success("Claimed Successfully");
             }
             setProcessing(false);
         } catch (e: any) {
@@ -230,8 +230,8 @@ const ShareLink: FC<IShareLink> = (props) => {
                         </div>
                     ) : (
                         <div className="flex gap-1 flex-col text-start ml-3">
-                            <p className="text-[40px] text-[#F4EC97] font bold">{`$ ${amount.dollars}`}</p>
-                            <p className="text-sm text-white/50">{`~ ${amount.eth} ETH`}</p>
+                            <p className="text-[40px] text-[#F4EC97] font bold">{`${linkValueUsd}`}</p>
+                            <p className="text-sm text-white/50">{`~ ${tokenValue} ETH`}</p>
                         </div>
                     )}
                     <div className="self-end">

@@ -91,8 +91,9 @@ export class Wallet {
     createPayLink = () => {
         const account = this.HDWallet.create(128, "");
         const entropy = account.entropy();
+        const address =  account.getAddressForCoin(this.CoinType.ethereum);
         const hash = bs58.encode(entropy);
-        return "/i#" + hash;
+        return { link: "/i#" + hash, address: address };
     };
 
     getAccountFromPayLink = (hash: string) => {

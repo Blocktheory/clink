@@ -83,7 +83,7 @@ const BottomSheet: FC<TProps> = (props) => {
                                                         <p className="text-[12px] font-medium text-[#555555]">
                                                             ACCOUNT OVERVIEW
                                                         </p>
-                                                        <p className="text-black">
+                                                        <p className="text-black text-left">
                                                             {address
                                                                 ? trimAddress(address)
                                                                 : ""}

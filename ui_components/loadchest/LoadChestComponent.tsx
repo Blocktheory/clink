@@ -20,6 +20,7 @@ import {
 import {
     getCurrencyFormattedNumber,
     getTokenFormattedNumber,
+    getTokenValueFormatted,
     hexToNumber,
     numHex,
 } from "../../utils";
@@ -83,17 +84,25 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     }, []);
 
     const handleValueClick = (val: string) => {
-        setValue(`${val}`);
-        const valueWithoutDollarSign = val.replace(/\$/g, "");
+        setValue(`$${val}`);
+        const valueWithoutDollarSign = val.replace(/[^\d.]/g, "");
         const tokenIputValue = Number(valueWithoutDollarSign) / Number(tokenPrice);
-        setInputValue(String(tokenIputValue));
+        setInputValue(getTokenValueFormatted(
+            Number(tokenIputValue),
+        ));
     };
 
     const handleInputChange = (val: string) => {
-        const valueWithoutDollarSign = val.replace(/\$/g, "");
-        setValue(`${valueWithoutDollarSign}`);
+        const valueWithoutDollarSign = val.replace(/[^\d.]/g, "");
+        let appendDollar = ""
+        if (Number(valueWithoutDollarSign) > 0) {
+            appendDollar = "$"
+        }
+        setValue(`${appendDollar}${valueWithoutDollarSign}`);
         const tokenIputValue = Number(valueWithoutDollarSign) / Number(tokenPrice);
-        setInputValue(String(tokenIputValue));
+        setInputValue(getTokenValueFormatted(
+            Number(tokenIputValue),
+        ));
     };
 
     const dollorToToken = (val: string) => {
@@ -119,16 +128,21 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     }
 
     const createWallet = async () => {
-        if (value) {
+        console.log("value ", value)
+        console.log("inputValue ", inputValue)
+        const _inputValue = inputValue.replace(/[^\d.]/g, "")
+        if (_inputValue) {
             setTransactionLoading(true);
             try {
                 const walletCore = await initWasm();
                 const wallet = new Wallet(walletCore);
-                const link = await wallet.createPayLink();
-                const toAddress = await wallet.getAccountFromPayLink(link);
-                const tokenAmount = Number(inputValue) * Math.pow(10, 18);
+                const payData = await wallet.createPayLink();
+                console.log("link ", payData)
+                const toAddress = payData.address;
+                console.log("toAddress ", toAddress)
+                const tokenAmount = Number(_inputValue) * Math.pow(10, 18);
 
-                const amountParsed = numHex(Number(parseEther(inputValue)));
+                const amountParsed = numHex(Number(parseEther(_inputValue)));
                 const nonStrtZero = removeLeadingZeros(amountParsed);
 
                 if (loggedInVia === LOGGED_IN.GOOGLE) {
@@ -155,7 +169,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                             gasPriceHex: "3B9ACA00" ?? "0x1",
                             gasLimitHex: gasLimitData.result,
                             amountHex: numHex(tokenAmount),
-                            amount: tokenAmount,
                             contractDecimals: 18,
                             fromAddress: fromAddress,
                             transactionType: TRANSACTION_TYPE.SEND,
@@ -164,7 +177,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
 
                         const txData = await wallet.signEthTx(tx, openLogin.privKey);
                         const rawTx = await getSendRawTransaction(txData);
-                        router.push(link);
+                        router.push(payData.link);
                     } catch (e: any) {
                         setTransactionLoading(false);
                         const err = serializeError(e);
@@ -177,7 +190,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                             to: toAddress,
                             value: parseEther(inputValue),
                         });
-                        router.push(link);
+                        router.push(payData.link);
                     } catch (e: any) {
                         setTransactionLoading(false);
                         const err = serializeError(e);
@@ -224,7 +237,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                                 <div className="flex items-start gap-3 my-2">
                                     <Image src={icons.transferIcon} alt="transferIcon" />
                                     <div>
-                                        <p className="text-white text-[24px] font-semibold leading-10 mb-2">
+                                        <p className="text-white/80 text-[24px] font-semibold leading-10 mb-2">
                                             {price}
                                         </p>
                                         <p className="text-white/30 text-[12px] leading-[14px]">
@@ -258,30 +271,26 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                             <div className="flex items-center justify-center">
                                 <div>
                                     <div className="flex items-center justify-center">
-                                        <p className="text-[32px] text-white">$</p>
+                                        {/* <p className="text-[32px] text-white">$</p> */}
                                         <input
-                                            name={"usd value"}
+                                            name="usdValue"
                                             style={{ caretColor: "white" }}
                                             inputMode="decimal"
-                                            type="number"
+                                            type="text"
                                             className={`dollorInput pl-0 pt-2 pb-1 backdrop-blur-xl text-[32px] border-none text-center bg-transparent text-white dark:text-textDark-900 placeholder-white dark:placeholder-textDark-300 rounded-lg block w-full focus:outline-none focus:ring-transparent`}
-                                            placeholder={"0"}
+                                            placeholder="$0"
                                             autoFocus={true}
                                             value={value}
                                             onChange={(e) => {
-                                                handleInputChange(`${e.target.value}`);
+                                                handleInputChange(e.target.value);
                                             }}
                                             disabled={loading}
-                                            onWheel={() =>
-                                                (
-                                                    document.activeElement as HTMLElement
-                                                ).blur()
-                                            }
+                                            onWheel={() => (document.activeElement as HTMLElement).blur()}
                                         />
                                     </div>
-                                    <p className="text-white/30 text-[12px] leading-[14px] text-center">
+                                    {Number(inputValue) > 0 && <p className="text-white/30 text-[12px] leading-[14px] text-center">
                                         ~ {inputValue} ETH
-                                    </p>
+                                    </p>}
                                 </div>
                             </div>
                         </div>
