@@ -90,7 +90,7 @@ export const getCurrencyFormattedNumber = (
     }
     // Added to round down the number
     const expo = Math.pow(10, decimals);
-    val = Math.floor(val * expo) / expo;
+    val = Math.ceil(val * expo) / expo;
     const _val = val.toLocaleString("en-US", {
         style: "currency",
         currency: currency,
@@ -98,7 +98,7 @@ export const getCurrencyFormattedNumber = (
         currencyDisplay: "symbol",
     });
     if (!_val.includes("$")) {
-        return "$" + _val + currencySuffix;
+        return "$" + Number(_val) + currencySuffix;
     }
     if (decimals === 2 && _val.includes(".") && _val.endsWith(".00")) {
         return _val.slice(0, -3) + currencySuffix;
