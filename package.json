@@ -10,6 +10,7 @@
     },
     "dependencies": {
         "@headlessui/react": "^1.7.16",
+        "@rainbow-me/rainbowkit": "^1.0.8",
         "@safe-global/auth-kit": "^1.2.0",
         "@toruslabs/openlogin": "^4.7.2",
         "@trustwallet/wallet-core": "^3.2.7",
