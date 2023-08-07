@@ -80,6 +80,8 @@ export const getCurrencyFormattedNumber = (
     } else if (val < 0 || val < 1) {
         if (val < 0.01 && !ignoreSmallVal) {
             return "<$0.01";
+        } else if (ignoreSmallVal && val < 0.01) {
+            return ZERO_USD;
         }
     } else if (val > 999999999) {
         val = val / 1000000000;

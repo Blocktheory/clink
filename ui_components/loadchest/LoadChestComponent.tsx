@@ -261,7 +261,11 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 <div>
                     {googleUserInfo ? (
                         <div onClick={handleShowActivity}>
-                            <ProfileCard balance={price} showActivity={showActivity} transactionLoading={transactionLoading} />
+                            <ProfileCard
+                                balance={price}
+                                showActivity={showActivity}
+                                transactionLoading={transactionLoading}
+                            />
                         </div>
                     ) : (
                         <div className="text-center mb-6 mt-12">
@@ -326,18 +330,16 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                                         </p>
                                     </div>
                                 </div>
-                                {loggedInVia === LOGGED_IN.GOOGLE && (
-                                    <div
-                                        className="bg-white/80 py-2 rounded-b-lg cursor-pointer"
-                                        onClick={() => {
-                                            setOpen(true);
-                                        }}
-                                    >
-                                        <p className="text-[#010101] text-[14px] leading-[18px] font-medium text-center">
-                                            + Add funds to your account
-                                        </p>
-                                    </div>
-                                )}
+                                <div
+                                    className="bg-white/80 py-2 rounded-b-lg cursor-pointer"
+                                    onClick={() => {
+                                        setOpen(true);
+                                    }}
+                                >
+                                    <p className="text-[#010101] text-[14px] leading-[18px] font-medium text-center">
+                                        + Add funds to your account
+                                    </p>
+                                </div>
                             </div>
                             <div className="w-full mt-5 ">
                                 <div className="relative rounded-lg border bg-white/5 border-gray-500  h-auto  p-4">
