@@ -1,6 +1,6 @@
 import "react-toastify/dist/ReactToastify.css";
 import { serializeError } from "eth-rpc-errors";
-import React, { useContext, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import HomePage from "../ui_components/home/HomePage";
 import ConnectWallet from "../ui_components/connect_wallet/";
 import "./globals.css";
@@ -17,8 +17,8 @@ import { ACTIONS, GlobalContext } from "../context/GlobalContext";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
 import { ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
-
-import { connect } from "@wagmi/core";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
 
 export type THandleStep = {
     handleSteps: (step: number) => void;
@@ -45,7 +45,9 @@ export default function Home() {
     const [step, setStep] = useState<number>(ESteps.ONE);
     const [openBottomSheet, setOpenBottomSheet] = useState(false);
     const [connecting, setConnecting] = useState(false);
-    const { fetchBalance, injectConnector, sendTransaction, getAccount } = useWagmi();
+    const { getAccount, disconnect } = useWagmi();
+    const { openConnectModal } = useConnectModal();
+    const { address, isConnecting, isConnected } = useAccount();
 
     useMemo(async () => {
         async function initializeOpenLogin() {
@@ -84,24 +86,23 @@ export default function Home() {
     }, []);
 
     useMemo(async () => {
-        const account = await getAccount();
-        if (account.isConnected && loggedInVia === LOGGED_IN.EXTERNAL_WALLET) {
+        if (isConnected && address && !openLogin.privKey) {
             dispatch({
                 type: ACTIONS.SET_ADDRESS,
-                payload: account.address,
+                payload: address,
             });
             dispatch({
                 type: ACTIONS.LOGGED_IN_VIA,
                 payload: LOGGED_IN.EXTERNAL_WALLET,
             });
-            setWalletAddress(account.address);
-            handleSteps(ESteps.THREE);
+            setWalletAddress(address!);
+            setStep(ESteps.THREE);
         }
-    }, [walletAddress]);
+    }, [address]);
 
     useMemo(async () => {
         const account = await getAccount();
-        if (account.isConnected && loggedInVia === LOGGED_IN.EXTERNAL_WALLET) {
+        if (isConnected && address && !openLogin.privKey) {
             dispatch({
                 type: ACTIONS.SET_ADDRESS,
                 payload: account.address,
@@ -110,8 +111,8 @@ export default function Home() {
                 type: ACTIONS.LOGGED_IN_VIA,
                 payload: LOGGED_IN.EXTERNAL_WALLET,
             });
-            setWalletAddress(account.address);
-            handleSteps(ESteps.THREE);
+            setWalletAddress(address!);
+            setStep(ESteps.THREE);
         }
     }, []);
 
@@ -155,10 +156,22 @@ export default function Home() {
     const signOut = async () => {
         await openLogin.logout();
         setStep(ESteps.ONE);
+
+        dispatch({
+            type: ACTIONS.LOGGED_IN_VIA,
+            payload: "",
+        });
         dispatch({
             type: ACTIONS.LOGOUT,
             payload: "",
         });
+        dispatch({
+            type: ACTIONS.SET_ADDRESS,
+            payload: "",
+        });
+        if (isConnected) {
+            await disconnect();
+        }
         setWalletAddress("");
         setOpenBottomSheet(false);
     };
@@ -203,30 +216,7 @@ export default function Home() {
     const connectWallet = async () => {
         setConnecting(true);
         try {
-            connect({
-                chainId: baseGoerli.chainId,
-                connector: injectConnector,
-            })
-                .then((result: any) => {
-                    setWalletAddress(result.account);
-                    setConnecting(false);
-                    dispatch({
-                        type: ACTIONS.SET_ADDRESS,
-                        payload: result.account,
-                    });
-                    dispatch({
-                        type: ACTIONS.LOGGED_IN_VIA,
-                        payload: LOGGED_IN.EXTERNAL_WALLET,
-                    });
-                    setStep(ESteps.THREE);
-                })
-                .catch((e) => {
-                    const err = serializeError(e);
-                    console.log(err, "err");
-                    setConnecting(false);
-                    toast.error(err.message);
-                    console.log(e, "error");
-                });
+            await openConnectModal?.();
         } catch (e: any) {
             const err = serializeError(e);
             console.log(err, "err");
@@ -235,6 +225,22 @@ export default function Home() {
             console.log(e, "error");
         }
     };
+
+    useEffect(() => {
+        if (address && !isConnecting && connecting) {
+            dispatch({
+                type: ACTIONS.SET_ADDRESS,
+                payload: address,
+            });
+            dispatch({
+                type: ACTIONS.LOGGED_IN_VIA,
+                payload: LOGGED_IN.EXTERNAL_WALLET,
+            });
+            setConnecting(false);
+            setWalletAddress(address);
+            handleSteps(ESteps.THREE);
+        }
+    }, [isConnecting]);
 
     return (
         <>
@@ -245,6 +251,7 @@ export default function Home() {
                 handleSteps={handleSteps}
                 onHamburgerClick={onHamburgerClick}
                 signOut={signOut}
+                setWalletAddress={setWalletAddress}
             />
             <div className="p-4 relative">
                 <ToastContainer
