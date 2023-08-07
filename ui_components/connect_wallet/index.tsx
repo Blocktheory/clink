@@ -49,7 +49,7 @@ export default function ConnectWallet(props: IConnectWallet) {
                 </p>
                 <div className="flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto rounded-lg">
                     <button
-                        className={`py-4 w-[90%] rounded-lg bg-white flex gap-2 items-center justify-center max-w-[320px]`}
+                        className={`py-4 w-full rounded-lg bg-white flex gap-2 items-center justify-center max-w-[400px]`}
                         onClick={signIn}
                     >
                         <Image
