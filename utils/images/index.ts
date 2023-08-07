@@ -15,6 +15,7 @@ import logoutIcon from "../../public/assets/images/logout_icon.svg";
 import helpIcon from "../../public/assets/images/help_icon.svg";
 import downloadBtnIconBlack from "../../public/assets/images/download_btn_icon_black.svg";
 import shareBtnIconWhite from "../../public/assets/images/share_btn_icon_white.svg";
+import profileCardBg from "../../public/assets/images/bg_card_topology.svg";
 
 export type TImages =
     | "logo"
@@ -33,6 +34,7 @@ export type TImages =
     | "downloadBtnIcon"
     | "downloadBtnIconBlack"
     | "shareBtnIconWhite"
+    | "profileCardBg"
     | "ethLogo";
 
 export type TNextImage = {
@@ -59,4 +61,5 @@ export const icons: Record<TImages, TNextImage> = {
     ethLogo,
     downloadBtnIconBlack,
     shareBtnIconWhite,
+    profileCardBg,
 };
