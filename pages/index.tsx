@@ -4,7 +4,6 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import HomePage from "../ui_components/home/HomePage";
 import ConnectWallet from "../ui_components/connect_wallet/";
 import "./globals.css";
-import OpenLogin from "@toruslabs/openlogin";
 import { baseGoerli, projectId } from "../constants/base";
 import { Wallet } from "../utils/wallet";
 import { initWasm } from "@trustwallet/wallet-core";
@@ -23,6 +22,9 @@ import { Web3AuthModalPack, Web3AuthConfig } from "@safe-global/auth-kit";
 import { Web3AuthOptions } from "@web3auth/modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
+import { ethers } from "ethers";
+import { EthersAdapter, SafeFactory, SafeAccountConfig } from "@safe-global/protocol-kit";
+import { GelatoRelayPack } from "@safe-global/relay-kit";
 
 export type THandleStep = {
     handleSteps: (step: number) => void;
@@ -177,6 +179,8 @@ export default function Home() {
         // }
         // setOpenBottomSheet(false);
         const authKitSignData = await safeLogin.signIn();
+        console.log(authKitSignData, "authkitsigndata");
+        await deploySafeContract();
         dispatch({
             type: ACTIONS.LOGGED_IN_VIA,
             payload: LOGGED_IN.GOOGLE,
@@ -187,7 +191,45 @@ export default function Home() {
         });
         setWalletAddress(authKitSignData.eoa);
         handleSteps(ESteps.THREE);
-        console.log(authKitSignData, "authkitsigndata");
+    };
+
+    const deploySafeContract = async () => {
+        console.log("deploy safe contract called")
+        const provider = new ethers.providers.Web3Provider(safeLogin.getProvider());
+        const signer = provider.getSigner();
+        console.log("deploy signer", signer);
+        const ethAdapter = new EthersAdapter({
+            ethers,
+            signerOrProvider: signer || provider,
+        });
+        const safeFactory = await SafeFactory.create({ ethAdapter: ethAdapter });
+        console.log("deploy safeFactory", safeFactory);
+        const safeAccountConfig: SafeAccountConfig = {
+            owners: [await signer.getAddress()],
+            threshold: 1,
+        };
+        console.log("deploy safeAccountConfig", safeAccountConfig);
+        const safeSdkOwnerPredicted = await safeFactory.predictSafeAddress(
+            safeAccountConfig,
+        );
+        console.log("deploy safeSdkOwner1", safeSdkOwnerPredicted);
+        const safeSdkOwner1 = await safeFactory.deploySafe({ safeAccountConfig });
+        // const relayKit = new GelatoRelayPack(
+        //     "qbec0fcMKxOAXM0qyxL6cDMX_aaJUmSPPAJUIEg17kU_",
+        // );
+
+        // const response = await relayKit.relayTransaction({
+        //     target: "0x...", // The Safe address
+        //     encodedTransaction: "0x...", // Encoded Safe transaction data
+        //     chainId: "100",
+        // });
+
+
+        // console.log("deploy safeSdkOwner1", safeSdkOwner1);
+        // const safeAddress = await safeSdkOwner1.getAddress();
+        console.log("Your Safe has been deployed:");
+        // console.log(`https://goerli.etherscan.io/address/${safeAddress}`);
+        // console.log(`https://app.safe.global/gor:${safeAddress}`);
     };
 
     const getAddress = async (prvKey: string) => {
