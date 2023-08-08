@@ -19,6 +19,10 @@ import { ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
+import { Web3AuthModalPack, Web3AuthConfig } from "@safe-global/auth-kit";
+import { Web3AuthOptions } from "@web3auth/modal";
+import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
+import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
 
 export type THandleStep = {
     handleSteps: (step: number) => void;
@@ -41,6 +45,7 @@ export default function Home() {
     } = useContext(GlobalContext);
     const [loader, setLoader] = useState(true);
     const [openLogin, setSdk] = useState<any>("");
+    const [safeLogin, setSafeLogin] = useState<any>("");
     const [walletAddress, setWalletAddress] = useState<string>("");
     const [step, setStep] = useState<number>(ESteps.ONE);
     const [openBottomSheet, setOpenBottomSheet] = useState(false);
@@ -51,41 +56,75 @@ export default function Home() {
 
     useMemo(async () => {
         async function initializeOpenLogin() {
-            const sdkInstance = new OpenLogin({
-                clientId: projectId,
-                network: baseGoerli.networks.testnet.displayName,
-                mfaSettings: undefined,
-            });
-            await sdkInstance.init();
-            if (sdkInstance.privKey) {
-                if (localStorage.getItem("loginAttempted") === "true") {
-                    handleSteps(ESteps.THREE);
-                    localStorage.removeItem("loginAttempted");
-                }
-                const prvKey = sdkInstance.privKey;
-                getAddress(prvKey);
-            } else {
-                setLoader(false);
-            }
-            setSdk(sdkInstance);
-
-            dispatch({
-                type: ACTIONS.LOGGED_IN_VIA,
-                payload: LOGGED_IN.GOOGLE,
-            });
-            dispatch({
-                type: ACTIONS.GOOGLE_USER_INFO,
-                payload: {
-                    googleUserInfo: sdkInstance.state.userInfo,
-                    isConnected: sdkInstance.privKey ? true : false,
+            // const sdkInstance = new OpenLogin({
+            //     clientId: projectId,
+            //     network: baseGoerli.networks.testnet.displayName,
+            //     mfaSettings: undefined,
+            // });
+            // await sdkInstance.init();
+            // if (sdkInstance.privKey) {
+            //     if (localStorage.getItem("loginAttempted") === "true") {
+            //         handleSteps(ESteps.THREE);
+            //         localStorage.removeItem("loginAttempted");
+            //     }
+            //     const prvKey = sdkInstance.privKey;
+            //     getAddress(prvKey);
+            // } else {
+            //     setLoader(false);
+            // }
+            // setSdk(sdkInstance);
+            // dispatch({
+            //     type: ACTIONS.LOGGED_IN_VIA,
+            //     payload: LOGGED_IN.GOOGLE,
+            // });
+            // dispatch({
+            //     type: ACTIONS.GOOGLE_USER_INFO,
+            //     payload: {
+            //         googleUserInfo: sdkInstance.state.userInfo,
+            //         isConnected: sdkInstance.privKey ? true : false,
+            //     },
+            // });
+            const options: Web3AuthOptions = {
+                clientId:
+                    "BGYt14IfWWn05BWMxtbsTx9SLMkuU1RJmj08ISnj0sTrO9fie5r-IZt7oh0jpqn5GrkZFWqqX6okxHCJEfYJ_uI",
+                web3AuthNetwork: "testnet",
+                chainConfig: {
+                    chainNamespace: CHAIN_NAMESPACES.EIP155,
+                    chainId: "0x14a33",
+                    rpcTarget: "https://goerli.base.org",
                 },
-            });
+                uiConfig: {
+                    appName: "MicroPay",
+                    theme: "dark",
+                    loginMethodsOrder: ["google", "facebook"],
+                },
+            };
+
+            const modalConfig = {
+                [WALLET_ADAPTERS.TORUS_EVM]: {
+                    label: "torus",
+                    showOnModal: false,
+                },
+                [WALLET_ADAPTERS.METAMASK]: {
+                    label: "metamask",
+                    showOnDesktop: false,
+                    showOnMobile: false,
+                },
+            };
+
+            const web3AuthConfig: Web3AuthConfig = {
+                txServiceUrl: "https://safe-transaction-goerli.safe.global",
+            };
+            // Instantiate and initialize the pack
+            const web3AuthModalPack = new Web3AuthModalPack(web3AuthConfig);
+            await web3AuthModalPack.init({ options, modalConfig });
+            setSafeLogin(web3AuthModalPack);
         }
         initializeOpenLogin();
     }, []);
 
     useMemo(async () => {
-        if (isConnected && address && !openLogin.privKey) {
+        if (isConnected && address && !safeLogin) {
             dispatch({
                 type: ACTIONS.SET_ADDRESS,
                 payload: address,
@@ -101,7 +140,7 @@ export default function Home() {
 
     useMemo(async () => {
         const account = await getAccount();
-        if (isConnected && address && !openLogin.privKey) {
+        if (isConnected && address && !safeLogin) {
             dispatch({
                 type: ACTIONS.SET_ADDRESS,
                 payload: account.address,
@@ -126,18 +165,29 @@ export default function Home() {
     // }, 200);
 
     const signIn = async () => {
-        localStorage.setItem("loginAttempted", "true");
-        try {
-            await openLogin.login({
-                loginProvider: "google",
-                redirectUrl: `${window.origin}`,
-                mfaLevel: "none",
-            });
-        } catch (error) {
-            console.log("error", error);
-        }
-
-        setOpenBottomSheet(false);
+        // localStorage.setItem("loginAttempted", "true");
+        // try {
+        //     await openLogin.login({
+        //         loginProvider: "google",
+        //         redirectUrl: `${window.origin}`,
+        //         mfaLevel: "none",
+        //     });
+        // } catch (error) {
+        //     console.log("error", error);
+        // }
+        // setOpenBottomSheet(false);
+        const authKitSignData = await safeLogin.signIn();
+        dispatch({
+            type: ACTIONS.LOGGED_IN_VIA,
+            payload: LOGGED_IN.GOOGLE,
+        });
+        dispatch({
+            type: ACTIONS.SET_ADDRESS,
+            payload: authKitSignData.eoa,
+        });
+        setWalletAddress(authKitSignData.eoa);
+        handleSteps(ESteps.THREE);
+        console.log(authKitSignData, "authkitsigndata");
     };
 
     const getAddress = async (prvKey: string) => {
