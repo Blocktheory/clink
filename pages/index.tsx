@@ -121,12 +121,17 @@ export default function Home() {
             const web3AuthModalPack = new Web3AuthModalPack(web3AuthConfig);
             await web3AuthModalPack.init({ options, modalConfig });
             setSafeLogin(web3AuthModalPack);
+            console.log(
+                localStorage.getItem("isConnected") === "true",
+                localStorage.getItem("isGoogleLogin") === "true",
+                "sa;fksd;fsa;kj",
+            );
         }
         initializeOpenLogin();
     }, []);
 
     useMemo(async () => {
-        if (isConnected && address && !safeLogin) {
+        if (isConnected && address && localStorage.getItem("isGoogleLogin") === "false") {
             dispatch({
                 type: ACTIONS.SET_ADDRESS,
                 payload: address,
@@ -141,11 +146,15 @@ export default function Home() {
     }, [address]);
 
     useMemo(async () => {
-        const account = await getAccount();
-        if (isConnected && address && !safeLogin) {
+        console.log(loggedInVia, "login in via");
+        if (
+            localStorage.getItem("isConnected") === "true" &&
+            address &&
+            localStorage.getItem("isGoogleLogin") === "false"
+        ) {
             dispatch({
                 type: ACTIONS.SET_ADDRESS,
-                payload: account.address,
+                payload: address,
             });
             dispatch({
                 type: ACTIONS.LOGGED_IN_VIA,
@@ -154,6 +163,14 @@ export default function Home() {
             setWalletAddress(address!);
             setStep(ESteps.THREE);
         }
+        // else if (
+        //     localStorage.getItem("isConnected") === "true" &&
+        //     localStorage.getItem("isGoogleLogin") === "true"
+        // ) {
+        //     if (safeLogin) {
+        //         signIn();
+        //     }
+        // }
     }, []);
 
     // const { dispatch } = getStore();
@@ -165,6 +182,24 @@ export default function Home() {
     //         },
     //     });
     // }, 200);
+
+    useEffect(() => {
+        if (
+            localStorage.getItem("isConnected") === "true" &&
+            localStorage.getItem("isGoogleLogin") === "true" &&
+            safeLogin
+        ) {
+            signIn();
+        }
+    }, [safeLogin]);
+
+    useEffect(() => {
+        if (googleSignInStarted) {
+            signIn();
+        }
+    }, [safeLogin]);
+
+    const [googleSignInStarted, setGoogleSignInStarted] = useState(false);
 
     const signIn = async () => {
         // localStorage.setItem("loginAttempted", "true");
@@ -178,18 +213,24 @@ export default function Home() {
         //     console.log("error", error);
         // }
         // setOpenBottomSheet(false);
-        const authKitSignData = await safeLogin.signIn();
-        // await deploySafeContract();
-        dispatch({
-            type: ACTIONS.LOGGED_IN_VIA,
-            payload: LOGGED_IN.GOOGLE,
-        });
-        dispatch({
-            type: ACTIONS.SET_ADDRESS,
-            payload: authKitSignData.eoa,
-        });
-        setWalletAddress(authKitSignData.eoa);
-        handleSteps(ESteps.THREE);
+        setGoogleSignInStarted(true);
+        if (safeLogin) {
+            const authKitSignData = await safeLogin.signIn();
+            localStorage.setItem("isConnected", "true");
+            localStorage.setItem("isGoogleLogin", "true");
+            // await deploySafeContract();
+            dispatch({
+                type: ACTIONS.LOGGED_IN_VIA,
+                payload: LOGGED_IN.GOOGLE,
+            });
+            dispatch({
+                type: ACTIONS.SET_ADDRESS,
+                payload: authKitSignData.eoa,
+            });
+            setWalletAddress(authKitSignData.eoa);
+            handleSteps(ESteps.THREE);
+            setGoogleSignInStarted(false);
+        }
     };
 
     const deploySafeContract = async () => {
@@ -243,7 +284,9 @@ export default function Home() {
     };
 
     const signOut = async () => {
-        await openLogin.logout();
+        await safeLogin.signOut();
+        localStorage.removeItem("isGoogleLogin");
+        localStorage.removeItem("isConnected");
         setStep(ESteps.ONE);
 
         dispatch({
@@ -284,7 +327,11 @@ export default function Home() {
                 );
             case ESteps.THREE:
                 return (
-                    <LoadChestComponent openLogin={openLogin} handleSteps={handleSteps} />
+                    <LoadChestComponent
+                        openLogin={openLogin}
+                        handleSteps={handleSteps}
+                        safeLogin={safeLogin}
+                    />
                 );
             default:
                 return <HomePage handleSetupChest={handleSetupChest} />;
@@ -317,6 +364,8 @@ export default function Home() {
 
     useEffect(() => {
         if (address && !isConnecting && connecting) {
+            localStorage.setItem("isConnected", "true");
+            localStorage.setItem("isGoogleLogin", "false");
             dispatch({
                 type: ACTIONS.SET_ADDRESS,
                 payload: address,

@@ -152,7 +152,7 @@ const ShareLink: FC<IShareLink> = (props) => {
             let bgBal = BigNumber(walletBalanceHex);
             const bgGasPirce = BigNumber("0x" + gasPirce);
             const bgGasLimit = BigNumber(gasLimit);
-            const gasFee = bgGasPirce.multipliedBy(bgGasLimit).plus(100000)
+            const gasFee = bgGasPirce.multipliedBy(bgGasLimit);
             bgBal = bgBal.minus(gasFee);
             const amountToSend = hexFormatter(bgBal.toString(16));
             const nonce = (await getNonce(fromAddress)) as any;

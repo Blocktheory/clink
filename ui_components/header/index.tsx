@@ -73,6 +73,8 @@ const Header = (props: IHeader) => {
 
     const handleDisConnect = async () => {
         await disconnect();
+        localStorage.removeItem("isGoogleLogin");
+        localStorage.removeItem("isConnected");
         handleSteps(ESteps.ONE);
         setWalletAddress("");
         dispatch({
@@ -116,13 +118,7 @@ const Header = (props: IHeader) => {
                             disabled={isConnected}
                         >
                             <Image
-                                src={
-                                    !isConnected
-                                        ? icons.googleIcon
-                                        : loggedInVia === LOGGED_IN.GOOGLE
-                                        ? googleUserInfo.profileImage
-                                        : icons.ethLogo
-                                }
+                                src={!isConnected ? icons.googleIcon : icons.ethLogo}
                                 alt="google login"
                                 width={20}
                                 height={20}

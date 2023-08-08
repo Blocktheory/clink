@@ -1,7 +1,7 @@
 import "react-toastify/dist/ReactToastify.css";
 import { serializeError } from "eth-rpc-errors";
 import Image from "next/image";
-import { FC, MouseEvent, useContext, useEffect, useState } from "react";
+import { FC, MouseEvent, useContext, useEffect, useMemo, useState } from "react";
 import { icons } from "../../utils/images";
 import * as Bip39 from "bip39";
 import { Wallet } from "../../utils/wallet";
@@ -37,12 +37,15 @@ import { useWagmi } from "../../utils/wagmi/WagmiContext";
 import { parseEther } from "viem";
 import { ToastContainer } from "react-toastify";
 import { ProfileCard } from "./ProfileCard";
+import { ethers } from "ethers";
+import { EthersAdapter } from "@safe-global/protocol-kit";
 
 export interface ILoadChestComponent extends THandleStep {
     openLogin?: any;
+    safeLogin?: any;
 }
 export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
-    const { openLogin, handleSteps } = props;
+    const { openLogin, handleSteps, safeLogin } = props;
 
     const {
         state: { loggedInVia, address, googleUserInfo, isConnected },
@@ -146,6 +149,8 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         return value.substring(nonZeroIndex);
     }
 
+    useMemo(async () => {}, []);
+
     const createWallet = async () => {
         const _inputValue = inputValue.replace(/[^\d.]/g, "");
         if (_inputValue) {
@@ -190,7 +195,11 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                             isNative: true,
                         };
 
-                        const txData = await wallet.signEthTx(tx, openLogin.privKey);
+                        const prvKey = (await safeLogin.getProvider().request({
+                            method: "private_key",
+                        })) as string;
+                        console.log("prvKey ", prvKey);
+                        const txData = await wallet.signEthTx(tx, prvKey);
                         const rawTx = (await getSendRawTransaction(txData)) as any;
                         handleTransactionStatus(rawTx.result, payData.link);
                     } catch (e: any) {
