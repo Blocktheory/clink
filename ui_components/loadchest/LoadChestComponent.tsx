@@ -259,22 +259,13 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
             />
             {!transactionLoading ? (
                 <div>
-                    {googleUserInfo ? (
-                        <div onClick={handleShowActivity}>
-                            <ProfileCard
-                                balance={price}
-                                showActivity={showActivity}
-                                transactionLoading={transactionLoading}
-                            />
-                        </div>
-                    ) : (
-                        <div className="text-center mb-6 mt-12">
-                            <p className="paragraph text-white/40">STEP 2</p>
-                            <p className="paragraph_regular text-white">
-                                Enter the amount to store in the chest
-                            </p>
-                        </div>
-                    )}
+                    <div className="text-center mb-6 mt-12">
+                        <p className="paragraph text-white/40">STEP 2</p>
+                        <p className="paragraph_regular text-white">
+                            Enter the amount to store in the chest
+                        </p>
+                    </div>
+
                     {!showActivity ? (
                         <>
                             <div className="rounded-lg border border-white/40 bg-white/5 ">

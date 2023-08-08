@@ -63,6 +63,11 @@ export const trimAddress = (val: string) => {
     const lastFour = val.substring(val.length - 4, val.length);
     return firstFour + "..." + lastFour;
 };
+export const trimLink = (val: string) => {
+    const firstTen = val.substring(0, 6);
+    const lastTen = val.substring(val.length - 15, val.length);
+    return firstTen + "..." + lastTen;
+};
 
 export const getCurrencyFormattedNumber = (
     val: number | string,

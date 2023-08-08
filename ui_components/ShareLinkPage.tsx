@@ -31,6 +31,8 @@ import { TTranx, TRANSACTION_TYPE } from "../utils/wallet/types";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
 import { GlobalContext } from "../context/GlobalContext";
 import { ToastContainer } from "react-toastify";
+import ClaimBtnModal from "./ClaimBtnModal";
+import { ShareBtnModal } from "./ShareBtnModal";
 
 export interface IShareLink {
     uuid: string;
@@ -52,10 +54,10 @@ const ShareLink: FC<IShareLink> = (props) => {
     const [headingText, setHeadingText] = useState("Your Chest is ready");
     const [linkValueUsd, setLinkValueUsd] = useState("");
     const [isRedirected, setIsRedirected] = useState(false);
-
     const [isLoading, setIsLoading] = useState(true);
-
     const [processing, setProcessing] = useState(false);
+    const [openClaimModal, setOpenClaimModal] = useState(false);
+    const [openShareModal, setOpenShareModal] = useState(false);
     const shareData = {
         text: "Here is you Gifted Chest",
         url: typeof window !== "undefined" ? window.location.href : "",
@@ -219,6 +221,7 @@ const ShareLink: FC<IShareLink> = (props) => {
             setIsRedirected(true);
         }
     }, []);
+
     return (
         <div className="w-full h-screen relative flex items-center">
             <ToastContainer
@@ -266,13 +269,15 @@ const ShareLink: FC<IShareLink> = (props) => {
                         <div className="hidden lg:block w-full max-w-[400px]">
                             <PrimaryBtn
                                 title={shareText}
-                                onClick={copyToClipBoard}
+                                onClick={() => {
+                                    setOpenShareModal(true);
+                                }}
                                 rightImage={showShareIcon ? icons.shareBtnIcon : ""}
                             />
                         </div>
                         <SecondaryBtn
                             title={processing ? "Processing..." : "Claim"}
-                            onClick={() => handleConnect()}
+                            onClick={() => setOpenClaimModal(true)}
                             rightImage={processing ? undefined : icons.downloadBtnIcon}
                         />
                     </>
@@ -280,7 +285,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                     <>
                         <PrimaryBtn
                             title={processing ? "Processing..." : "Claim"}
-                            onClick={() => handleConnect()}
+                            onClick={() => setOpenClaimModal(true)}
                             rightImage={
                                 processing ? undefined : icons.downloadBtnIconBlack
                             }
@@ -298,13 +303,21 @@ const ShareLink: FC<IShareLink> = (props) => {
                         <div className="hidden lg:block w-full max-w-[400px]">
                             <SecondaryBtn
                                 title={shareText}
-                                onClick={copyToClipBoard}
+                                onClick={() => {
+                                    setOpenShareModal(true);
+                                }}
                                 rightImage={showShareIcon ? icons.shareBtnIconWhite : ""}
                             />
                         </div>
                     </>
                 )}
             </div>
+            <ClaimBtnModal
+                open={openClaimModal}
+                setOpen={setOpenClaimModal}
+                uuid={uuid}
+            />
+            <ShareBtnModal open={openShareModal} setOpen={setOpenShareModal} />
         </div>
     );
 };

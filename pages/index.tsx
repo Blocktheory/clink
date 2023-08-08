@@ -82,7 +82,6 @@ export default function Home() {
             });
         }
         initializeOpenLogin();
-        localStorage.removeItem("chestRedirect");
     }, []);
 
     useMemo(async () => {

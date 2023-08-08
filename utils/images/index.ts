@@ -16,6 +16,9 @@ import helpIcon from "../../public/assets/images/help_icon.svg";
 import downloadBtnIconBlack from "../../public/assets/images/download_btn_icon_black.svg";
 import shareBtnIconWhite from "../../public/assets/images/share_btn_icon_white.svg";
 import profileCardBg from "../../public/assets/images/bg_card_topology.svg";
+import x from "../../public/assets/images/x.svg";
+import telegramBlue from "../../public/assets/images/telegram_blue.svg";
+import linkedinBlue from "../../public/assets/images/linkedin_blue.svg";
 
 export type TImages =
     | "logo"
@@ -35,6 +38,9 @@ export type TImages =
     | "downloadBtnIconBlack"
     | "shareBtnIconWhite"
     | "profileCardBg"
+    | "x"
+    | "telegramBlue"
+    | "linkedinBlue"
     | "ethLogo";
 
 export type TNextImage = {
@@ -62,4 +68,7 @@ export const icons: Record<TImages, TNextImage> = {
     downloadBtnIconBlack,
     shareBtnIconWhite,
     profileCardBg,
+    x,
+    linkedinBlue,
+    telegramBlue,
 };
