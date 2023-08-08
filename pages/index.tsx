@@ -77,6 +77,25 @@ export default function Home() {
             };
 
             const modalConfig = {
+                // Disable Wallet Connect V2
+                [WALLET_ADAPTERS.WALLET_CONNECT_V2]: {
+                    label: "wallet_connect",
+                    showOnModal: false,
+                },
+                // Disable Metamask
+                [WALLET_ADAPTERS.METAMASK]: {
+                    label: "metamask",
+                    showOnModal: false,
+                },
+                [WALLET_ADAPTERS.OPENLOGIN]: {
+                    label: "openlogin",
+                    loginMethods: {
+                        sms_passwordless: {
+                            name: "sms_passwordless",
+                            showOnModal: false,
+                        },
+                    },
+                },
                 [WALLET_ADAPTERS.TORUS_EVM]: {
                     label: "torus",
                     showOnModal: false,
