@@ -179,8 +179,7 @@ export default function Home() {
         // }
         // setOpenBottomSheet(false);
         const authKitSignData = await safeLogin.signIn();
-        console.log(authKitSignData, "authkitsigndata");
-        await deploySafeContract();
+        // await deploySafeContract();
         dispatch({
             type: ACTIONS.LOGGED_IN_VIA,
             payload: LOGGED_IN.GOOGLE,
@@ -194,7 +193,7 @@ export default function Home() {
     };
 
     const deploySafeContract = async () => {
-        console.log("deploy safe contract called")
+        console.log("deploy safe contract called");
         const provider = new ethers.providers.Web3Provider(safeLogin.getProvider());
         const signer = provider.getSigner();
         console.log("deploy signer", signer);
@@ -223,7 +222,6 @@ export default function Home() {
         //     encodedTransaction: "0x...", // Encoded Safe transaction data
         //     chainId: "100",
         // });
-
 
         // console.log("deploy safeSdkOwner1", safeSdkOwner1);
         // const safeAddress = await safeSdkOwner1.getAddress();
