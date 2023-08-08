@@ -1,5 +1,5 @@
-import { getStore } from "../store/GlobalStore";
 import { ACTIONS, GlobalContext } from "../context/GlobalContext";
+import { getStore } from "../store/GlobalStore";
 
 export const ZERO_USD = "$0";
 export const MIN_VAL = 0.000001;

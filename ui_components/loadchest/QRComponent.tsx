@@ -1,7 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react";
-import { icons } from "../../utils/images";
 import Image from "next/image";
-import { copyToClipBoard, trimAddress } from "../../utils";
 import QRCodeStyling, {
     CornerDotType,
     CornerSquareType,
@@ -14,6 +11,10 @@ import QRCodeStyling, {
     ShapeType,
     TypeNumber,
 } from "qr-code-styling";
+import { FC, useEffect, useRef, useState } from "react";
+
+import { copyToClipBoard, trimAddress } from "../../utils";
+import { icons } from "../../utils/images";
 export declare type QRCodeStylingOptions = {
     type?: DrawType;
     shape?: ShapeType;

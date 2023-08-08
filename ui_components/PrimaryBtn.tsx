@@ -1,7 +1,8 @@
+import Image from "next/image";
 import React, { FC } from "react";
+
 import { TImages, TNextImage } from "../utils/images";
 import { icons } from "../utils/images";
-import Image from "next/image";
 
 interface IPrimaryBtn {
     title: string;

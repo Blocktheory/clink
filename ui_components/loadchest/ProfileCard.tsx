@@ -1,10 +1,11 @@
-import { FC, useContext, useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
-import Image from "next/image";
-import { icons } from "../../utils/images";
 
-import { ESteps, LOGGED_IN, THandleStep } from "../../pages";
+import Image from "next/image";
+import { FC, useContext, useState } from "react";
+
 import { GlobalContext } from "../../context/GlobalContext";
+import { ESTEPS, LOGGED_IN, THandleStep } from "../../pages";
+import { icons } from "../../utils/images";
 import PrimaryBtn from "../PrimaryBtn";
 import SecondaryBtn from "../SecondaryBtn";
 

@@ -1,14 +1,15 @@
-import * as React from "react";
-import PrimaryBtn from "../PrimaryBtn";
 import Image from "next/image";
-import { icons } from "../../utils/images";
-import { trimAddress } from "../../utils";
-import { ESteps, LOGGED_IN } from "../../pages";
-import BackBtn from "../BackBtn";
-import { useContext, useState, useRef, useEffect, useMemo } from "react";
-import { ACTIONS, GlobalContext } from "../../context/GlobalContext";
 import Link from "next/link";
+import * as React from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
+
+import { ACTIONS, GlobalContext } from "../../context/GlobalContext";
+import { ESTEPS, LOGGED_IN } from "../../pages";
+import { trimAddress } from "../../utils";
+import { icons } from "../../utils/images";
 import { useWagmi } from "../../utils/wagmi/WagmiContext";
+import BackBtn from "../BackBtn";
+import PrimaryBtn from "../PrimaryBtn";
 interface IHeader {
     walletAddress: string;
     signIn: () => Promise<void>;
@@ -75,7 +76,7 @@ const Header = (props: IHeader) => {
         await disconnect();
         localStorage.removeItem("isGoogleLogin");
         localStorage.removeItem("isConnected");
-        handleSteps(ESteps.ONE);
+        handleSteps(ESTEPS.ONE);
         setWalletAddress("");
         dispatch({
             type: ACTIONS.LOGOUT,

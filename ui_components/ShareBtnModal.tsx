@@ -2,18 +2,19 @@ import { Dialog, Transition } from "@headlessui/react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { serializeError } from "eth-rpc-errors";
 import dynamic from "next/dynamic";
+import Image from "next/image";
+import Link from "next/link";
 import { Options } from "qr-code-styling";
 import React, { FC, Fragment, useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { toast } from "react-toastify";
 import { useAccount } from "wagmi";
+
+import { trimAddress, trimLink } from "../utils";
 import { icons } from "../utils/images";
 import { DepositAmountComponent } from "./loadchest/DepositAmountComponent";
 import { QRComponent } from "./loadchest/QRComponent";
 import PrimaryBtn from "./PrimaryBtn";
-import Link from "next/link";
-import Image from "next/image";
-import { trimAddress, trimLink } from "../utils";
 
 export default dynamic(() => Promise.resolve(ShareBtnModal), {
     ssr: false,

@@ -1,36 +1,38 @@
 import "react-toastify/dist/ReactToastify.css";
-import { serializeError } from "eth-rpc-errors";
-import React, { useContext, useEffect, useMemo, useState } from "react";
-import HomePage from "../ui_components/home/HomePage";
-import ConnectWallet from "../ui_components/connect_wallet/";
 import "./globals.css";
-import { baseGoerli, projectId } from "../constants/base";
-import { Wallet } from "../utils/wallet";
-import { initWasm } from "@trustwallet/wallet-core";
-import { LoadChestComponent } from "../ui_components/loadchest/LoadChestComponent";
-import Header from "../ui_components/header";
-import BottomSheet from "../ui_components/bottom-sheet";
-import LoadingTokenPage from "../ui_components/loadingTokenPage";
-import { getStore } from "../store/GlobalStore";
-import { ACTIONS, GlobalContext } from "../context/GlobalContext";
-import { useWagmi } from "../utils/wagmi/WagmiContext";
-import { ToastContainer } from "react-toastify";
-import { toast } from "react-toastify";
+
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
-import { Web3AuthModalPack, Web3AuthConfig } from "@safe-global/auth-kit";
+import { Web3AuthConfig, Web3AuthModalPack } from "@safe-global/auth-kit";
+import { EthersAdapter, SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
+import { GelatoRelayPack } from "@safe-global/relay-kit";
+import { initWasm } from "@trustwallet/wallet-core";
+import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
 import { Web3AuthOptions } from "@web3auth/modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
-import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
+import { serializeError } from "eth-rpc-errors";
 import { ethers } from "ethers";
-import { EthersAdapter, SafeFactory, SafeAccountConfig } from "@safe-global/protocol-kit";
-import { GelatoRelayPack } from "@safe-global/relay-kit";
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import { ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
+import { useAccount } from "wagmi";
+
+import { baseGoerli, projectId } from "../constants/base";
+import { ACTIONS, GlobalContext } from "../context/GlobalContext";
+import { getStore } from "../store/GlobalStore";
+import BottomSheet from "../ui_components/bottom-sheet";
+import ConnectWallet from "../ui_components/connect_wallet/";
+import Header from "../ui_components/header";
+import HomePage from "../ui_components/home/HomePage";
+import { LoadChestComponent } from "../ui_components/loadchest/LoadChestComponent";
+import LoadingTokenPage from "../ui_components/loadingTokenPage";
+import { useWagmi } from "../utils/wagmi/WagmiContext";
+import { Wallet } from "../utils/wallet";
 
 export type THandleStep = {
     handleSteps: (step: number) => void;
 };
 
-export enum ESteps {
+export enum ESTEPS {
     ONE = 1,
     TWO = 2,
     THREE = 3,
@@ -49,43 +51,15 @@ export default function Home() {
     const [openLogin, setSdk] = useState<any>("");
     const [safeLogin, setSafeLogin] = useState<any>("");
     const [walletAddress, setWalletAddress] = useState<string>("");
-    const [step, setStep] = useState<number>(ESteps.ONE);
+    const [step, setStep] = useState<number>(ESTEPS.ONE);
     const [openBottomSheet, setOpenBottomSheet] = useState(false);
     const [connecting, setConnecting] = useState(false);
     const { getAccount, disconnect } = useWagmi();
     const { openConnectModal } = useConnectModal();
     const { address, isConnecting, isConnected } = useAccount();
 
-    useMemo(async () => {
+    useEffect(() => {
         async function initializeOpenLogin() {
-            // const sdkInstance = new OpenLogin({
-            //     clientId: projectId,
-            //     network: baseGoerli.networks.testnet.displayName,
-            //     mfaSettings: undefined,
-            // });
-            // await sdkInstance.init();
-            // if (sdkInstance.privKey) {
-            //     if (localStorage.getItem("loginAttempted") === "true") {
-            //         handleSteps(ESteps.THREE);
-            //         localStorage.removeItem("loginAttempted");
-            //     }
-            //     const prvKey = sdkInstance.privKey;
-            //     getAddress(prvKey);
-            // } else {
-            //     setLoader(false);
-            // }
-            // setSdk(sdkInstance);
-            // dispatch({
-            //     type: ACTIONS.LOGGED_IN_VIA,
-            //     payload: LOGGED_IN.GOOGLE,
-            // });
-            // dispatch({
-            //     type: ACTIONS.GOOGLE_USER_INFO,
-            //     payload: {
-            //         googleUserInfo: sdkInstance.state.userInfo,
-            //         isConnected: sdkInstance.privKey ? true : false,
-            //     },
-            // });
             const options: Web3AuthOptions = {
                 clientId:
                     "BGYt14IfWWn05BWMxtbsTx9SLMkuU1RJmj08ISnj0sTrO9fie5r-IZt7oh0jpqn5GrkZFWqqX6okxHCJEfYJ_uI",
@@ -121,16 +95,12 @@ export default function Home() {
             const web3AuthModalPack = new Web3AuthModalPack(web3AuthConfig);
             await web3AuthModalPack.init({ options, modalConfig });
             setSafeLogin(web3AuthModalPack);
-            console.log(
-                localStorage.getItem("isConnected") === "true",
-                localStorage.getItem("isGoogleLogin") === "true",
-                "sa;fksd;fsa;kj",
-            );
         }
+
         initializeOpenLogin();
     }, []);
 
-    useMemo(async () => {
+    useEffect(() => {
         if (isConnected && address && localStorage.getItem("isGoogleLogin") === "false") {
             dispatch({
                 type: ACTIONS.SET_ADDRESS,
@@ -140,12 +110,12 @@ export default function Home() {
                 type: ACTIONS.LOGGED_IN_VIA,
                 payload: LOGGED_IN.EXTERNAL_WALLET,
             });
-            setWalletAddress(address!);
-            setStep(ESteps.THREE);
+            setWalletAddress(address);
+            setStep(ESTEPS.THREE);
         }
-    }, [address]);
+    }, [isConnected, address]);
 
-    useMemo(async () => {
+    useEffect(() => {
         console.log(loggedInVia, "login in via");
         if (
             localStorage.getItem("isConnected") === "true" &&
@@ -160,28 +130,10 @@ export default function Home() {
                 type: ACTIONS.LOGGED_IN_VIA,
                 payload: LOGGED_IN.EXTERNAL_WALLET,
             });
-            setWalletAddress(address!);
-            setStep(ESteps.THREE);
+            setWalletAddress(address);
+            setStep(ESTEPS.THREE);
         }
-        // else if (
-        //     localStorage.getItem("isConnected") === "true" &&
-        //     localStorage.getItem("isGoogleLogin") === "true"
-        // ) {
-        //     if (safeLogin) {
-        //         signIn();
-        //     }
-        // }
     }, []);
-
-    // const { dispatch } = getStore();
-    // setTimeout(function () {
-    //     dispatch({
-    //         type: ACTIONS.GOOGLE_USER_INFO,
-    //         payload: {
-    //             googleUserInfo: openLogin.state,
-    //         },
-    //     });
-    // }, 200);
 
     useEffect(() => {
         if (
@@ -228,7 +180,7 @@ export default function Home() {
                 payload: authKitSignData.eoa,
             });
             setWalletAddress(authKitSignData.eoa);
-            handleSteps(ESteps.THREE);
+            handleSteps(ESTEPS.THREE);
             setGoogleSignInStarted(false);
         }
     };
@@ -287,7 +239,7 @@ export default function Home() {
         await safeLogin.signOut();
         localStorage.removeItem("isGoogleLogin");
         localStorage.removeItem("isConnected");
-        setStep(ESteps.ONE);
+        setStep(ESTEPS.ONE);
 
         dispatch({
             type: ACTIONS.LOGGED_IN_VIA,
@@ -314,9 +266,9 @@ export default function Home() {
 
     const getUIComponent = (step: number) => {
         switch (step) {
-            case ESteps.ONE:
+            case ESTEPS.ONE:
                 return <HomePage handleSetupChest={handleSetupChest} />;
-            case ESteps.TWO:
+            case ESTEPS.TWO:
                 return (
                     <ConnectWallet
                         signIn={signIn}
@@ -325,7 +277,7 @@ export default function Home() {
                         connecting={connecting}
                     />
                 );
-            case ESteps.THREE:
+            case ESTEPS.THREE:
                 return (
                     <LoadChestComponent
                         openLogin={openLogin}
@@ -340,9 +292,9 @@ export default function Home() {
 
     const handleSetupChest = async () => {
         if (walletAddress) {
-            handleSteps(ESteps.THREE);
+            handleSteps(ESTEPS.THREE);
         } else {
-            handleSteps(ESteps.TWO);
+            handleSteps(ESTEPS.TWO);
         }
     };
     const onHamburgerClick = () => {
@@ -376,7 +328,7 @@ export default function Home() {
             });
             setConnecting(false);
             setWalletAddress(address);
-            handleSteps(ESteps.THREE);
+            handleSteps(ESTEPS.THREE);
         }
     }, [isConnecting]);
 

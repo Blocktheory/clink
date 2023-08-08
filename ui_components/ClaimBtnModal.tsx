@@ -1,20 +1,16 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { initWasm } from "@trustwallet/wallet-core";
+import { BigNumber } from "bignumber.js";
 import { serializeError } from "eth-rpc-errors";
 import dynamic from "next/dynamic";
 import { Options } from "qr-code-styling";
 import React, { FC, Fragment, useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { useAccount } from "wagmi";
-import { icons } from "../utils/images";
-import { DepositAmountComponent } from "./loadchest/DepositAmountComponent";
-import { QRComponent } from "./loadchest/QRComponent";
-import PrimaryBtn from "./PrimaryBtn";
-import { useWagmi } from "../utils/wagmi/WagmiContext";
-import { initWasm } from "@trustwallet/wallet-core";
-import { Wallet } from "../utils/wallet";
-import { BigNumber } from "bignumber.js";
+
 import {
     getBalance,
     getEstimatedGas,
@@ -23,6 +19,7 @@ import {
     getSendTransactionStatus,
     getUsdPrice,
 } from "../apiServices";
+import { GlobalContext } from "../context/GlobalContext";
 import {
     getCurrencyFormattedNumber,
     getTokenValueFormatted,
@@ -31,9 +28,13 @@ import {
     numHex,
 } from "../utils";
 import { Base } from "../utils/chain/base";
-import { TTranx, TRANSACTION_TYPE } from "../utils/wallet/types";
-import { GlobalContext } from "../context/GlobalContext";
-import { ToastContainer } from "react-toastify";
+import { icons } from "../utils/images";
+import { useWagmi } from "../utils/wagmi/WagmiContext";
+import { Wallet } from "../utils/wallet";
+import { TRANSACTION_TYPE, TTranx } from "../utils/wallet/types";
+import { DepositAmountComponent } from "./loadchest/DepositAmountComponent";
+import { QRComponent } from "./loadchest/QRComponent";
+import PrimaryBtn from "./PrimaryBtn";
 
 export default dynamic(() => Promise.resolve(ClaimBtnModal), {
     ssr: false,

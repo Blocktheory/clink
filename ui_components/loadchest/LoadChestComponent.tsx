@@ -1,14 +1,18 @@
 import "react-toastify/dist/ReactToastify.css";
-import { serializeError } from "eth-rpc-errors";
-import Image from "next/image";
-import { FC, MouseEvent, useContext, useEffect, useMemo, useState } from "react";
-import { icons } from "../../utils/images";
-import * as Bip39 from "bip39";
-import { Wallet } from "../../utils/wallet";
+
+import { EthersAdapter } from "@safe-global/protocol-kit";
 import { initWasm } from "@trustwallet/wallet-core";
+import * as Bip39 from "bip39";
+import { serializeError } from "eth-rpc-errors";
+import { ethers } from "ethers";
+import Lottie from "lottie-react";
+import Image from "next/image";
 import { useRouter } from "next/router";
-import * as loaderAnimation from "../../public/lottie/loader.json";
+import { FC, MouseEvent, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import { parseEther } from "viem";
+
 import {
     getBalance,
     getEstimatedGas,
@@ -18,6 +22,9 @@ import {
     getSendTransactionStatus,
     getUsdPrice,
 } from "../../apiServices";
+import { GlobalContext } from "../../context/GlobalContext";
+import { ESTEPS, LOGGED_IN, THandleStep } from "../../pages";
+import * as loaderAnimation from "../../public/lottie/loader.json";
 import {
     getCurrencyFormattedNumber,
     getTokenFormattedNumber,
@@ -25,20 +32,15 @@ import {
     hexToNumber,
     numHex,
 } from "../../utils";
-import { TRANSACTION_TYPE, TTranx } from "../../utils/wallet/types";
 import { Base } from "../../utils/chain/base";
+import { icons } from "../../utils/images";
+import { useWagmi } from "../../utils/wagmi/WagmiContext";
+import { Wallet } from "../../utils/wallet";
+import { TRANSACTION_TYPE, TTranx } from "../../utils/wallet/types";
 import BackBtn from "../BackBtn";
-import { ESteps, LOGGED_IN, THandleStep } from "../../pages";
-import Lottie from "lottie-react";
 import PrimaryBtn from "../PrimaryBtn";
 import DepositAmountModal from "./DepositAmountModal";
-import { GlobalContext } from "../../context/GlobalContext";
-import { useWagmi } from "../../utils/wagmi/WagmiContext";
-import { parseEther } from "viem";
-import { ToastContainer } from "react-toastify";
 import { ProfileCard } from "./ProfileCard";
-import { ethers } from "ethers";
-import { EthersAdapter } from "@safe-global/protocol-kit";
 
 export interface ILoadChestComponent extends THandleStep {
     openLogin?: any;

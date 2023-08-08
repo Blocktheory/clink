@@ -1,16 +1,15 @@
 import "react-toastify/dist/ReactToastify.css";
+
+import { initWasm } from "@trustwallet/wallet-core";
+import { BigNumber } from "bignumber.js";
 import { serializeError } from "eth-rpc-errors";
+import Image from "next/image";
 import * as React from "react";
 import { FC, useContext, useEffect, useMemo, useState } from "react";
-import PrimaryBtn from "./PrimaryBtn";
-import SecondaryBtn from "./SecondaryBtn";
-import { icons } from "../utils/images";
-import { Address } from "wagmi";
-import { initWasm } from "@trustwallet/wallet-core";
-import { Wallet } from "../utils/wallet";
-import Image from "next/image";
 import { toast } from "react-toastify";
-import { BigNumber } from "bignumber.js";
+import { ToastContainer } from "react-toastify";
+import { Address } from "wagmi";
+
 import {
     getBalance,
     getEstimatedGas,
@@ -19,6 +18,7 @@ import {
     getSendTransactionStatus,
     getUsdPrice,
 } from "../apiServices";
+import { GlobalContext } from "../context/GlobalContext";
 import {
     getCurrencyFormattedNumber,
     getTokenValueFormatted,
@@ -27,11 +27,13 @@ import {
     numHex,
 } from "../utils";
 import { Base } from "../utils/chain/base";
-import { TTranx, TRANSACTION_TYPE } from "../utils/wallet/types";
+import { icons } from "../utils/images";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
-import { GlobalContext } from "../context/GlobalContext";
-import { ToastContainer } from "react-toastify";
+import { Wallet } from "../utils/wallet";
+import { TRANSACTION_TYPE, TTranx } from "../utils/wallet/types";
 import ClaimBtnModal from "./ClaimBtnModal";
+import PrimaryBtn from "./PrimaryBtn";
+import SecondaryBtn from "./SecondaryBtn";
 import { ShareBtnModal } from "./ShareBtnModal";
 
 export interface IShareLink {

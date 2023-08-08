@@ -1,9 +1,10 @@
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import Image from "next/image";
 import * as React from "react";
+
+import { THandleStep } from "../../pages";
 import { icons } from "../../utils/images";
 import SecondaryBtn from "../SecondaryBtn";
-import { THandleStep } from "../../pages";
-import Image from "next/image";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 interface IConnectWallet extends THandleStep {
     signIn: () => Promise<void>;
