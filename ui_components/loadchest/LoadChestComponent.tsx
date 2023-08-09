@@ -45,9 +45,10 @@ import { ProfileCard } from "./ProfileCard";
 export interface ILoadChestComponent extends THandleStep {
     openLogin?: any;
     safeLogin?: any;
+    provider?: any;
 }
 export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
-    const { openLogin, handleSteps, safeLogin } = props;
+    const { openLogin, handleSteps, safeLogin, provider } = props;
 
     const {
         state: { loggedInVia, address, googleUserInfo, isConnected },
@@ -197,7 +198,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                             isNative: true,
                         };
 
-                        const prvKey = (await safeLogin.getProvider().request({
+                        const prvKey = (await provider.request({
                             method: "private_key",
                         })) as string;
                         console.log("prvKey ", prvKey);
