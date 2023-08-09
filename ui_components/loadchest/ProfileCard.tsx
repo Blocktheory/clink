@@ -49,19 +49,19 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
                     <Image
                         src={icons.copyIconWhite}
                         alt="copy address"
-                        className="w-5 cursor-pointer opacity-60"
+                        className="w-5 cursor-pointer opacity-50 hover:opacity-80"
                         onClick={() => {}}
                     />
                     <Image
                         src={icons.qrWhite}
                         alt="show qr code"
-                        className="w-5 cursor-pointer opacity-60"
+                        className="w-5 cursor-pointer opacity-50 hover:opacity-80"
                         onClick={() => {}}
                     />
                     <Image
                         src={icons.linkWhite}
                         alt="external link"
-                        className="w-5 cursor-pointer opacity-60"
+                        className="w-5 cursor-pointer opacity-50 hover:opacity-80"
                         onClick={() => {}}
                     />
                 </div>

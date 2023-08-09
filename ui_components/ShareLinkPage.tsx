@@ -47,7 +47,6 @@ const ShareLink: FC<IShareLink> = (props) => {
         state: { isConnected },
     } = useContext(GlobalContext);
     const { uuid } = props;
-
     const [toAddress, setToAddress] = useState("");
     const [walletBalanceHex, setWalletBalanceHex] = useState("");
     const [fromAddress, setFromAddress] = useState("");
@@ -244,7 +243,8 @@ const ShareLink: FC<IShareLink> = (props) => {
             />
             <div className="w-full h-[70%] text-center p-4  flex flex-col gap-5 items-center">
                 <p className="text-white text-[20px] font-bold">{headingText}</p>
-                <div className="w-full md:w-[60%] max-w-[450px] h-[300px] shareLinkBg mb-16">
+
+                <div className="w-full md:w-[60%] max-w-[450px] h-[300px] shareLinkBg mb-16 cardShine">
                     <div className=" rounded-lg profileBackgroundImage flex flex-col justify-between h-full">
                         {isLoading ? (
                             <div className="w-full h-full mt-5 ml-5">

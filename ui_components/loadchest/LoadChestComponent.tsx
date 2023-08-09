@@ -41,6 +41,7 @@ import BackBtn from "../BackBtn";
 import PrimaryBtn from "../PrimaryBtn";
 import DepositAmountModal from "./DepositAmountModal";
 import { ProfileCard } from "./ProfileCard";
+import SecondaryBtn from "../SecondaryBtn";
 
 export interface ILoadChestComponent extends THandleStep {
     openLogin?: any;
@@ -409,17 +410,26 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                                         !btnDisable && value
                                             ? "opacity-100"
                                             : "opacity-50"
-                                    }`}
+                                    } flex justify-between`}
                                 >
                                     <PrimaryBtn
-                                        className={`lg:w-[400px] max-w-[400px] ${
+                                        className={`w-[45%] lg:w-[185px] max-w-[185px] mx-0 ${
                                             btnDisable || !value
                                                 ? "cursor-not-allowed"
                                                 : ""
                                         }`}
-                                        title={"Load Chest"}
+                                        title={"Create Link"}
                                         onClick={createWallet}
                                         btnDisable={btnDisable || !value}
+                                    />
+                                    <SecondaryBtn
+                                        className={`w-[45%] lg:w-[185px] max-w-[185px] mx-0 ${
+                                            btnDisable || !value
+                                                ? "cursor-not-allowed"
+                                                : ""
+                                        }`}
+                                        title={"Send"}
+                                        onClick={createWallet}
                                     />
                                 </div>
                             </div>
