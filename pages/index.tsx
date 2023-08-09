@@ -8,10 +8,12 @@ import { GelatoRelayPack } from "@safe-global/relay-kit";
 import { initWasm } from "@trustwallet/wallet-core";
 import {
     CHAIN_NAMESPACES,
-    WALLET_ADAPTERS,
     SafeEventEmitterProvider,
+    WALLET_ADAPTERS,
 } from "@web3auth/base";
+import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { Web3AuthOptions } from "@web3auth/modal";
+import { Web3AuthNoModal } from "@web3auth/no-modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { serializeError } from "eth-rpc-errors";
 import { ethers } from "ethers";
@@ -31,11 +33,6 @@ import { LoadChestComponent } from "../ui_components/loadchest/LoadChestComponen
 import LoadingTokenPage from "../ui_components/loadingTokenPage";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
 import { Wallet } from "../utils/wallet";
-import { Web3AuthNoModal } from "@web3auth/no-modal";
-import {
-    EthereumPrivateKeyProvider,
-    EthereumPrivKeyProviderConfig,
-} from "@web3auth/ethereum-provider";
 
 export type THandleStep = {
     handleSteps: (step: number) => void;
@@ -89,16 +86,10 @@ export default function Home() {
             });
 
             const privateKeyProvider = new EthereumPrivateKeyProvider({
-                config: {
-                    chainConfig,
-                },
+                config: { chainConfig },
             });
 
             const openloginAdapter = new OpenloginAdapter({
-                // privateKeyProvider: {
-                //     provider: provider,
-                //     currentChainConfig: chainConfig,
-                // },
                 adapterSettings: {
                     uxMode: "popup",
                     loginConfig: {
@@ -110,6 +101,9 @@ export default function Home() {
                                 "97006979879-hpprsfnk927avhc0368fvbqjra6h5c4t.apps.googleusercontent.com",
                         },
                     },
+                },
+                loginSettings: {
+                    mfaLevel: "none",
                 },
                 privateKeyProvider,
             });
