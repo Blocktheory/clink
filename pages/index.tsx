@@ -67,7 +67,7 @@ export default function Home() {
                 chainNamespace: CHAIN_NAMESPACES.EIP155,
                 chainId: "0x14a33",
                 rpcTarget: "https://goerli.base.org",
-                displayName: "Base Goerli Testnet",
+                displayName: "Base Görli Testnet",
                 blockExplorer: "https://goerli.basescan.org/",
                 ticker: "ETH",
                 tickerName: "Ethereum",

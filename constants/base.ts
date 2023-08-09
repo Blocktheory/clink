@@ -5,7 +5,7 @@ enum OPENLOGIN_NETWORK {
 }
 
 const baseGoerli = {
-    chainName: "Base Goerli",
+    chainName: "Base Görli",
     chainId: 84531,
     chainIdHex: "0x14a33",
     networks: {

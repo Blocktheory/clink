@@ -10,7 +10,6 @@ import {
     RelayTransaction,
 } from "@safe-global/safe-core-sdk-types";
 import { initWasm } from "@trustwallet/wallet-core";
-import * as Bip39 from "bip39";
 import { serializeError } from "eth-rpc-errors";
 import { ethers } from "ethers";
 import Lottie from "lottie-react";
@@ -171,7 +170,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         const destinationAddress = toAdd;
         const withdrawAmount = ethers.utils.parseUnits(value, "ether").toString();
 
-        const GELATO_RELAY_API_KEY = "qbec0fcMKxOAXM0qyxL6cDMX_aaJUmSPPAJUIEg17kU_";
+        const GELATO_RELAY_API_KEY = process.env.GELATO_API_KEY;
 
         const gasLimit = "100000";
 
@@ -241,33 +240,26 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 const walletCore = await initWasm();
                 const wallet = new Wallet(walletCore);
                 const payData = await wallet.createPayLink();
-                const payPrivKey = await wallet.getPrivKeyFromPayLink(payData.link);
                 const toAddress = payData.address;
                 const tokenAmount = Number(_inputValue) * Math.pow(10, 18);
-
-                const RPC_URL = "https://goerli.base.org";
-                const ethersProvider = new ethers.providers.JsonRpcProvider(RPC_URL);
-
-                const owner1Signer = new ethers.Wallet(payPrivKey, ethersProvider);
-
-                const ethAdapterOwner1 = new EthersAdapter({
+                const ethersProvider = new ethers.providers.JsonRpcProvider();
+                const ownerSigner = new ethers.Wallet(payData.key, ethersProvider);
+                const ethAdapterOwner = new EthersAdapter({
                     ethers,
-                    signerOrProvider: owner1Signer,
+                    signerOrProvider: ownerSigner,
                 });
 
                 const safeFactory = await SafeFactory.create({
-                    ethAdapter: ethAdapterOwner1,
+                    ethAdapter: ethAdapterOwner,
                 });
 
                 const safeAccountConfig: SafeAccountConfig = {
-                    owners: [await owner1Signer.getAddress()],
+                    owners: [await ownerSigner.getAddress()],
                     threshold: 1,
                 };
-
                 const addPredicted = await safeFactory.predictSafeAddress(
                     safeAccountConfig,
                 );
-
                 console.log(addPredicted, "addPredicted");
 
                 const amountParsed = numHex(Number(parseEther(_inputValue)));
@@ -442,6 +434,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                                 </div>
                                 <div
                                     className="bg-white/80 py-2 rounded-b-lg cursor-pointer"
+                                    role="presentation"
                                     onClick={() => {
                                         setOpen(true);
                                     }}
@@ -464,7 +457,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                                                     type="text"
                                                     className={`dollorInput pl-0 pt-2 pb-1 backdrop-blur-xl text-[32px] border-none text-center bg-transparent text-white dark:text-textDark-900 placeholder-white dark:placeholder-textDark-300 rounded-lg block w-full focus:outline-none focus:ring-transparent`}
                                                     placeholder="$0"
-                                                    autoFocus={true}
                                                     value={value}
                                                     onChange={(e) => {
                                                         handleInputChange(e.target.value);

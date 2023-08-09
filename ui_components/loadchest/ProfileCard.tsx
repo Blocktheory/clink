@@ -48,19 +48,25 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
                         src={icons.copyIconWhite}
                         alt="copy address"
                         className="w-5 cursor-pointer opacity-60 hover:opacity-100"
-                        onClick={() => {}}
+                        onClick={() => {
+                            console.info("on click");
+                        }}
                     />
                     <Image
                         src={icons.qrWhite}
                         alt="show qr code"
                         className="w-5 cursor-pointer opacity-60 hover:opacity-100"
-                        onClick={() => {}}
+                        onClick={() => {
+                            console.info("on click");
+                        }}
                     />
                     <Image
                         src={icons.linkWhite}
                         alt="external link"
                         className="w-5 cursor-pointer opacity-60 hover:opacity-100"
-                        onClick={() => {}}
+                        onClick={() => {
+                            console.info("on click");
+                        }}
                     />
                 </div>
                 <p className="inline text-[10px] text-white/50">Powered by: </p>

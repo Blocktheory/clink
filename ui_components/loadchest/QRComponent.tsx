@@ -15,7 +15,7 @@ import { FC, useEffect, useRef, useState } from "react";
 
 import { copyToClipBoard, trimAddress } from "../../utils";
 import { icons } from "../../utils/images";
-export declare type QRCodeStylingOptions = {
+export declare type TQRCodeStylingOptions = {
     type?: DrawType;
     shape?: ShapeType;
     width?: number;
@@ -55,7 +55,7 @@ export declare type QRCodeStylingOptions = {
         gradient?: Gradient;
     };
 };
-const useQRCodeStyling = (options: QRCodeStylingOptions): QRCodeStyling | null => {
+const useQRCodeStyling = (options: TQRCodeStylingOptions): QRCodeStyling | null => {
     //Only do this on the client
     if (typeof window !== "undefined") {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
