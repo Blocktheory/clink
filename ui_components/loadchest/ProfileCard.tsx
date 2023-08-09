@@ -39,7 +39,7 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
                         className="w-16 h-16 rounded-full mx-auto border-white/50 border"
                     />
                 </div>
-                <p className="text-sm mx-auto text-white/50 pb-4">MY ACCOUNT</p>
+                <p className="text-sm mx-auto text-white/50 pb-4">SMART ACCOUNT</p>
                 {transactionLoading ? (
                     <div className="w-20 h-10 animate-pulse bg-white/10 rounded-lg mx-auto"></div>
                 ) : (
