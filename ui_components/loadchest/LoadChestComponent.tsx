@@ -1,6 +1,7 @@
 import "react-toastify/dist/ReactToastify.css";
 
-import { EthersAdapter } from "@safe-global/protocol-kit";
+import Safe, { EthersAdapter, getSafeContract } from "@safe-global/protocol-kit";
+import { GelatoRelayPack } from "@safe-global/relay-kit";
 import { initWasm } from "@trustwallet/wallet-core";
 import * as Bip39 from "bip39";
 import { serializeError } from "eth-rpc-errors";
@@ -41,6 +42,13 @@ import BackBtn from "../BackBtn";
 import PrimaryBtn from "../PrimaryBtn";
 import DepositAmountModal from "./DepositAmountModal";
 import { ProfileCard } from "./ProfileCard";
+import { SafeFactory, SafeAccountConfig } from "@safe-global/protocol-kit";
+import {
+    MetaTransactionData,
+    MetaTransactionOptions,
+    OperationType,
+    RelayTransaction,
+} from "@safe-global/safe-core-sdk-types";
 
 export interface ILoadChestComponent extends THandleStep {
     openLogin?: any;
@@ -152,7 +160,77 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         return value.substring(nonZeroIndex);
     }
 
-    useMemo(async () => {}, []);
+    const relayTransaction = async (fromAdd: string, toAdd: string, value: string) => {
+        const RPC_URL = "https://endpoints.omniatech.io/v1/bsc/mainnet/public";
+        const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+        const signer = new ethers.Wallet(process.env.OWNER_1_PRIVATE_KEY!, provider);
+        const safeAddress = fromAdd;
+        const chainId = 84531;
+
+        const destinationAddress = toAdd;
+        const withdrawAmount = ethers.utils.parseUnits(value, "ether").toString();
+
+        const GELATO_RELAY_API_KEY = "qbec0fcMKxOAXM0qyxL6cDMX_aaJUmSPPAJUIEg17kU_";
+
+        const gasLimit = "100000";
+
+        const safeTransactionData: MetaTransactionData = {
+            to: destinationAddress,
+            data: "",
+            value: withdrawAmount,
+            operation: OperationType.Call,
+        };
+        const options: MetaTransactionOptions = {
+            gasLimit,
+            isSponsored: true,
+        };
+        const ethAdapter = new EthersAdapter({
+            ethers,
+            signerOrProvider: signer,
+        });
+
+        const safeSDK = await Safe.create({
+            ethAdapter,
+            safeAddress,
+        });
+
+        const relayKit = new GelatoRelayPack(GELATO_RELAY_API_KEY);
+
+        const safeTransaction = await safeSDK.createTransaction({
+            safeTransactionData,
+        });
+
+        const signedSafeTx = await safeSDK.signTransaction(safeTransaction);
+        const safeSingletonContract = await getSafeContract({
+            ethAdapter,
+            safeVersion: await safeSDK.getContractVersion(),
+        });
+
+        const encodedTx = safeSingletonContract.encode("execTransaction", [
+            signedSafeTx.data.to,
+            signedSafeTx.data.value,
+            signedSafeTx.data.data,
+            signedSafeTx.data.operation,
+            signedSafeTx.data.safeTxGas,
+            signedSafeTx.data.baseGas,
+            signedSafeTx.data.gasPrice,
+            signedSafeTx.data.gasToken,
+            signedSafeTx.data.refundReceiver,
+            signedSafeTx.encodedSignatures(),
+        ]);
+
+        const relayTransaction: RelayTransaction = {
+            target: safeAddress,
+            encodedTransaction: encodedTx,
+            chainId: chainId,
+            options,
+        };
+        const response = await relayKit.relayTransaction(relayTransaction);
+
+        console.log(
+            `Relay Transaction Task ID: https://relay.gelato.digital/tasks/status/${response.taskId}`,
+        );
+    };
 
     const createWallet = async () => {
         const _inputValue = inputValue.replace(/[^\d.]/g, "");
@@ -162,8 +240,34 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 const walletCore = await initWasm();
                 const wallet = new Wallet(walletCore);
                 const payData = await wallet.createPayLink();
+                const payPrivKey = await wallet.getPrivKeyFromPayLink(payData.link);
                 const toAddress = payData.address;
                 const tokenAmount = Number(_inputValue) * Math.pow(10, 18);
+
+                const RPC_URL = "https://goerli.base.org";
+                const ethersProvider = new ethers.providers.JsonRpcProvider(RPC_URL);
+
+                const owner1Signer = new ethers.Wallet(payPrivKey, ethersProvider);
+
+                const ethAdapterOwner1 = new EthersAdapter({
+                    ethers,
+                    signerOrProvider: owner1Signer,
+                });
+
+                const safeFactory = await SafeFactory.create({
+                    ethAdapter: ethAdapterOwner1,
+                });
+
+                const safeAccountConfig: SafeAccountConfig = {
+                    owners: [await owner1Signer.getAddress()],
+                    threshold: 1,
+                };
+
+                const addPredicted = await safeFactory.predictSafeAddress(
+                    safeAccountConfig,
+                );
+
+                console.log(addPredicted, "addPredicted");
 
                 const amountParsed = numHex(Number(parseEther(_inputValue)));
                 const nonStrtZero = removeLeadingZeros(amountParsed);
@@ -233,6 +337,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
             }
         }
     };
+
     const handleTransactionStatus = (hash: string, link: string) => {
         const intervalInMilliseconds = 2000;
         const interval = setInterval(() => {
@@ -252,9 +357,11 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
             });
         }, intervalInMilliseconds);
     };
+
     const handleShowActivity = () => {
         setShowActivity(!showActivity);
     };
+
     return (
         <div className="mx-auto relative max-w-[400px]">
             <ToastContainer

@@ -27,6 +27,7 @@ import HomePage from "../ui_components/home/HomePage";
 import { LoadChestComponent } from "../ui_components/loadchest/LoadChestComponent";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
 import { Wallet } from "../utils/wallet";
+import { EthersAdapter, SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
 
 export type THandleStep = {
     handleSteps: (step: number) => void;
@@ -255,16 +256,36 @@ export default function Home() {
             return;
         }
         try {
-            const ethersProvider = new ethers.BrowserProvider(provider);
+            const contractAddress = await deploySafeContract();
 
-            const signer = await ethersProvider.getSigner();
-
-            const address = signer.getAddress();
-
-            return await address;
+            return await contractAddress;
         } catch (error) {
             return error;
         }
+    };
+
+    const deploySafeContract = async () => {
+        console.log("deploy safe contract called");
+        const ethProvider = new ethers.providers.Web3Provider(provider!);
+        const signer = await ethProvider.getSigner();
+        console.log("deploy signer", signer);
+        const ethAdapter = new EthersAdapter({
+            ethers,
+            signerOrProvider: signer || ethProvider,
+        });
+        const safeFactory = await SafeFactory.create({ ethAdapter: ethAdapter });
+        console.log("deploy safeFactory", safeFactory);
+        const address = signer.getAddress() as unknown as string;
+        const safeAccountConfig: SafeAccountConfig = {
+            owners: [await signer.getAddress()],
+            threshold: 1,
+        };
+        console.log("deploy safeAccountConfig", safeAccountConfig);
+        const safeSdkOwnerPredicted = await safeFactory.predictSafeAddress(
+            safeAccountConfig,
+        );
+        console.log("deploy safeSdkOwner1", safeSdkOwnerPredicted);
+        return safeSdkOwnerPredicted;
     };
 
     const getAddress = async (prvKey: string) => {
