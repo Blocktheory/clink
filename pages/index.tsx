@@ -6,7 +6,11 @@ import { Web3AuthConfig, Web3AuthModalPack } from "@safe-global/auth-kit";
 import { EthersAdapter, SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
 import { GelatoRelayPack } from "@safe-global/relay-kit";
 import { initWasm } from "@trustwallet/wallet-core";
-import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
+import {
+    CHAIN_NAMESPACES,
+    WALLET_ADAPTERS,
+    SafeEventEmitterProvider,
+} from "@web3auth/base";
 import { Web3AuthOptions } from "@web3auth/modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { serializeError } from "eth-rpc-errors";
@@ -27,6 +31,11 @@ import { LoadChestComponent } from "../ui_components/loadchest/LoadChestComponen
 import LoadingTokenPage from "../ui_components/loadingTokenPage";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
 import { Wallet } from "../utils/wallet";
+import { Web3AuthNoModal } from "@web3auth/no-modal";
+import {
+    EthereumPrivateKeyProvider,
+    EthereumPrivKeyProviderConfig,
+} from "@web3auth/ethereum-provider";
 
 export type THandleStep = {
     handleSteps: (step: number) => void;
@@ -57,63 +66,114 @@ export default function Home() {
     const { getAccount, disconnect } = useWagmi();
     const { openConnectModal } = useConnectModal();
     const { address, isConnecting, isConnected } = useAccount();
+    const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
+    const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
 
     useEffect(() => {
         async function initializeOpenLogin() {
-            const options: Web3AuthOptions = {
-                clientId:
-                    "BGYt14IfWWn05BWMxtbsTx9SLMkuU1RJmj08ISnj0sTrO9fie5r-IZt7oh0jpqn5GrkZFWqqX6okxHCJEfYJ_uI",
-                web3AuthNetwork: "testnet",
-                chainConfig: {
-                    chainNamespace: CHAIN_NAMESPACES.EIP155,
-                    chainId: "0x14a33",
-                    rpcTarget: "https://goerli.base.org",
-                },
-                uiConfig: {
-                    appName: "MicroPay",
-                    theme: "dark",
-                    loginMethodsOrder: ["google", "facebook"],
-                },
+            const chainConfig = {
+                chainNamespace: CHAIN_NAMESPACES.EIP155,
+                chainId: "0x14a33",
+                rpcTarget: "https://goerli.base.org",
+                displayName: "Base Goerli Testnet",
+                blockExplorer: "https://goerli.basescan.org/",
+                ticker: "ETH",
+                tickerName: "Ethereum",
             };
 
-            const modalConfig = {
-                // Disable Wallet Connect V2
-                [WALLET_ADAPTERS.WALLET_CONNECT_V2]: {
-                    label: "wallet_connect",
-                    showOnModal: false,
+            const web3auth = new Web3AuthNoModal({
+                clientId:
+                    "BFWg2RH35EKxZJtntj1l-G2XU8AY0l-yFgFIs9iDbgKAW45ZxE9_qfj6COAWwI-RhOs2pN6OHwgZHgtoHjOlMFM",
+                web3AuthNetwork: "testnet",
+                chainConfig: chainConfig,
+            });
+
+            const privateKeyProvider = new EthereumPrivateKeyProvider({
+                config: {
+                    chainConfig,
                 },
-                // Disable Metamask
-                [WALLET_ADAPTERS.METAMASK]: {
-                    label: "metamask",
-                    showOnModal: false,
-                },
-                [WALLET_ADAPTERS.OPENLOGIN]: {
-                    label: "openlogin",
-                    loginMethods: {
-                        sms_passwordless: {
-                            name: "sms_passwordless",
-                            showOnModal: false,
+            });
+
+            const openloginAdapter = new OpenloginAdapter({
+                // privateKeyProvider: {
+                //     provider: provider,
+                //     currentChainConfig: chainConfig,
+                // },
+                adapterSettings: {
+                    uxMode: "popup",
+                    loginConfig: {
+                        google: {
+                            name: "Name of your choice",
+                            verifier: "micropay",
+                            typeOfLogin: "google",
+                            clientId:
+                                "97006979879-hpprsfnk927avhc0368fvbqjra6h5c4t.apps.googleusercontent.com",
                         },
                     },
                 },
-                [WALLET_ADAPTERS.TORUS_EVM]: {
-                    label: "torus",
-                    showOnModal: false,
-                },
-                [WALLET_ADAPTERS.METAMASK]: {
-                    label: "metamask",
-                    showOnDesktop: false,
-                    showOnMobile: false,
-                },
-            };
+                privateKeyProvider,
+            });
 
-            const web3AuthConfig: Web3AuthConfig = {
-                txServiceUrl: "https://safe-transaction-goerli.safe.global",
-            };
-            // Instantiate and initialize the pack
-            const web3AuthModalPack = new Web3AuthModalPack(web3AuthConfig);
-            await web3AuthModalPack.init({ options, modalConfig });
-            setSafeLogin(web3AuthModalPack);
+            web3auth.configureAdapter(openloginAdapter);
+            setWeb3auth(web3auth);
+
+            await web3auth.init();
+            setProvider(web3auth.provider);
+
+            // const options: Web3AuthOptions = {
+            //     clientId:
+            //         "BGYt14IfWWn05BWMxtbsTx9SLMkuU1RJmj08ISnj0sTrO9fie5r-IZt7oh0jpqn5GrkZFWqqX6okxHCJEfYJ_uI",
+            //     web3AuthNetwork: "testnet",
+            //     chainConfig: {
+            //         chainNamespace: CHAIN_NAMESPACES.EIP155,
+            //         chainId: "0x14a33",
+            //         rpcTarget: "https://goerli.base.org",
+            //     },
+            //     uiConfig: {
+            //         appName: "MicroPay",
+            //         theme: "dark",
+            //         loginMethodsOrder: ["google", "facebook"],
+            //     },
+            // };
+
+            // const modalConfig = {
+            //     // Disable Wallet Connect V2
+            //     [WALLET_ADAPTERS.WALLET_CONNECT_V2]: {
+            //         label: "wallet_connect",
+            //         showOnModal: false,
+            //     },
+            //     // Disable Metamask
+            //     [WALLET_ADAPTERS.METAMASK]: {
+            //         label: "metamask",
+            //         showOnModal: false,
+            //     },
+            //     [WALLET_ADAPTERS.OPENLOGIN]: {
+            //         label: "openlogin",
+            //         loginMethods: {
+            //             sms_passwordless: {
+            //                 name: "sms_passwordless",
+            //                 showOnModal: false,
+            //             },
+            //         },
+            //     },
+            //     [WALLET_ADAPTERS.TORUS_EVM]: {
+            //         label: "torus",
+            //         showOnModal: false,
+            //     },
+            //     [WALLET_ADAPTERS.METAMASK]: {
+            //         label: "metamask",
+            //         showOnDesktop: false,
+            //         showOnMobile: false,
+            //     },
+            // };
+
+            // const web3AuthConfig: Web3AuthConfig = {
+            //     txServiceUrl: "https://safe-transaction-goerli.safe.global",
+            // };
+            // // Instantiate and initialize the pack
+            // const web3AuthModalPack = new Web3AuthModalPack(web3AuthConfig);
+            // await web3AuthModalPack.init({ options, modalConfig });
+            // setSafeLogin(web3AuthModalPack);
         }
 
         initializeOpenLogin();
@@ -173,35 +233,33 @@ export default function Home() {
     const [googleSignInStarted, setGoogleSignInStarted] = useState(false);
 
     const signIn = async () => {
-        // localStorage.setItem("loginAttempted", "true");
-        // try {
-        //     await openLogin.login({
-        //         loginProvider: "google",
-        //         redirectUrl: `${window.origin}`,
-        //         mfaLevel: "none",
+        // setGoogleSignInStarted(true);
+        // if (safeLogin) {
+        //     const authKitSignData = await safeLogin.signIn();
+        //     localStorage.setItem("isConnected", "true");
+        //     localStorage.setItem("isGoogleLogin", "true");
+        //     // await deploySafeContract();
+        //     dispatch({
+        //         type: ACTIONS.LOGGED_IN_VIA,
+        //         payload: LOGGED_IN.GOOGLE,
         //     });
-        // } catch (error) {
-        //     console.log("error", error);
+        //     dispatch({
+        //         type: ACTIONS.SET_ADDRESS,
+        //         payload: authKitSignData.eoa,
+        //     });
+        //     setWalletAddress(authKitSignData.eoa);
+        //     handleSteps(ESTEPS.THREE);
+        //     setGoogleSignInStarted(false);
         // }
-        // setOpenBottomSheet(false);
-        setGoogleSignInStarted(true);
-        if (safeLogin) {
-            const authKitSignData = await safeLogin.signIn();
-            localStorage.setItem("isConnected", "true");
-            localStorage.setItem("isGoogleLogin", "true");
-            // await deploySafeContract();
-            dispatch({
-                type: ACTIONS.LOGGED_IN_VIA,
-                payload: LOGGED_IN.GOOGLE,
-            });
-            dispatch({
-                type: ACTIONS.SET_ADDRESS,
-                payload: authKitSignData.eoa,
-            });
-            setWalletAddress(authKitSignData.eoa);
-            handleSteps(ESTEPS.THREE);
-            setGoogleSignInStarted(false);
+        if (!web3auth) {
+            console.log("web3auth not initialized yet");
+            return;
         }
+        const web3authProvider = await web3auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
+            loginProvider: "google",
+        });
+        console.log(web3authProvider, "web3 prvider");
+        setProvider(web3authProvider);
     };
 
     const deploySafeContract = async () => {
