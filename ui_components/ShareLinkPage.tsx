@@ -240,14 +240,14 @@ const ShareLink: FC<IShareLink> = (props) => {
             />
             <div className="w-full h-[70%] text-center p-4  flex flex-col gap-5 items-center">
                 <p className="text-white text-[20px] font-bold">{headingText}</p>
-                <div className="w-full md:w-[60%] max-w-[450px] h-[300px] rounded-lg shareLinkBg flex flex-col justify-between mb-16">
+                <div className="w-full md:w-[60%] max-w-[450px] h-[250px] rounded-lg shareLinkBg flex flex-col justify-between mb-16">
                     {isLoading ? (
                         <div className="w-full h-full mt-5 ml-5">
                             <div className="w-[15%] h-[20%] bg-white/10 animate-pulse rounded-lg mb-2"></div>
                             <div className="w-[10%] h-[12%] bg-white/10 animate-pulse rounded-lg "></div>
                         </div>
                     ) : (
-                        <div className="flex gap-1 flex-col text-start ml-3">
+                        <div className="flex flex-col text-start ml-3">
                             <p className="text-[40px] text-[#F4EC97] font bold">{`${linkValueUsd}`}</p>
                             <p className="text-sm text-white/50">{`~ ${tokenValue} ETH`}</p>
                         </div>
