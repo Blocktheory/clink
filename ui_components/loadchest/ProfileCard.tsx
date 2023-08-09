@@ -5,10 +5,10 @@ import { FC, useContext, useState } from "react";
 
 import { GlobalContext } from "../../context/GlobalContext";
 import { ESTEPS, LOGGED_IN, THandleStep } from "../../pages";
+import { trimAddress } from "../../utils";
 import { icons } from "../../utils/images";
 import PrimaryBtn from "../PrimaryBtn";
 import SecondaryBtn from "../SecondaryBtn";
-import { trimAddress } from "../../utils";
 
 export interface IProfileCard {
     profileImage?: string;
@@ -25,7 +25,7 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
     return (
         <>
             <div className="w-full h-auto bg-[#0C0421] rounded-lg mb-4 profileBackgroundImage flex-col justify-center items-center text-center cursor-pointer pb-2">
-                <div className="py-2">
+                <div className="pt-2">
                     <Image
                         src={
                             address ? `https://effigy.im/a/${address}.png` : icons.ethLogo
@@ -36,41 +36,38 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
                         className="w-12 h-12 rounded-full mx-auto border-white/50 border"
                     />
                 </div>
-                <p className="text-sm mx-auto text-white/50 pb-2">SMART ACCOUNT</p>
+                <p className="text-sm mx-auto pt-1 text-white/50">My Smart Wallet</p>
                 {transactionLoading ? (
                     <div className="w-20 h-10 animate-pulse bg-white/10 rounded-lg mx-auto"></div>
                 ) : (
-                    <p className="text-sm text-white/50 pb-2">
-                        {`Address: ${trimAddress(address)}`}
-                    </p>
+                    <p className="text-sm text-white pb-2">{`${trimAddress(address)}`}</p>
                 )}
 
-                <div className="flex justify-around w-[100px] mx-auto pb-2">
+                <div className="flex justify-around w-[100px] mx-auto pb-1">
                     <Image
                         src={icons.copyIconWhite}
                         alt="copy address"
-                        className="w-5 cursor-pointer opacity-50 hover:opacity-80"
+                        className="w-5 cursor-pointer opacity-60 hover:opacity-100"
                         onClick={() => {}}
                     />
                     <Image
                         src={icons.qrWhite}
                         alt="show qr code"
-                        className="w-5 cursor-pointer opacity-50 hover:opacity-80"
+                        className="w-5 cursor-pointer opacity-60 hover:opacity-100"
                         onClick={() => {}}
                     />
                     <Image
                         src={icons.linkWhite}
                         alt="external link"
-                        className="w-5 cursor-pointer opacity-50 hover:opacity-80"
+                        className="w-5 cursor-pointer opacity-60 hover:opacity-100"
                         onClick={() => {}}
                     />
                 </div>
-
-                <p className="inline text-[10px] text-white/50">Powered by : </p>
+                <p className="inline text-[10px] text-white/50">Powered by: </p>
                 <Image
                     src={icons.safeLogo}
                     alt="safe logo"
-                    className="w-8 inline-block"
+                    className="w-10 inline-block"
                 />
 
                 {/* {showActivity ? (

@@ -32,10 +32,10 @@ import { useWagmi } from "../utils/wagmi/WagmiContext";
 import { Wallet } from "../utils/wallet";
 import { TRANSACTION_TYPE, TTranx } from "../utils/wallet/types";
 import ClaimBtnModal from "./ClaimBtnModal";
+import { QRComponent } from "./loadchest/QRComponent";
 import PrimaryBtn from "./PrimaryBtn";
 import SecondaryBtn from "./SecondaryBtn";
 import { ShareBtnModal } from "./ShareBtnModal";
-import { QRComponent } from "./loadchest/QRComponent";
 
 export interface IShareLink {
     uuid: string;

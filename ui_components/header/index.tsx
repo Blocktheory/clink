@@ -119,7 +119,7 @@ const Header = (props: IHeader) => {
                             disabled={isConnected}
                         >
                             <Image
-                                src={!isConnected ? icons.googleIcon : icons.ethLogo}
+                                src={!isConnected ? icons.googleIcon : icons.baseLogo}
                                 alt="google login"
                                 width={20}
                                 height={20}
