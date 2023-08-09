@@ -271,7 +271,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
             {!transactionLoading ? (
                 <div>
                     <ProfileCard
-                        balance={""}
+                        balance={price}
                         showActivity={false}
                         transactionLoading={false}
                     ></ProfileCard>
@@ -303,7 +303,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                                                             {price}
                                                         </p>
                                                         <p className="text-white/30 text-[12px] leading-[14px]">
-                                                            ~ {tokenValue} ETH
+                                                            {tokenValue} ETH
                                                         </p>
                                                     </div>
                                                 )

@@ -19,6 +19,11 @@ import tokensLoading from "../../public/assets/images/tokens_loading.png";
 import transferIcon from "../../public/assets/images/transfer_icon.svg";
 import walletIcon from "../../public/assets/images/wallet_btn_image.svg";
 import x from "../../public/assets/images/x.svg";
+import safeLogo from "../../public/assets/images/safe_logo.svg";
+import baseLogo from "../../public/assets/images/base_logo.svg";
+import copyIconWhite from "../../public/assets/images/copy_icon_white.svg";
+import qrWhite from "../../public/assets/images/qr_white.svg";
+import linkWhite from "../../public/assets/images/link_white.svg";
 
 export type TImages =
     | "logo"
@@ -41,6 +46,11 @@ export type TImages =
     | "x"
     | "telegramBlue"
     | "linkedinBlue"
+    | "safeLogo"
+    | "baseLogo"
+    | "copyIconWhite"
+    | "linkWhite"
+    | "qrWhite"
     | "ethLogo";
 
 export type TNextImage = {
@@ -71,4 +81,9 @@ export const icons: Record<TImages, TNextImage> = {
     x,
     linkedinBlue,
     telegramBlue,
+    safeLogo,
+    baseLogo,
+    copyIconWhite,
+    linkWhite,
+    qrWhite,
 };

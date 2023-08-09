@@ -68,12 +68,14 @@ const useQRCodeStyling = (options: QRCodeStylingOptions): QRCodeStyling | null =
 export interface IQRComponent {
     walletAddress: string;
     isShareQr?: boolean;
+    widthPx: number;
+    heightPx: number;
 }
 export const QRComponent: FC<IQRComponent> = (props) => {
-    const { walletAddress, isShareQr } = props;
+    const { walletAddress, isShareQr, widthPx, heightPx } = props;
     const [options] = useState<Options>({
-        width: 240,
-        height: 240,
+        width: widthPx,
+        height: heightPx,
         type: "svg",
         image: icons.logo.src,
         margin: 5,
