@@ -83,7 +83,7 @@ export default function Home() {
 
             const web3auth = new Web3AuthNoModal({
                 clientId: web3AuthClientId,
-                web3AuthNetwork: "mainnet",
+                web3AuthNetwork: "testnet",
                 chainConfig: chainConfig,
             });
 
@@ -220,7 +220,6 @@ export default function Home() {
             signerOrProvider: signer || ethProvider,
         });
         const safeFactory = await SafeFactory.create({ ethAdapter: ethAdapter });
-        const address = signer.getAddress() as unknown as string;
         const safeAccountConfig: SafeAccountConfig = {
             owners: [await signer.getAddress()],
             threshold: 1,
