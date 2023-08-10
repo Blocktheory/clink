@@ -1,4 +1,3 @@
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Image from "next/image";
 import * as React from "react";
 
@@ -13,7 +12,7 @@ interface IConnectWallet extends THandleStep {
 }
 
 export default function ConnectWallet(props: IConnectWallet) {
-    const { signIn, handleSteps, connectWallet, connecting } = props;
+    const { signIn, connectWallet, connecting } = props;
     return (
         <>
             <div className="w-full relative lg:pt-10">
