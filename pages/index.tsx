@@ -19,6 +19,13 @@ import { ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
 import { useAccount } from "wagmi";
 
+import {
+    oauthClientId,
+    productName,
+    web3AuthClientId,
+    web3AuthLoginType,
+    web3AuthVerifier,
+} from "../constants";
 import { ACTIONS, GlobalContext } from "../context/GlobalContext";
 import { getStore } from "../store/GlobalStore";
 import BottomSheet from "../ui_components/bottom-sheet";
@@ -26,6 +33,7 @@ import ConnectWallet from "../ui_components/connect_wallet/";
 import Header from "../ui_components/header";
 import HomePage from "../ui_components/home/HomePage";
 import { LoadChestComponent } from "../ui_components/loadchest/LoadChestComponent";
+import { BaseGoerli } from "../utils/chain/baseGoerli";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
 import { Wallet } from "../utils/wallet";
 
@@ -65,18 +73,17 @@ export default function Home() {
         async function initializeOpenLogin() {
             const chainConfig = {
                 chainNamespace: CHAIN_NAMESPACES.EIP155,
-                chainId: "0x14a33",
-                rpcTarget: "https://goerli.base.org",
-                displayName: "Base Görli Testnet",
-                blockExplorer: "https://goerli.basescan.org/",
-                ticker: "ETH",
+                chainId: BaseGoerli.chainIdHex,
+                rpcTarget: BaseGoerli.info.rpc,
+                displayName: BaseGoerli.name,
+                blockExplorer: BaseGoerli.explorer.url,
+                ticker: BaseGoerli.symbol,
                 tickerName: "Ethereum",
             };
 
             const web3auth = new Web3AuthNoModal({
-                clientId:
-                    "BFWg2RH35EKxZJtntj1l-G2XU8AY0l-yFgFIs9iDbgKAW45ZxE9_qfj6COAWwI-RhOs2pN6OHwgZHgtoHjOlMFM",
-                web3AuthNetwork: "testnet",
+                clientId: web3AuthClientId,
+                web3AuthNetwork: "mainnet",
                 chainConfig: chainConfig,
             });
 
@@ -89,11 +96,10 @@ export default function Home() {
                     uxMode: "popup",
                     loginConfig: {
                         google: {
-                            name: "Name of your choice",
-                            verifier: "micropay",
-                            typeOfLogin: "google",
-                            clientId:
-                                "97006979879-hpprsfnk927avhc0368fvbqjra6h5c4t.apps.googleusercontent.com",
+                            name: productName,
+                            verifier: web3AuthVerifier,
+                            typeOfLogin: web3AuthLoginType,
+                            clientId: oauthClientId,
                         },
                     },
                 },
@@ -102,67 +108,10 @@ export default function Home() {
                 },
                 privateKeyProvider,
             });
-
             web3auth.configureAdapter(openloginAdapter);
             setWeb3auth(web3auth);
-
             await web3auth.init();
             setProvider(web3auth.provider);
-
-            // const options: Web3AuthOptions = {
-            //     clientId:
-            //         "BGYt14IfWWn05BWMxtbsTx9SLMkuU1RJmj08ISnj0sTrO9fie5r-IZt7oh0jpqn5GrkZFWqqX6okxHCJEfYJ_uI",
-            //     web3AuthNetwork: "testnet",
-            //     chainConfig: {
-            //         chainNamespace: CHAIN_NAMESPACES.EIP155,
-            //         chainId: "0x14a33",
-            //         rpcTarget: "https://goerli.base.org",
-            //     },
-            //     uiConfig: {
-            //         appName: "MicroPay",
-            //         theme: "dark",
-            //         loginMethodsOrder: ["google", "facebook"],
-            //     },
-            // };
-
-            // const modalConfig = {
-            //     // Disable Wallet Connect V2
-            //     [WALLET_ADAPTERS.WALLET_CONNECT_V2]: {
-            //         label: "wallet_connect",
-            //         showOnModal: false,
-            //     },
-            //     // Disable Metamask
-            //     [WALLET_ADAPTERS.METAMASK]: {
-            //         label: "metamask",
-            //         showOnModal: false,
-            //     },
-            //     [WALLET_ADAPTERS.OPENLOGIN]: {
-            //         label: "openlogin",
-            //         loginMethods: {
-            //             sms_passwordless: {
-            //                 name: "sms_passwordless",
-            //                 showOnModal: false,
-            //             },
-            //         },
-            //     },
-            //     [WALLET_ADAPTERS.TORUS_EVM]: {
-            //         label: "torus",
-            //         showOnModal: false,
-            //     },
-            //     [WALLET_ADAPTERS.METAMASK]: {
-            //         label: "metamask",
-            //         showOnDesktop: false,
-            //         showOnMobile: false,
-            //     },
-            // };
-
-            // const web3AuthConfig: Web3AuthConfig = {
-            //     txServiceUrl: "https://safe-transaction-goerli.safe.global",
-            // };
-            // // Instantiate and initialize the pack
-            // const web3AuthModalPack = new Web3AuthModalPack(web3AuthConfig);
-            // await web3AuthModalPack.init({ options, modalConfig });
-            // setSafeLogin(web3AuthModalPack);
         }
 
         initializeOpenLogin();
@@ -184,7 +133,6 @@ export default function Home() {
     }, [isConnected, address]);
 
     useEffect(() => {
-        console.log(loggedInVia, "login in via");
         if (
             localStorage.getItem("isConnected") === "true" &&
             address &&
@@ -265,16 +213,13 @@ export default function Home() {
     };
 
     const deploySafeContract = async () => {
-        console.log("deploy safe contract called");
         const ethProvider = new ethers.providers.Web3Provider(provider!);
         const signer = await ethProvider.getSigner();
-        console.log("deploy signer", signer);
         const ethAdapter = new EthersAdapter({
             ethers,
             signerOrProvider: signer || ethProvider,
         });
         const safeFactory = await SafeFactory.create({ ethAdapter: ethAdapter });
-        console.log("deploy safeFactory", safeFactory);
         const address = signer.getAddress() as unknown as string;
         const safeAccountConfig: SafeAccountConfig = {
             owners: [await signer.getAddress()],
