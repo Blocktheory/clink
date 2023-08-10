@@ -30,6 +30,7 @@ import { ACTIONS, GlobalContext } from "../context/GlobalContext";
 import { getStore } from "../store/GlobalStore";
 import BottomSheet from "../ui_components/bottom-sheet";
 import ConnectWallet from "../ui_components/connect_wallet/";
+import Footer from "../ui_components/footer";
 import Header from "../ui_components/header";
 import HomePage from "../ui_components/home/HomePage";
 import { LoadChestComponent } from "../ui_components/loadchest/LoadChestComponent";
@@ -377,6 +378,7 @@ export default function Home() {
                     signIn={signIn}
                     handleSteps={handleSteps}
                 />
+                <Footer />
             </div>
         </>
     );
