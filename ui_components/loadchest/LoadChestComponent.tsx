@@ -1,5 +1,6 @@
 import "react-toastify/dist/ReactToastify.css";
 
+import AccountAbstraction from "@safe-global/account-abstraction-kit-poc";
 import Safe, { EthersAdapter, getSafeContract } from "@safe-global/protocol-kit";
 import { SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
 import { GelatoRelayPack } from "@safe-global/relay-kit";
@@ -20,15 +21,7 @@ import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import { parseEther } from "viem";
 
-import {
-    getBalance,
-    getEstimatedGas,
-    getGasPrice,
-    getNonce,
-    getSendRawTransaction,
-    getSendTransactionStatus,
-    getUsdPrice,
-} from "../../apiServices";
+import { getBalance, getSendTransactionStatus, getUsdPrice } from "../../apiServices";
 import { GlobalContext } from "../../context/GlobalContext";
 import { ESTEPS, LOGGED_IN, THandleStep } from "../../pages";
 import * as loaderAnimation from "../../public/lottie/loader.json";
@@ -160,78 +153,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         return value.substring(nonZeroIndex);
     }
 
-    const relayTransaction = async (fromAdd: string, toAdd: string, value: string) => {
-        const RPC_URL = "https://endpoints.omniatech.io/v1/bsc/mainnet/public";
-        const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
-        const signer = new ethers.Wallet(process.env.OWNER_1_PRIVATE_KEY!, provider);
-        const safeAddress = fromAdd;
-        const chainId = 84531;
-
-        const destinationAddress = toAdd;
-        const withdrawAmount = ethers.utils.parseUnits(value, "ether").toString();
-
-        const GELATO_RELAY_API_KEY = process.env.GELATO_API_KEY;
-
-        const gasLimit = "100000";
-
-        const safeTransactionData: MetaTransactionData = {
-            to: destinationAddress,
-            data: "",
-            value: withdrawAmount,
-            operation: OperationType.Call,
-        };
-        const options: MetaTransactionOptions = {
-            gasLimit,
-            isSponsored: true,
-        };
-        const ethAdapter = new EthersAdapter({
-            ethers,
-            signerOrProvider: signer,
-        });
-
-        const safeSDK = await Safe.create({
-            ethAdapter,
-            safeAddress,
-        });
-
-        const relayKit = new GelatoRelayPack(GELATO_RELAY_API_KEY);
-
-        const safeTransaction = await safeSDK.createTransaction({
-            safeTransactionData,
-        });
-
-        const signedSafeTx = await safeSDK.signTransaction(safeTransaction);
-        const safeSingletonContract = await getSafeContract({
-            ethAdapter,
-            safeVersion: await safeSDK.getContractVersion(),
-        });
-
-        const encodedTx = safeSingletonContract.encode("execTransaction", [
-            signedSafeTx.data.to,
-            signedSafeTx.data.value,
-            signedSafeTx.data.data,
-            signedSafeTx.data.operation,
-            signedSafeTx.data.safeTxGas,
-            signedSafeTx.data.baseGas,
-            signedSafeTx.data.gasPrice,
-            signedSafeTx.data.gasToken,
-            signedSafeTx.data.refundReceiver,
-            signedSafeTx.encodedSignatures(),
-        ]);
-
-        const relayTransaction: RelayTransaction = {
-            target: safeAddress,
-            encodedTransaction: encodedTx,
-            chainId: chainId,
-            options,
-        };
-        const response = await relayKit.relayTransaction(relayTransaction);
-
-        console.log(
-            `Relay Transaction Task ID: https://relay.gelato.digital/tasks/status/${response.taskId}`,
-        );
-    };
-
     const createWallet = async () => {
         const _inputValue = inputValue.replace(/[^\d.]/g, "");
         if (_inputValue) {
@@ -242,86 +163,119 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 const payData = await wallet.createPayLink();
                 const toAddress = payData.address;
                 const tokenAmount = Number(_inputValue) * Math.pow(10, 18);
-                const ethersProvider = new ethers.providers.JsonRpcProvider();
-                const ownerSigner = new ethers.Wallet(payData.key, ethersProvider);
-                const ethAdapterOwner = new EthersAdapter({
+                const ethersProvider = new ethers.providers.JsonRpcProvider(
+                    "https://goerli.base.org",
+                );
+                const signer = new ethers.Wallet(payData.key, ethersProvider);
+                const ethAdapter = new EthersAdapter({
                     ethers,
-                    signerOrProvider: ownerSigner,
+                    signerOrProvider: signer,
                 });
 
                 const safeFactory = await SafeFactory.create({
-                    ethAdapter: ethAdapterOwner,
+                    ethAdapter: ethAdapter,
                 });
-
+                const destinationAddress = await signer.getAddress();
                 const safeAccountConfig: SafeAccountConfig = {
-                    owners: [await ownerSigner.getAddress()],
+                    owners: [destinationAddress],
                     threshold: 1,
                 };
+                const relayPack = new GelatoRelayPack(
+                    "qbec0fcMKxOAXM0qyxL6cDMX_aaJUmSPPAJUIEg17kU_",
+                );
+                const safeAccountAbstraction = new AccountAbstraction(signer);
+                await safeAccountAbstraction.init({ relayPack });
+
                 const addPredicted = await safeFactory.predictSafeAddress(
                     safeAccountConfig,
                 );
                 console.log(addPredicted, "addPredicted");
-
+                console.log(
+                    parseEther(inputValue).toString(),
+                    "parseEther(inputValue).toString()",
+                );
+                console.log(
+                    "process.env.GELATO_RELAY_API_KEY ",
+                    "qbec0fcMKxOAXM0qyxL6cDMX_aaJUmSPPAJUIEg17kU_",
+                );
                 const amountParsed = numHex(Number(parseEther(_inputValue)));
-                const nonStrtZero = removeLeadingZeros(amountParsed);
+                const safeTransactionData: MetaTransactionData = {
+                    to: destinationAddress,
+                    data: "0x",
+                    value: parseEther(inputValue).toString(),
+                    operation: OperationType.Call,
+                };
+                const options: MetaTransactionOptions = {
+                    gasLimit: "100000",
+                    isSponsored: true,
+                };
 
-                if (loggedInVia === LOGGED_IN.GOOGLE) {
-                    try {
-                        let valueHex = String(nonStrtZero);
+                const gelatoTaskId = await safeAccountAbstraction.relayTransaction(
+                    [safeTransactionData],
+                    options,
+                );
 
-                        if (!valueHex.startsWith("0x")) {
-                            valueHex = "0x" + valueHex;
-                        }
+                console.log("gelatoTaskId ", gelatoTaskId);
 
-                        const gasLimitData = (await getEstimatedGas({
-                            from: fromAddress,
-                            to: toAddress,
-                            value: valueHex,
-                        })) as any;
+                handleTransactionStatus(gelatoTaskId, payData.link);
 
-                        const nonce = (await getNonce(fromAddress)) as any;
+                // if (loggedInVia === LOGGED_IN.GOOGLE) {
+                //     try {
+                //         let valueHex = String(nonStrtZero);
 
-                        const tx: TTranx = {
-                            toAddress: toAddress,
-                            nonceHex: nonce.result,
-                            chainIdHex: numHex(Number(Base.chainId)),
-                            // gas price is hardcoded to pass 1 by default as of now
-                            gasPriceHex: "3B9ACA00" ?? "0x1",
-                            gasLimitHex: gasLimitData.result,
-                            amountHex: numHex(tokenAmount),
-                            contractDecimals: 18,
-                            fromAddress: fromAddress,
-                            transactionType: TRANSACTION_TYPE.SEND,
-                            isNative: true,
-                        };
+                //         if (!valueHex.startsWith("0x")) {
+                //             valueHex = "0x" + valueHex;
+                //         }
 
-                        const prvKey = (await provider.request({
-                            method: "private_key",
-                        })) as string;
-                        console.log("prvKey ", prvKey);
-                        const txData = await wallet.signEthTx(tx, prvKey);
-                        const rawTx = (await getSendRawTransaction(txData)) as any;
-                        handleTransactionStatus(rawTx.result, payData.link);
-                    } catch (e: any) {
-                        setTransactionLoading(false);
-                        const err = serializeError(e);
-                        toast.error(err.message);
-                        console.log(e, "error");
-                    }
-                } else {
-                    try {
-                        const sendAmount = await sendTransaction({
-                            to: toAddress,
-                            value: parseEther(inputValue),
-                        });
-                        handleTransactionStatus(sendAmount.hash, payData.link);
-                    } catch (e: any) {
-                        setTransactionLoading(false);
-                        const err = serializeError(e);
-                        toast.error(err.message);
-                        console.log(e, "error");
-                    }
-                }
+                //         const gasLimitData = (await getEstimatedGas({
+                //             from: fromAddress,
+                //             to: toAddress,
+                //             value: valueHex,
+                //         })) as any;
+
+                //         const nonce = (await getNonce(fromAddress)) as any;
+
+                //         const tx: TTranx = {
+                //             toAddress: toAddress,
+                //             nonceHex: nonce.result,
+                //             chainIdHex: numHex(Number(Base.chainId)),
+                //             // gas price is hardcoded to pass 1 by default as of now
+                //             gasPriceHex: "3B9ACA00" ?? "0x1",
+                //             gasLimitHex: gasLimitData.result,
+                //             amountHex: numHex(tokenAmount),
+                //             contractDecimals: 18,
+                //             fromAddress: fromAddress,
+                //             transactionType: TRANSACTION_TYPE.SEND,
+                //             isNative: true,
+                //         };
+
+                //         const prvKey = (await provider.request({
+                //             method: "private_key",
+                //         })) as string;
+                //         console.log("prvKey ", prvKey);
+                //         const txData = await wallet.signEthTx(tx, prvKey);
+                //         const rawTx = (await getSendRawTransaction(txData)) as any;
+                //         handleTransactionStatus(rawTx.result, payData.link);
+                //     } catch (e: any) {
+                //         setTransactionLoading(false);
+                //         const err = serializeError(e);
+                //         toast.error(err.message);
+                //         console.log(e, "error");
+                //     }
+                // } else {
+                //     try {
+                //         const sendAmount = await sendTransaction({
+                //             to: toAddress,
+                //             value: parseEther(inputValue),
+                //         });
+                //         handleTransactionStatus(sendAmount.hash, payData.link);
+                //     } catch (e: any) {
+                //         setTransactionLoading(false);
+                //         const err = serializeError(e);
+                //         toast.error(err.message);
+                //         console.log(e, "error");
+                //     }
+                // }
             } catch (e: any) {
                 setTransactionLoading(false);
                 const err = serializeError(e);

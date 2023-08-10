@@ -938,6 +938,17 @@
   resolved "https://registry.npmjs.org/@rushstack/eslint-patch/-/eslint-patch-1.3.2.tgz"
   integrity sha512-V+MvGwaHH03hYhY+k6Ef/xKd6RYlc4q8WBx+2ANmipHJcKuktNcI/NgEsJgdSUF6Lw32njT6OnrRsKYCdgHjYw==
 
+"@safe-global/account-abstraction-kit-poc@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@safe-global/account-abstraction-kit-poc/-/account-abstraction-kit-poc-1.2.0.tgz#3314c9e36c924299b9626aa270a96f7d72b0538c"
+  integrity sha512-mrmHLSZpH0s6dL5mTwpYtz89t21unvMIlP8zWVrwOda7DaWDxrbloAp7iYeO/Mf6nsyB/n9K5PSQSvvOiFxMjA==
+  dependencies:
+    "@safe-global/protocol-kit" "^1.2.0"
+    "@safe-global/relay-kit" "^1.2.0"
+    "@safe-global/safe-core-sdk-types" "^2.2.0"
+    ethereumjs-util "^7.1.5"
+    ethers "^5.7.2"
+
 "@safe-global/api-kit@^1.3.0":
   version "1.3.0"
   resolved "https://registry.npmjs.org/@safe-global/api-kit/-/api-kit-1.3.0.tgz"
