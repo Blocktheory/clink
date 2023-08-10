@@ -33,6 +33,7 @@ import {
     numHex,
 } from "../../utils";
 import { Base } from "../../utils/chain/base";
+import { BaseGoerli } from "../../utils/chain/baseGoerli";
 import { icons } from "../../utils/images";
 import { useWagmi } from "../../utils/wagmi/WagmiContext";
 import { Wallet } from "../../utils/wallet";
@@ -135,8 +136,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         return Number(val) / Number(tokenPrice);
     };
 
-    const { sendTransaction } = useWagmi();
-
     function removeLeadingZeros(value: string): string {
         // Check if the input value is empty or null
         if (!value || value.length === 0) {
@@ -161,44 +160,37 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 const walletCore = await initWasm();
                 const wallet = new Wallet(walletCore);
                 const payData = await wallet.createPayLink();
-                const toAddress = payData.address;
-                const tokenAmount = Number(_inputValue) * Math.pow(10, 18);
                 const ethersProvider = new ethers.providers.JsonRpcProvider(
-                    "https://goerli.base.org",
+                    BaseGoerli.info.rpc,
                 );
-                const signer = new ethers.Wallet(payData.key, ethersProvider);
+                const destinationSigner = new ethers.Wallet(payData.key, ethersProvider);
+                const destinationEOAAddress = await destinationSigner.getAddress();
                 const ethAdapter = new EthersAdapter({
                     ethers,
-                    signerOrProvider: signer,
+                    signerOrProvider: destinationSigner,
                 });
-
                 const safeFactory = await SafeFactory.create({
                     ethAdapter: ethAdapter,
                 });
-                const destinationAddress = await signer.getAddress();
                 const safeAccountConfig: SafeAccountConfig = {
-                    owners: [destinationAddress],
+                    owners: [destinationEOAAddress],
                     threshold: 1,
                 };
+                const destinationAddress = await safeFactory.predictSafeAddress(
+                    safeAccountConfig,
+                );
+                console.log(destinationAddress, "destinationAddress");
+
+                // should come from ENV
                 const relayPack = new GelatoRelayPack(
                     "qbec0fcMKxOAXM0qyxL6cDMX_aaJUmSPPAJUIEg17kU_",
                 );
-                const safeAccountAbstraction = new AccountAbstraction(signer);
-                await safeAccountAbstraction.init({ relayPack });
 
-                const addPredicted = await safeFactory.predictSafeAddress(
-                    safeAccountConfig,
-                );
-                console.log(addPredicted, "addPredicted");
-                console.log(
-                    parseEther(inputValue).toString(),
-                    "parseEther(inputValue).toString()",
-                );
-                console.log(
-                    "process.env.GELATO_RELAY_API_KEY ",
-                    "qbec0fcMKxOAXM0qyxL6cDMX_aaJUmSPPAJUIEg17kU_",
-                );
-                const amountParsed = numHex(Number(parseEther(_inputValue)));
+                // from signer address
+                const fromEthProvider = new ethers.providers.Web3Provider(provider);
+                const fromSigner = await fromEthProvider.getSigner();
+                const safeAccountAbstraction = new AccountAbstraction(fromSigner);
+                await safeAccountAbstraction.init({ relayPack });
                 const safeTransactionData: MetaTransactionData = {
                     to: destinationAddress,
                     data: "0x",
@@ -214,9 +206,15 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                     [safeTransactionData],
                     options,
                 );
+                setTransactionLoading(false);
 
                 console.log("gelatoTaskId ", gelatoTaskId);
-
+                console.log(
+                    "gelato Task Link ",
+                    "https://relay.gelato.digital/tasks/status/",
+                    gelatoTaskId,
+                );
+                console.log("payData.link ", payData.link);
                 handleTransactionStatus(gelatoTaskId, payData.link);
 
                 // if (loggedInVia === LOGGED_IN.GOOGLE) {

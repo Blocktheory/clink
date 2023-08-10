@@ -1,14 +1,15 @@
 import "react-toastify/dist/ReactToastify.css";
 
+import { EthersAdapter, SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
 import { initWasm } from "@trustwallet/wallet-core";
 import { BigNumber } from "bignumber.js";
 import { serializeError } from "eth-rpc-errors";
+import { ethers } from "ethers";
 import Image from "next/image";
 import * as React from "react";
 import { FC, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
-import { Address } from "wagmi";
 
 import {
     getBalance,
@@ -27,6 +28,7 @@ import {
     numHex,
 } from "../utils";
 import { Base } from "../utils/chain/base";
+import { BaseGoerli } from "../utils/chain/baseGoerli";
 import { icons } from "../utils/images";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
 import { Wallet } from "../utils/wallet";
@@ -94,12 +96,30 @@ const ShareLink: FC<IShareLink> = (props) => {
             const wallet = new Wallet(walletCore);
             setWallet(wallet);
             const account = wallet.getAccountFromPayLink(uuid);
-            if (account) {
-                setFromAddress(account);
+            const eoaAddress = account.address;
+            const eoaKey = account.key;
+            const ethersProvider = new ethers.providers.JsonRpcProvider(
+                BaseGoerli.info.rpc,
+            );
+            const destinationSigner = new ethers.Wallet(eoaKey, ethersProvider);
+            const ethAdapter = new EthersAdapter({
+                ethers,
+                signerOrProvider: destinationSigner,
+            });
+            const safeFactory = await SafeFactory.create({
+                ethAdapter: ethAdapter,
+            });
+            const safeAccountConfig: SafeAccountConfig = {
+                owners: [eoaAddress],
+                threshold: 1,
+            };
+            const smartAddress = await safeFactory.predictSafeAddress(safeAccountConfig);
+            if (smartAddress) {
+                setFromAddress(smartAddress);
             } else {
                 console.log("error", "invalid identifier");
             }
-            await fetchBalance(account);
+            await fetchBalance(smartAddress);
         }
     }, [uuid]);
 
