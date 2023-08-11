@@ -107,22 +107,29 @@ const ShareLink: FC<IShareLink> = (props) => {
             const account = wallet.getAccountFromPayLink(uuid);
             const eoaAddress = account.address;
             const eoaKey = account.key;
+            console.log("at 110");
             const ethersProvider = new ethers.providers.JsonRpcProvider(
                 BaseGoerli.info.rpc,
             );
+            console.log("at 114");
             const destinationSigner = new ethers.Wallet(eoaKey, ethersProvider);
+            console.log("at 116");
             const ethAdapter = new EthersAdapter({
                 ethers,
                 signerOrProvider: destinationSigner,
             });
+            console.log("at 121");
             const safeFactory = await SafeFactory.create({
                 ethAdapter: ethAdapter,
             });
+            console.log("at 125");
             const safeAccountConfig: SafeAccountConfig = {
                 owners: [eoaAddress],
                 threshold: 1,
             };
+            console.log("at 130");
             const smartAddress = await safeFactory.predictSafeAddress(safeAccountConfig);
+            console.log("at 132");
             if (smartAddress) {
                 setFromAddress(smartAddress);
             } else {
@@ -232,37 +239,6 @@ const ShareLink: FC<IShareLink> = (props) => {
             if (gelatoTaskId) {
                 handleTransactionStatus(gelatoTaskId);
             }
-            // const gasLimit = gasLimitData?.result ?? "0x5208";
-            // const gasPirce = "3B9ACA00";
-            // let bgBal = BigNumber(walletBalanceHex);
-            // const bgGasPirce = BigNumber("0x" + gasPirce);
-            // const bgGasLimit = BigNumber(gasLimit);
-            // const gasFee = bgGasPirce.multipliedBy(bgGasLimit);
-            // bgBal = bgBal.minus(gasFee);
-            // const amountToSend = hexFormatter(bgBal.toString(16));
-            // const nonce = (await getNonce(fromAddress)) as any;
-            // const tx: TTranx = {
-            //     toAddress: toAdd,
-            //     nonceHex: nonce.result,
-            //     chainIdHex: numHex(Number(Base.chainId)),
-            //     gasPriceHex: gasPirce,
-            //     gasLimitHex: gasLimit,
-            //     amountHex: amountToSend,
-            //     contractDecimals: 18,
-            //     fromAddress: fromAddress,
-            //     transactionType: TRANSACTION_TYPE.SEND,
-            //     isNative: true,
-            // };
-            // const privKey = await wallet.getPrivKeyFromPayLink(uuid);
-            // const txData = await wallet.signEthTx(tx, privKey);
-            // const rawTx = (await getSendRawTransaction(txData)) as any;
-            // if (rawTx.error) {
-            //     setProcessing(false);
-            //     const err = serializeError(rawTx.error.message);
-            //     toast.error(err.message);
-            // } else {
-            //     handleTransactionStatus(rawTx.result);
-            // }
         } catch (e: any) {
             setProcessing(false);
             toast.error(e.message);

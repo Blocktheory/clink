@@ -1,7 +1,6 @@
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 
-import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { EthersAdapter, SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
 import { initWasm } from "@trustwallet/wallet-core";
 import {
@@ -12,11 +11,9 @@ import {
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
-import { serializeError } from "eth-rpc-errors";
 import { ethers } from "ethers";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
-import { toast } from "react-toastify";
 import { useAccount } from "wagmi";
 
 import {
@@ -27,7 +24,6 @@ import {
     web3AuthVerifier,
 } from "../constants";
 import { ACTIONS, GlobalContext } from "../context/GlobalContext";
-import { getStore } from "../store/GlobalStore";
 import BottomSheet from "../ui_components/bottom-sheet";
 import ConnectWallet from "../ui_components/connect_wallet/";
 import Footer from "../ui_components/footer";
@@ -65,7 +61,6 @@ export default function Home() {
     const [openBottomSheet, setOpenBottomSheet] = useState(false);
     const [connecting, setConnecting] = useState(false);
     const { getAccount, disconnect } = useWagmi();
-    const { openConnectModal } = useConnectModal();
     const { address, isConnecting, isConnected } = useAccount();
     const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
     const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
@@ -116,40 +111,6 @@ export default function Home() {
         }
 
         initializeOpenLogin();
-    }, []);
-
-    useEffect(() => {
-        if (isConnected && address && localStorage.getItem("isGoogleLogin") === "false") {
-            dispatch({
-                type: ACTIONS.SET_ADDRESS,
-                payload: address,
-            });
-            dispatch({
-                type: ACTIONS.LOGGED_IN_VIA,
-                payload: LOGGED_IN.EXTERNAL_WALLET,
-            });
-            setWalletAddress(address);
-            setStep(ESTEPS.THREE);
-        }
-    }, [isConnected, address]);
-
-    useEffect(() => {
-        if (
-            localStorage.getItem("isConnected") === "true" &&
-            address &&
-            localStorage.getItem("isGoogleLogin") === "false"
-        ) {
-            dispatch({
-                type: ACTIONS.SET_ADDRESS,
-                payload: address,
-            });
-            dispatch({
-                type: ACTIONS.LOGGED_IN_VIA,
-                payload: LOGGED_IN.EXTERNAL_WALLET,
-            });
-            setWalletAddress(address);
-            setStep(ESTEPS.THREE);
-        }
     }, []);
 
     useEffect(() => {
@@ -283,19 +244,11 @@ export default function Home() {
                     <ConnectWallet
                         signIn={signIn}
                         handleSteps={handleSteps}
-                        connectWallet={connectWallet}
                         connecting={connecting}
                     />
                 );
             case ESTEPS.THREE:
-                return (
-                    <LoadChestComponent
-                        openLogin={openLogin}
-                        handleSteps={handleSteps}
-                        safeLogin={safeLogin}
-                        provider={provider}
-                    />
-                );
+                return <LoadChestComponent provider={provider} />;
             default:
                 return <HomePage handleSetupChest={handleSetupChest} />;
         }
@@ -311,37 +264,6 @@ export default function Home() {
     const onHamburgerClick = () => {
         setOpenBottomSheet(true);
     };
-
-    const connectWallet = async () => {
-        setConnecting(true);
-        try {
-            await openConnectModal?.();
-        } catch (e: any) {
-            const err = serializeError(e);
-            console.log(err, "err");
-            setConnecting(false);
-            toast.error(err.message);
-            console.log(e, "error");
-        }
-    };
-
-    useEffect(() => {
-        if (address && !isConnecting && connecting) {
-            localStorage.setItem("isConnected", "true");
-            localStorage.setItem("isGoogleLogin", "false");
-            dispatch({
-                type: ACTIONS.SET_ADDRESS,
-                payload: address,
-            });
-            dispatch({
-                type: ACTIONS.LOGGED_IN_VIA,
-                payload: LOGGED_IN.EXTERNAL_WALLET,
-            });
-            setConnecting(false);
-            setWalletAddress(address);
-            handleSteps(ESTEPS.THREE);
-        }
-    }, [isConnecting]);
 
     return (
         <>
