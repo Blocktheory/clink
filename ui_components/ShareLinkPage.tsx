@@ -1,15 +1,24 @@
 import "react-toastify/dist/ReactToastify.css";
 
+import AccountAbstraction from "@safe-global/account-abstraction-kit-poc";
 import { EthersAdapter, SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
+import { GelatoRelayPack } from "@safe-global/relay-kit";
+import {
+    MetaTransactionData,
+    MetaTransactionOptions,
+    OperationType,
+} from "@safe-global/safe-core-sdk-types";
 import { initWasm } from "@trustwallet/wallet-core";
 import { BigNumber } from "bignumber.js";
 import { serializeError } from "eth-rpc-errors";
 import { ethers } from "ethers";
 import Image from "next/image";
+import Link from "next/link";
 import * as React from "react";
 import { FC, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
+import { parseEther } from "viem";
 
 import {
     getBalance,
@@ -37,16 +46,9 @@ import { TRANSACTION_TYPE, TTranx } from "../utils/wallet/types";
 import ClaimBtnModal from "./ClaimBtnModal";
 import { QRComponent } from "./loadchest/QRComponent";
 import PrimaryBtn from "./PrimaryBtn";
+import QrModal from "./QrModal";
 import SecondaryBtn from "./SecondaryBtn";
 import { ShareBtnModal } from "./ShareBtnModal";
-import AccountAbstraction from "@safe-global/account-abstraction-kit-poc";
-import { GelatoRelayPack } from "@safe-global/relay-kit";
-import { parseEther } from "viem";
-import {
-    MetaTransactionData,
-    MetaTransactionOptions,
-    OperationType,
-} from "@safe-global/safe-core-sdk-types";
 
 export interface IShareLink {
     uuid: string;
@@ -65,13 +67,15 @@ const ShareLink: FC<IShareLink> = (props) => {
     const [shareText, setShareText] = useState("Share");
     const [showShareIcon, setShowShareIcon] = useState(true);
     const [tokenValue, setTokenValue] = useState("");
-    const [headingText, setHeadingText] = useState("Your Chest is ready");
+    const [headingText, setHeadingText] = useState("Your Chest is ready to claim!");
     const [linkValueUsd, setLinkValueUsd] = useState("");
     const [isRedirected, setIsRedirected] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [processing, setProcessing] = useState(false);
     const [openClaimModal, setOpenClaimModal] = useState(false);
     const [openShareModal, setOpenShareModal] = useState(false);
+    const [showQr, setShowQr] = useState(false);
+
     const [url, setUrl] = useState("");
     const shareData = {
         text: "Here is you Gifted Chest",
@@ -85,6 +89,12 @@ const ShareLink: FC<IShareLink> = (props) => {
                 .then(() => console.log("Successfully shared"))
                 .catch((error) => console.log("Error sharing", error));
         }
+    };
+
+    const copyAddress = (e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+        navigator.clipboard.writeText(fromAddress);
     };
 
     const copyToClipBoard = (e: any) => {
@@ -107,29 +117,23 @@ const ShareLink: FC<IShareLink> = (props) => {
             const account = wallet.getAccountFromPayLink(uuid);
             const eoaAddress = account.address;
             const eoaKey = account.key;
-            console.log("at 110");
             const ethersProvider = new ethers.providers.JsonRpcProvider(
                 BaseGoerli.info.rpc,
             );
-            console.log("at 114");
+            // const destinationSigner = new ethers.Wallet(eoaKey, ethersProvider);
             const destinationSigner = new ethers.Wallet(eoaKey, ethersProvider);
-            console.log("at 116");
             const ethAdapter = new EthersAdapter({
                 ethers,
                 signerOrProvider: destinationSigner,
             });
-            console.log("at 121");
             const safeFactory = await SafeFactory.create({
                 ethAdapter: ethAdapter,
             });
-            console.log("at 125");
             const safeAccountConfig: SafeAccountConfig = {
                 owners: [eoaAddress],
                 threshold: 1,
             };
-            console.log("at 130");
             const smartAddress = await safeFactory.predictSafeAddress(safeAccountConfig);
-            console.log("at 132");
             if (smartAddress) {
                 setFromAddress(smartAddress);
             } else {
@@ -310,7 +314,7 @@ const ShareLink: FC<IShareLink> = (props) => {
             <div className="w-full h-[70%] text-center p-4  flex flex-col gap-5 items-center">
                 <p className="text-white text-[20px] font-bold">{headingText}</p>
 
-                <div className="w-full md:w-[60%] max-w-[450px] h-[300px] shareLinkBg mb-16 cardShine">
+                <div className="w-full md:w-[60%] max-w-[450px] h-[235px] shareLinkBg mb-16 cardShine">
                     <div className=" rounded-lg profileBackgroundImage flex flex-col justify-between h-full">
                         {isLoading ? (
                             <div className="w-full h-full mt-5 ml-5">
@@ -322,15 +326,42 @@ const ShareLink: FC<IShareLink> = (props) => {
                                 <div className="flex gap-1 flex-col text-start ml-3">
                                     <p className="text-[40px] text-[#F4EC97] font bold">{`${linkValueUsd}`}</p>
                                     <p className="text-sm text-white/50">{`~ ${tokenValue} ETH`}</p>
+                                    <div className="flex justify-around w-[100px] mx-auto mt-1.5">
+                                        <Link
+                                            href={`https://goerli.basescan.org/address/${fromAddress}`}
+                                            target="_blank"
+                                        >
+                                            <Image
+                                                src={icons.linkWhite}
+                                                alt="external link"
+                                                className="w-5 cursor-pointer opacity-60 hover:opacity-100"
+                                            />
+                                        </Link>
+
+                                        <Image
+                                            src={icons.qrWhite}
+                                            alt="show qr code"
+                                            className="w-5 cursor-pointer opacity-60 hover:opacity-100"
+                                            onClick={() => {
+                                                setShowQr(!showQr);
+                                            }}
+                                        />
+                                        <Image
+                                            src={icons.copyIconWhite}
+                                            alt="copy address"
+                                            className="w-5 cursor-pointer opacity-60 hover:opacity-100"
+                                            onClick={copyAddress}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="pr-8 pt-2">
+                                {/* <div className="pr-8 pt-2">
                                     <QRComponent
                                         walletAddress={url}
                                         isShareQr={true}
                                         widthPx={120}
                                         heightPx={120}
                                     />
-                                </div>
+                                </div> */}
                             </div>
                         )}
                         <div className="self-end">
@@ -404,6 +435,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                 handlePublicAddressTransaction={handlePublicAddressTransaction}
             />
             <ShareBtnModal open={openShareModal} setOpen={setOpenShareModal} />
+            <QrModal open={showQr} setOpen={setShowQr} value={fromAddress} />
         </div>
     );
 };

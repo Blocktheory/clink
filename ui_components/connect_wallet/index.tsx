@@ -3,14 +3,16 @@ import * as React from "react";
 
 import { THandleStep } from "../../pages";
 import { icons } from "../../utils/images";
+import SecondaryBtn from "../SecondaryBtn";
 
 interface IConnectWallet extends THandleStep {
     signIn: () => Promise<void>;
+    connectWallet: () => Promise<void>;
     connecting: boolean;
 }
 
 export default function ConnectWallet(props: IConnectWallet) {
-    const { signIn, connecting } = props;
+    const { signIn, connecting, connectWallet } = props;
     return (
         <>
             <div className="w-full relative lg:pt-10">
@@ -32,6 +34,14 @@ export default function ConnectWallet(props: IConnectWallet) {
                         src={icons.tchest}
                         alt="Chest"
                     />
+
+                    <div className="flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] h-[64px] mx-auto rounded-lg mb-6 lg:mb-4">
+                        <SecondaryBtn
+                            leftImage={icons.walletIcon ?? ""}
+                            title={connecting ? "Connecting..." : "Connect your wallet"}
+                            onClick={connectWallet}
+                        />
+                    </div>
                     <div className="flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto rounded-lg mt-10">
                         <button
                             className={`py-4 w-full rounded-lg bg-white flex gap-2 items-center justify-center max-w-[400px]`}
