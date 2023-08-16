@@ -54,7 +54,8 @@ export default function Home() {
         dispatch,
         state: { loggedInVia },
     } = useContext(GlobalContext);
-    const [loader, setLoader] = useState(true);
+    const [loader, setLoader] = useState(false);
+    const [initLoader, setInitLoader] = useState(false);
     const { openConnectModal } = useConnectModal();
 
     const [openLogin, setSdk] = useState<any>("");
@@ -70,6 +71,7 @@ export default function Home() {
 
     useEffect(() => {
         async function initializeOpenLogin() {
+            setInitLoader(true);
             const chainConfig = {
                 chainNamespace: CHAIN_NAMESPACES.EIP155,
                 chainId: BaseGoerli.chainIdHex,
@@ -107,10 +109,12 @@ export default function Home() {
                 },
                 privateKeyProvider,
             });
+
             web3auth.configureAdapter(openloginAdapter);
             setWeb3auth(web3auth);
             await web3auth.init();
             setProvider(web3auth.provider);
+            setInitLoader(false);
         }
 
         initializeOpenLogin();
@@ -118,45 +122,58 @@ export default function Home() {
 
     useEffect(() => {
         if (web3auth && web3auth.connected) {
-            getAccounts().then((res: any) => {
-                dispatch({
-                    type: ACTIONS.LOGGED_IN_VIA,
-                    payload: LOGGED_IN.GOOGLE,
+            setLoader(true);
+            getAccounts()
+                .then((res: any) => {
+                    setLoader(false);
+                    dispatch({
+                        type: ACTIONS.LOGGED_IN_VIA,
+                        payload: LOGGED_IN.GOOGLE,
+                    });
+                    dispatch({
+                        type: ACTIONS.SET_ADDRESS,
+                        payload: res,
+                    });
+                    setWalletAddress(res);
+                    handleSteps(ESTEPS.THREE);
+                })
+                .catch((e) => {
+                    console.log(e, "error");
                 });
-                dispatch({
-                    type: ACTIONS.SET_ADDRESS,
-                    payload: res,
-                });
-                setWalletAddress(res);
-                handleSteps(ESTEPS.THREE);
-            });
         }
     }, [provider]);
 
     const signIn = async () => {
-        if (!web3auth) {
-            return;
+        setLoader(true);
+        try {
+            if (!web3auth) {
+                return;
+            }
+            if (web3auth.connected) {
+                return;
+            }
+            const web3authProvider = await web3auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
+                loginProvider: "google",
+            });
+            setProvider(web3authProvider);
+            const acc = (await getAccounts()) as any;
+            localStorage.setItem("isConnected", "true");
+            localStorage.setItem("isGoogleLogin", "true");
+            dispatch({
+                type: ACTIONS.LOGGED_IN_VIA,
+                payload: LOGGED_IN.GOOGLE,
+            });
+            dispatch({
+                type: ACTIONS.SET_ADDRESS,
+                payload: acc,
+            });
+            setWalletAddress(acc);
+            setLoader(false);
+            handleSteps(ESTEPS.THREE);
+        } catch (e) {
+            setLoader(false);
+            console.log(e, "e");
         }
-        if (web3auth.connected) {
-            return;
-        }
-        const web3authProvider = await web3auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
-            loginProvider: "google",
-        });
-        setProvider(web3authProvider);
-        const acc = (await getAccounts()) as any;
-        localStorage.setItem("isConnected", "true");
-        localStorage.setItem("isGoogleLogin", "true");
-        dispatch({
-            type: ACTIONS.LOGGED_IN_VIA,
-            payload: LOGGED_IN.GOOGLE,
-        });
-        dispatch({
-            type: ACTIONS.SET_ADDRESS,
-            payload: acc,
-        });
-        setWalletAddress(acc);
-        handleSteps(ESTEPS.THREE);
     };
 
     const getAccounts = async () => {
@@ -165,9 +182,9 @@ export default function Home() {
         }
         try {
             const contractAddress = await deploySafeContract();
-
             return await contractAddress;
         } catch (error) {
+            setLoader(false);
             return error;
         }
     };
@@ -222,14 +239,13 @@ export default function Home() {
     const getUIComponent = (step: number) => {
         switch (step) {
             case ESTEPS.ONE:
-                return <HomePage handleSetupChest={handleSetupChest} />;
+                return <HomePage handleSetupChest={handleSetupChest} loader={loader} />;
             case ESTEPS.TWO:
                 return (
                     <ConnectWallet
                         signIn={signIn}
                         handleSteps={handleSteps}
-                        connecting={connecting}
-                        connectWallet={connectWallet}
+                        loader={loader}
                     />
                 );
             case ESTEPS.THREE:
@@ -289,6 +305,8 @@ export default function Home() {
                 onHamburgerClick={onHamburgerClick}
                 signOut={signOut}
                 setWalletAddress={setWalletAddress}
+                loader={loader}
+                initLoader={initLoader}
             />
             <div className="p-4 relative">
                 <ToastContainer
