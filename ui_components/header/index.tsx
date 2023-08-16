@@ -18,6 +18,8 @@ interface IHeader {
     onHamburgerClick: () => void;
     signOut: () => Promise<void>;
     setWalletAddress: (val: string) => void;
+    loader?: boolean;
+    initLoader?: boolean;
 }
 
 const Header = (props: IHeader) => {
@@ -30,6 +32,8 @@ const Header = (props: IHeader) => {
         onHamburgerClick,
         signOut,
         setWalletAddress,
+        loader,
+        initLoader,
     } = props;
     const {
         dispatch,
@@ -116,18 +120,26 @@ const Header = (props: IHeader) => {
                         <button
                             className={`px-4 h-[40px] rounded-lg bg-white flex gap-2 items-center justify-center`}
                             onClick={signIn}
-                            disabled={isConnected}
+                            disabled={address || loader || initLoader ? true : false}
                         >
                             <Image
-                                src={!isConnected ? icons.googleIcon : icons.baseLogo}
+                                src={!address ? icons.googleIcon : icons.baseLogo}
                                 alt="google login"
                                 width={20}
                                 height={20}
                                 className="w-5 rounded-full"
                             />
-                            <span className="text-[16px] font-medium text-black/50 self-center my-auto">
-                                {address ? trimAddress(address) : "Login"}
-                            </span>
+                            {loader || initLoader ? (
+                                <div className="bouncing-loader">
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                            ) : (
+                                <span className="text-[16px] font-medium text-black/50 self-center my-auto">
+                                    {address ? trimAddress(address) : "Login"}
+                                </span>
+                            )}
                         </button>
                         <div className="relative" ref={menuRef}>
                             <button

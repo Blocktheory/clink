@@ -18,6 +18,7 @@ import { useRouter } from "next/router";
 import { FC, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
+import ReactTyped from "react-typed";
 import { parseEther } from "viem";
 
 import {
@@ -37,13 +38,12 @@ import {
 } from "../../utils";
 import { BaseGoerli } from "../../utils/chain/baseGoerli";
 import { icons } from "../../utils/images";
+import { useWagmi } from "../../utils/wagmi/WagmiContext";
 import { Wallet } from "../../utils/wallet";
 import PrimaryBtn from "../PrimaryBtn";
 import SecondaryBtn from "../SecondaryBtn";
 import DepositAmountModal from "./DepositAmountModal";
 import { ProfileCard } from "./ProfileCard";
-import { useWagmi } from "../../utils/wagmi/WagmiContext";
-import ReactTyped from "react-typed";
 
 export interface ILoadChestComponent {
     provider?: any;
@@ -167,7 +167,9 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 setChestLoadingText("Safe contract created");
 
                 if (loggedInVia === LOGGED_IN.GOOGLE) {
-                    const relayPack = new GelatoRelayPack(process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY);
+                    const relayPack = new GelatoRelayPack(
+                        process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY,
+                    );
                     setChestLoadingText(
                         "Initializing account abstraction for transaction relay",
                     );
@@ -193,7 +195,9 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                         options,
                     );
                     console.log("gelatoTaskId ", gelatoTaskId);
-                    console.log(`https://relay.gelato.digital/tasks/status/${gelatoTaskId}`);
+                    console.log(
+                        `https://relay.gelato.digital/tasks/status/${gelatoTaskId}`,
+                    );
                     if (gelatoTaskId) {
                         setChestLoadingText(
                             "Transaction on its way! Awaiting confirmation...",
