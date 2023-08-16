@@ -94,7 +94,7 @@ const Header = (props: IHeader) => {
 
     return (
         <header className="relative z-[9]">
-            <div className="h-[80px] hidden md:block"></div>
+            <div className="h-[40px] hidden md:block"></div>
             <div className="sticky top-0 flex items-center justify-center">
                 <div className="w-[95%] max-w-[600px] h-[64px] rounded-2xl bg-[#0C0421] text-center flex items-center justify-between relative z-[9]">
                     {step > 1 ? (
@@ -104,10 +104,10 @@ const Header = (props: IHeader) => {
                             />
                         </div>
                     ) : (
-                        <div className="flex gap-2 pl-2">
-                            <Image src={icons.logo} alt="logo" className="w-12" />
+                        <div className="flex gap-1 pl-2">
+                            <Image src={icons.logo2} alt="logo" className="w-10" />
                             <p className="text-[16px] font-bold text-white self-center">
-                                Micropay
+                                Clink Safe
                             </p>
                         </div>
                     )}

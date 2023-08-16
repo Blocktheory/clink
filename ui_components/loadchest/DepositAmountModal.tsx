@@ -49,7 +49,7 @@ export const DepositAmountModal: FC<IDepositAmountModal> = (props) => {
         width: 240,
         height: 240,
         type: "svg",
-        image: icons.logo.src,
+        image: icons.logo2.src,
         margin: 5,
         qrOptions: {
             typeNumber: 0,
@@ -87,7 +87,6 @@ export const DepositAmountModal: FC<IDepositAmountModal> = (props) => {
     };
 
     useEffect(() => {
-        console.log("came to ue");
         if (connecting) {
             handleWalletConnectFlow();
             toast.success("Wallet Connected Successfully");

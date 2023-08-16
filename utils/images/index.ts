@@ -13,12 +13,14 @@ import helpIcon from "../../public/assets/images/help_icon.svg";
 import linkWhite from "../../public/assets/images/link_white.svg";
 import linkedinBlue from "../../public/assets/images/linkedin_blue.svg";
 import logo from "../../public/assets/images/logo.svg";
+import logo2 from "../../public/assets/images/logo_clink.png";
 import logoutIcon from "../../public/assets/images/logout_icon.svg";
 import qrWhite from "../../public/assets/images/qr_white.svg";
 import safeLogo from "../../public/assets/images/safe_logo.svg";
 import shareBtnIcon from "../../public/assets/images/share_btn_icon.svg";
 import shareBtnIconWhite from "../../public/assets/images/share_btn_icon_white.svg";
 import tchest from "../../public/assets/images/tchest.svg";
+import tchestopen from "../../public/assets/images/tchestopen.svg";
 import telegramBlue from "../../public/assets/images/telegram_blue.svg";
 import tokensLoading from "../../public/assets/images/tokens_loading.png";
 import transferIcon from "../../public/assets/images/transfer_icon.svg";
@@ -27,7 +29,9 @@ import x from "../../public/assets/images/x.svg";
 
 export type TImages =
     | "logo"
+    | "logo2"
     | "tchest"
+    | "tchestopen"
     | "walletIcon"
     | "backIcon"
     | "shareBtnIcon"
@@ -61,7 +65,9 @@ export type TNextImage = {
 
 export const icons: Record<TImages, TNextImage> = {
     logo,
+    logo2,
     tchest,
+    tchestopen,
     walletIcon,
     backIcon,
     shareBtnIcon,

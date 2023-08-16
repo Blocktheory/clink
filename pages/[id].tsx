@@ -10,6 +10,7 @@ import { publicProvider } from "wagmi/providers/public";
 import { productName } from "../constants";
 import ShareLink from "../ui_components/ShareLinkPage";
 import { BaseGoerli } from "../utils/chain/baseGoerli";
+import MetaHead from "../ui_components/siteMeta";
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
     [baseGoerli],
@@ -44,8 +45,9 @@ export default function claim() {
     const router = useRouter();
     const uuid = router.asPath;
     return (
-        <WagmiConfig config={config}>
-            <ShareLink uuid={uuid} />
-        </WagmiConfig>
+      <WagmiConfig config={config}>
+        <MetaHead title="Hey, Claim your Reward!!" description="Crypto Rewards Just in Link | Clink Safe" imageUrl="https://raw.githubusercontent.com/punithbm/eth-micropay-superhack/develop/public/assets/images/meta.png" urlEndpoint="" />
+        <ShareLink uuid={uuid} />
+      </WagmiConfig>
     );
 }

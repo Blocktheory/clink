@@ -3,6 +3,8 @@ import "react-toastify/dist/ReactToastify.css";
 import AccountAbstraction from "@safe-global/account-abstraction-kit-poc";
 import { EthersAdapter, SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
 import { GelatoRelayPack } from "@safe-global/relay-kit";
+import Confetti from "react-confetti";
+
 import {
     MetaTransactionData,
     MetaTransactionOptions,
@@ -19,6 +21,7 @@ import { FC, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import { parseEther } from "viem";
+import "tailwindcss/tailwind.css";
 
 import {
     getBalance,
@@ -77,6 +80,7 @@ const ShareLink: FC<IShareLink> = (props) => {
     const [openClaimModal, setOpenClaimModal] = useState(false);
     const [openShareModal, setOpenShareModal] = useState(false);
     const [showQr, setShowQr] = useState(false);
+    const [isClaimSuccessful, setIsClaimSuccessful] = useState(false);
 
     const [url, setUrl] = useState("");
     const shareData = {
@@ -213,9 +217,7 @@ const ShareLink: FC<IShareLink> = (props) => {
             const ethersProvider = new ethers.providers.JsonRpcProvider(
                 BaseGoerli.info.rpc,
             );
-            const relayPack = new GelatoRelayPack(
-                "qbec0fcMKxOAXM0qyxL6cDMX_aaJUmSPPAJUIEg17kU_",
-            );
+            const relayPack = new GelatoRelayPack(process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY);
 
             // from signer address
             const fromSigner = new ethers.Wallet(fromKey.key, ethersProvider);
@@ -257,13 +259,10 @@ const ShareLink: FC<IShareLink> = (props) => {
             getRelayTransactionStatus(hash)
                 .then((res: any) => {
                     if (res) {
-                        console.log(res, "res");
                         const task = res.data.task;
                         if (task) {
                             if (task.taskState === "ExecSuccess") {
-                                setProcessing(false);
-                                toast.success("Claimed Successfully");
-                                fetchBalance(fromAddress);
+                                handleClaimSuccess();
                                 if (interval !== null) {
                                     clearInterval(interval);
                                 }
@@ -287,6 +286,13 @@ const ShareLink: FC<IShareLink> = (props) => {
                     }
                 });
         }, intervalInMilliseconds);
+    };
+
+    const handleClaimSuccess = () => {
+        setIsClaimSuccessful(true);
+        setProcessing(false);
+        toast.success("Claimed Successfully");
+        fetchBalance(fromAddress);
     };
 
     useEffect(() => {
@@ -366,7 +372,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                             </div>
                         )}
                         <div className="self-end">
-                            <Image className="" src={icons.tchest} alt="Chest" />
+                            {isClaimSuccessful ? <Image className="mt-[-29px]" src={icons.tchestopen} alt="Chest Open" /> : <Image className="" src={icons.tchest} alt="Chest" />}
                         </div>
                     </div>
                 </div>
@@ -374,55 +380,67 @@ const ShareLink: FC<IShareLink> = (props) => {
                     <>
                         <div className="lg:hidden block w-full">
                             <PrimaryBtn
+                                className={`${isLoading ? "opacity-60" : "opacity-100"}`}
                                 title="Share"
                                 onClick={() => {
                                     handleShareURL();
                                 }}
                                 rightImage={showShareIcon ? icons.shareBtnIcon : ""}
                                 showShareIcon={showShareIcon}
+                                btnDisable={isLoading}
                             />
                         </div>
                         <div className="hidden lg:block w-full max-w-[400px]">
                             <PrimaryBtn
+                                className={`${isLoading ? "opacity-60" : "opacity-100"}`}
                                 title={shareText}
                                 onClick={() => {
                                     setOpenShareModal(true);
                                 }}
                                 rightImage={showShareIcon ? icons.shareBtnIcon : ""}
+                                btnDisable={isLoading}
                             />
                         </div>
                         <SecondaryBtn
+                            className={`${isLoading ? "opacity-60" : "opacity-100"}`}
                             title={processing ? "Processing..." : "Claim"}
                             onClick={() => handleClaimClick()}
                             rightImage={processing ? undefined : icons.downloadBtnIcon}
+                            btnDisable={isLoading}
                         />
                     </>
                 ) : (
                     <>
                         <PrimaryBtn
+                            className={`${isLoading ? "opacity-60" : "opacity-100"}`}
                             title={processing ? "Processing..." : "Claim"}
                             onClick={() => handleClaimClick()}
                             rightImage={
                                 processing ? undefined : icons.downloadBtnIconBlack
                             }
+                            btnDisable={isLoading}
                         />
                         <div className="lg:hidden block w-full">
                             <SecondaryBtn
+                                className={`${isLoading ? "opacity-60" : "opacity-100"}`}
                                 title="Share"
                                 onClick={() => {
                                     handleShareURL();
                                 }}
                                 rightImage={showShareIcon ? icons.shareBtnIconWhite : ""}
                                 showShareIcon={showShareIcon}
+                                btnDisable={isLoading}
                             />
                         </div>
                         <div className="hidden lg:block w-full max-w-[400px]">
                             <SecondaryBtn
+                                className={`${isLoading ? "opacity-60" : "opacity-100"}`}
                                 title={shareText}
                                 onClick={() => {
                                     setOpenShareModal(true);
                                 }}
                                 rightImage={showShareIcon ? icons.shareBtnIconWhite : ""}
+                                btnDisable={isLoading}
                             />
                         </div>
                     </>
@@ -437,6 +455,8 @@ const ShareLink: FC<IShareLink> = (props) => {
             />
             <ShareBtnModal open={openShareModal} setOpen={setOpenShareModal} />
             <QrModal open={showQr} setOpen={setShowQr} value={fromAddress} />
+            {isClaimSuccessful && <Confetti width={2400} height={1200} recycle={false} numberOfPieces={2000} />}
+
             <Footer />
         </div>
     );
