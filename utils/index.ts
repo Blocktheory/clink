@@ -1,3 +1,4 @@
+import { toBuffer } from "@ethereumjs/util";
 import bs58 from "bs58";
 import crypto from "crypto";
 
@@ -55,6 +56,11 @@ export const hexToBuffer = (hex: string) => {
     }
     hex = hexFormatter(hex);
     return Buffer.from(hex, "hex");
+};
+
+export const bufferToHex = function (buf: Buffer): string {
+    buf = toBuffer(buf);
+    return "0x" + buf.toString("hex");
 };
 
 export const hexToNumber = (val: string, divider = 1) => {
@@ -197,4 +203,16 @@ export const encryptAndEncodeHexStrings = (hexString1: string, hexString2: strin
 
     const encodedData = bs58.encode(Buffer.from(concatenatedString));
     return encodedData;
+};
+
+export const encodeAddress = (address: string) => {
+    const buffData = hexToBuffer(address);
+    const hash = bs58.encode(buffData);
+    return hash;
+};
+
+export const decodeAddressHash = (hash: string) => {
+    const buffData = bs58.decode(hash);
+    const address = bufferToHex(Buffer.from(buffData));
+    return address;
 };

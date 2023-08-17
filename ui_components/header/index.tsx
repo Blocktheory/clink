@@ -101,18 +101,18 @@ const Header = (props: IHeader) => {
             <div className="h-[40px] hidden md:block"></div>
             <div className="sticky top-0 flex items-center justify-center">
                 <div className="w-[95%] max-w-[600px] h-[64px] rounded-2xl bg-[#0C0421] text-center flex items-center justify-between relative z-[9]">
-                    {step > 1 ? (
-                        <div className="ml-4">
-                            <BackBtn
-                                onClick={() => handleSteps(step === 3 ? 1 : step - 1)}
-                            />
-                        </div>
-                    ) : (
+                    {step === 1 ? (
                         <div className="flex gap-1 pl-2">
                             <Image src={icons.logo2} alt="logo" className="w-10" />
                             <p className="text-[16px] font-bold text-white self-center">
                                 Clink Safe
                             </p>
+                        </div>
+                    ) : (
+                        <div className="ml-4">
+                            <BackBtn
+                                onClick={() => handleSteps(step === 3 ? 1 : step - 1)}
+                            />
                         </div>
                     )}
 

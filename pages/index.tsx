@@ -61,7 +61,7 @@ export default function Home() {
     const [openLogin, setSdk] = useState<any>("");
     const [safeLogin, setSafeLogin] = useState<any>("");
     const [walletAddress, setWalletAddress] = useState<string>("");
-    const [step, setStep] = useState<number>(ESTEPS.ONE);
+    const [step, setStep] = useState<number>(0);
     const [openBottomSheet, setOpenBottomSheet] = useState(false);
     const [connecting, setConnecting] = useState(false);
     const { getAccount, disconnect } = useWagmi();
@@ -70,7 +70,20 @@ export default function Home() {
     const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
 
     useEffect(() => {
+        const item = localStorage.getItem("isGoogleLogin");
+        console.log(item, "item");
+        console.log(
+            localStorage.getItem("isGoogleLogin ") &&
+                localStorage.getItem("isGoogleLogin ") === "true",
+            "storage",
+        );
+        if (item) {
+            handleSteps(ESTEPS.THREE);
+        } else {
+            handleSteps(ESTEPS.ONE);
+        }
         async function initializeOpenLogin() {
+            item && setLoader(true);
             setInitLoader(true);
             const chainConfig = {
                 chainNamespace: CHAIN_NAMESPACES.EIP155,
@@ -135,7 +148,6 @@ export default function Home() {
                         payload: res,
                     });
                     setWalletAddress(res);
-                    handleSteps(ESTEPS.THREE);
                 })
                 .catch((e) => {
                     console.log(e, "error");
@@ -249,9 +261,9 @@ export default function Home() {
                     />
                 );
             case ESTEPS.THREE:
-                return <LoadChestComponent provider={provider} />;
+                return <LoadChestComponent provider={provider} loader={loader} />;
             default:
-                return <HomePage handleSetupChest={handleSetupChest} />;
+                return <></>;
         }
     };
 

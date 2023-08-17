@@ -16,6 +16,7 @@ import Lottie from "lottie-react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { FC, useContext, useEffect, useState } from "react";
+import React from "react";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import ReactTyped from "react-typed";
@@ -31,6 +32,7 @@ import { GlobalContext } from "../../context/GlobalContext";
 import { LOGGED_IN, THandleStep } from "../../pages";
 import * as loaderAnimation from "../../public/lottie/loader.json";
 import {
+    encodeAddress,
     getCurrencyFormattedNumber,
     getTokenFormattedNumber,
     getTokenValueFormatted,
@@ -47,9 +49,10 @@ import { ProfileCard } from "./ProfileCard";
 
 export interface ILoadChestComponent {
     provider?: any;
+    loader: boolean;
 }
 export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
-    const { provider } = props;
+    const { provider, loader } = props;
 
     const {
         state: { loggedInVia, address },
@@ -71,7 +74,8 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     const [balanceInUsd, setBalanceInUsd] = useState("");
     const [showActivity, setShowActivity] = useState(false);
     const [chestLoadingText, setChestLoadingText] = useState("");
-
+    const ethersProvider = new ethers.providers.JsonRpcProvider(BaseGoerli.info.rpc);
+    const relayPack = new GelatoRelayPack(process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY);
     const handleToggle = () => {
         setToggle(!toggle);
     };
@@ -144,9 +148,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 const payData = await wallet.createPayLink();
 
                 setChestLoadingText("Setting up destination signer and address");
-                const ethersProvider = new ethers.providers.JsonRpcProvider(
-                    BaseGoerli.info.rpc,
-                );
+
                 const destinationSigner = new ethers.Wallet(payData.key, ethersProvider);
                 const destinationEOAAddress = await destinationSigner.getAddress();
                 const ethAdapter = new EthersAdapter({
@@ -164,12 +166,11 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 const destinationAddress = await safeFactory.predictSafeAddress(
                     safeAccountConfig,
                 );
+                const destinatinoHash = encodeAddress(destinationAddress);
+                const fullHash = payData.link + "|" + destinatinoHash;
                 setChestLoadingText("Safe contract created");
 
                 if (loggedInVia === LOGGED_IN.GOOGLE) {
-                    const relayPack = new GelatoRelayPack(
-                        process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY,
-                    );
                     setChestLoadingText(
                         "Initializing account abstraction for transaction relay",
                     );
@@ -177,7 +178,9 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                     const fromSigner = await fromEthProvider.getSigner();
                     const safeAccountAbstraction = new AccountAbstraction(fromSigner);
                     await safeAccountAbstraction.init({ relayPack });
+
                     setChestLoadingText("Transaction process has begun...");
+
                     const safeTransactionData: MetaTransactionData = {
                         to: destinationAddress,
                         data: "0x",
@@ -202,7 +205,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                         setChestLoadingText(
                             "Transaction on its way! Awaiting confirmation...",
                         );
-                        handleTransactionStatus(gelatoTaskId, payData.link);
+                        handleTransactionStatus(gelatoTaskId, fullHash);
                     }
                 } else {
                     try {
@@ -210,7 +213,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                             to: destinationAddress,
                             value: parseEther(inputValue),
                         });
-                        handleTransactionStatus(sendAmount.hash, payData.link);
+                        handleTransactionStatus(sendAmount.hash, fullHash);
                     } catch (e: any) {
                         setTransactionLoading(false);
                         const err = serializeError(e);
@@ -228,7 +231,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     };
 
     const handleTransactionStatus = (hash: string, link: string) => {
-        const intervalInMilliseconds = 2000;
+        const intervalInMilliseconds = 1000;
         const interval = setInterval(() => {
             if (loggedInVia === LOGGED_IN.GOOGLE) {
                 getRelayTransactionStatus(hash)
@@ -318,7 +321,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                     <ProfileCard
                         balance={price}
                         showActivity={false}
-                        transactionLoading={false}
+                        transactionLoading={loader}
                     ></ProfileCard>
 
                     {!showActivity ? (
@@ -337,7 +340,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                                                 className="cursor-pointer"
                                             />
                                             {toggle ? (
-                                                loading ? (
+                                                loading || loader ? (
                                                     <div className="w-full h-full">
                                                         <div className="w-[40px] h-[10px] bg-white/10 animate-pulse rounded-lg mb-2"></div>
                                                         <div className="w[40px] h-[10px] bg-white/10 animate-pulse rounded-lg "></div>
@@ -370,10 +373,22 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <Image src={icons.ethLogo} alt="transferIcon" />
-                                        <p className="text-white text-[24px] font-normal leading-9">
-                                            ETH
-                                        </p>
+                                        <Image
+                                            src={
+                                                !loading && !loader
+                                                    ? icons.ethLogo
+                                                    : icons.loadAvatar
+                                            }
+                                            className="w-8 h-8"
+                                            alt="transferIcon"
+                                        />
+                                        {!loading && !loader ? (
+                                            <p className="text-white text-[24px] font-normal leading-9">
+                                                ETH
+                                            </p>
+                                        ) : (
+                                            <div className="w-10 h-3 my-2 animate-pulse bg-white/10 rounded-lg mx-auto"></div>
+                                        )}
                                     </div>
                                 </div>
                                 <div

@@ -146,6 +146,22 @@ body {
     opacity: 1;
     animation: bouncing-loader 0.5s infinite alternate;
   }
+
+  .bouncing-loader-black {
+    display: flex;
+    justify-content: center;
+    margin: 10px auto;
+  }
+  
+  .bouncing-loader-black > div {
+    width: 8px;
+    height: 8px;
+    margin: 3px 4px;
+    border-radius: 50%;
+    background: #000000;
+    opacity: 1;
+    animation: bouncing-loader 0.5s infinite alternate;
+  }
   
   @keyframes bouncing-loader {
     to {
@@ -159,5 +175,13 @@ body {
   }
   
   .bouncing-loader > div:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
+  .bouncing-loader-black > div:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .bouncing-loader-black > div:nth-child(3) {
     animation-delay: 0.4s;
   }
