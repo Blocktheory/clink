@@ -119,6 +119,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         const valueWithoutDollarSign = val.replace(/[^\d.]/g, "");
         const tokenIputValue = Number(valueWithoutDollarSign) / Number(tokenPrice);
         setInputValue(getTokenValueFormatted(Number(tokenIputValue)));
+        setBtnDisable(false);
     };
 
     const handleInputChange = (val: string) => {

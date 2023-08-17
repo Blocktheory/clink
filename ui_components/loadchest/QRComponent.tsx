@@ -70,9 +70,10 @@ export interface IQRComponent {
     isShareQr?: boolean;
     widthPx: number;
     heightPx: number;
+    showCopy?: boolean;
 }
 export const QRComponent: FC<IQRComponent> = (props) => {
-    const { walletAddress, isShareQr, widthPx, heightPx } = props;
+    const { walletAddress, isShareQr, widthPx, heightPx, showCopy } = props;
     const [options] = useState<Options>({
         width: widthPx,
         height: heightPx,
@@ -129,7 +130,7 @@ export const QRComponent: FC<IQRComponent> = (props) => {
             </p>
             <div className="flex items-center justify-center" ref={ref} />
 
-            {!isShareQr ? (
+            {!showCopy ? (
                 <div>
                     <div className="flex items-center justify-center">
                         <div className="w-fit mt-[15px] border-dashed border border-secondary-300 dark:border-secondaryDark-300 rounded-[10px] flex justify-center items-start md:items-center p-2">

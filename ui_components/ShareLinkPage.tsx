@@ -171,7 +171,9 @@ const ShareLink: FC<IShareLink> = (props) => {
             setTokenValue(getTokenValueFormatted(bgNum, 6, false));
             setIsLoading(false);
             const formatBal = bgNum * res.data.ethereum.usd;
-            setLinkValueUsd(getCurrencyFormattedNumber(formatBal, 2, "USD", true));
+            setLinkValueUsd(
+                getCurrencyFormattedNumber(roundDownToTenth(formatBal), 2, "USD", true),
+            );
             const zeroBal =
                 getCurrencyFormattedNumber(formatBal, 2, "USD", true) === "$0";
             setHeadingText(
@@ -319,6 +321,10 @@ const ShareLink: FC<IShareLink> = (props) => {
         } else {
             return true;
         }
+    };
+
+    const roundDownToTenth = (number: number) => {
+        return Math.round(number * 10) / 10;
     };
 
     return (
@@ -489,7 +495,12 @@ const ShareLink: FC<IShareLink> = (props) => {
                 handlePublicAddressTransaction={handlePublicAddressTransaction}
             />
             <ShareBtnModal open={openShareModal} setOpen={setOpenShareModal} />
-            <QrModal open={showQr} setOpen={setShowQr} value={fromAddress} />
+            <QrModal
+                open={showQr}
+                setOpen={setShowQr}
+                value={fromAddress}
+                showCopy={false}
+            />
             {isClaimSuccessful && (
                 <Confetti
                     width={2400}

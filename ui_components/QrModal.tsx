@@ -14,10 +14,11 @@ export interface IQrModal {
     open: boolean;
     setOpen: (val: boolean) => void;
     value: string;
+    showCopy?: boolean;
 }
 
 export const QrModal: FC<IQrModal> = (props) => {
-    const { open, setOpen, value } = props;
+    const { open, setOpen, value, showCopy } = props;
 
     const [showOptions, setShowOptions] = useState(true);
 
@@ -65,6 +66,7 @@ export const QrModal: FC<IQrModal> = (props) => {
                                                     isShareQr={true}
                                                     widthPx={240}
                                                     heightPx={240}
+                                                    showCopy={showCopy}
                                                 />
                                             </div>
                                         </div>
