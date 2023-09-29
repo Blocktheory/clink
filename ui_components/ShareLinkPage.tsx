@@ -253,7 +253,6 @@ const ShareLink: FC<IShareLink> = (props) => {
                         [safeTransactionData],
                         options,
                     );
-                console.log(gelatoTaskId, "task id");
                 if (gelatoTaskId) {
                     handleTransactionStatus(gelatoTaskId);
                 }

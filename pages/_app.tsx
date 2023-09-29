@@ -5,17 +5,29 @@ import React, { FC } from "react";
 
 import GlobalContextProvider from "../context/GlobalContext";
 import { WagmiWrapper } from "../utils/wagmi/WagmiContext";
+import { bindings as wagmiBindings } from "@lens-protocol/wagmi";
+import {
+  LensProvider,
+  LensConfig,
+  development,
+} from "@lens-protocol/react-web";
 
 const Layout: FC<AppProps> = ({ Component, pageProps }) => {
-    return (
-        <main>
-            <GlobalContextProvider>
-                <WagmiWrapper>
-                    <Component {...pageProps} />
-                </WagmiWrapper>
-            </GlobalContextProvider>
-        </main>
-    );
+  const lensConfig: LensConfig = {
+    bindings: wagmiBindings(),
+    environment: development,
+  };
+  return (
+    <main>
+      <GlobalContextProvider>
+        <WagmiWrapper>
+          <LensProvider config={lensConfig}>
+            <Component {...pageProps} />
+          </LensProvider>
+        </WagmiWrapper>
+      </GlobalContextProvider>
+    </main>
+  );
 };
 
 export default Layout;
