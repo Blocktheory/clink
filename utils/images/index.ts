@@ -27,72 +27,75 @@ import tokensLoading from "../../public/assets/images/tokens_loading.png";
 import transferIcon from "../../public/assets/images/transfer_icon.svg";
 import walletIcon from "../../public/assets/images/wallet_btn_image.svg";
 import x from "../../public/assets/images/x.svg";
+import lensLogo from "../../public/assets/images/lens_logo.png";
 
 export type TImages =
-    | "logo"
-    | "logo2"
-    | "tchest"
-    | "tchestopen"
-    | "walletIcon"
-    | "backIcon"
-    | "shareBtnIcon"
-    | "transferIcon"
-    | "tokensLoading"
-    | "hamburgerBlack"
-    | "googleIcon"
-    | "chevronRight"
-    | "copyBlack"
-    | "logoutIcon"
-    | "helpIcon"
-    | "downloadBtnIcon"
-    | "downloadBtnIconBlack"
-    | "shareBtnIconWhite"
-    | "profileCardBg"
-    | "x"
-    | "telegramBlue"
-    | "linkedinBlue"
-    | "safeLogo"
-    | "baseLogo"
-    | "copyIconWhite"
-    | "linkWhite"
-    | "qrWhite"
-    | "ethLogo"
-    | "loadAvatar";
+  | "logo"
+  | "logo2"
+  | "tchest"
+  | "tchestopen"
+  | "walletIcon"
+  | "backIcon"
+  | "shareBtnIcon"
+  | "transferIcon"
+  | "tokensLoading"
+  | "hamburgerBlack"
+  | "googleIcon"
+  | "chevronRight"
+  | "copyBlack"
+  | "logoutIcon"
+  | "helpIcon"
+  | "downloadBtnIcon"
+  | "downloadBtnIconBlack"
+  | "shareBtnIconWhite"
+  | "profileCardBg"
+  | "x"
+  | "telegramBlue"
+  | "linkedinBlue"
+  | "safeLogo"
+  | "baseLogo"
+  | "copyIconWhite"
+  | "linkWhite"
+  | "qrWhite"
+  | "ethLogo"
+  | "loadAvatar"
+  | "lensLogo";
 
 export type TNextImage = {
-    src: string;
-    height: number;
-    width: number;
+  src: string;
+  height: number;
+  width: number;
 };
 
 export const icons: Record<TImages, TNextImage> = {
-    logo,
-    logo2,
-    tchest,
-    tchestopen,
-    walletIcon,
-    backIcon,
-    shareBtnIcon,
-    transferIcon,
-    downloadBtnIcon,
-    tokensLoading,
-    hamburgerBlack,
-    googleIcon,
-    chevronRight,
-    copyBlack,
-    logoutIcon,
-    helpIcon,
-    ethLogo,
-    downloadBtnIconBlack,
-    shareBtnIconWhite,
-    profileCardBg,
-    x,
-    linkedinBlue,
-    telegramBlue,
-    safeLogo,
-    baseLogo,
-    copyIconWhite,
-    linkWhite,
-    qrWhite,
-    loadAvatar,
+  logo,
+  logo2,
+  tchest,
+  tchestopen,
+  walletIcon,
+  backIcon,
+  shareBtnIcon,
+  transferIcon,
+  downloadBtnIcon,
+  tokensLoading,
+  hamburgerBlack,
+  googleIcon,
+  chevronRight,
+  copyBlack,
+  logoutIcon,
+  helpIcon,
+  ethLogo,
+  downloadBtnIconBlack,
+  shareBtnIconWhite,
+  profileCardBg,
+  x,
+  linkedinBlue,
+  telegramBlue,
+  safeLogo,
+  baseLogo,
+  copyIconWhite,
+  linkWhite,
+  qrWhite,
+  loadAvatar,
+  lensLogo,
 };

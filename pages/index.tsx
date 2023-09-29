@@ -291,13 +291,14 @@ export default function Home() {
   const getUIComponent = (step: number) => {
     switch (step) {
       case ESTEPS.ONE:
-        return <HomePage handleSetupChest={onLoginClick} loader={loader} />;
+        return <HomePage handleSetupChest={handleSetupChest} loader={loader} />;
       case ESTEPS.TWO:
         return (
           <ConnectWallet
             signIn={signIn}
             handleSteps={handleSteps}
             loader={loader}
+            handleLensLogin={onLoginClick}
           />
         );
       case ESTEPS.THREE:
