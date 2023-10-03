@@ -21,6 +21,7 @@ import { useAccount } from "wagmi";
 import {
     oauthClientId,
     productName,
+    saltNonce,
     web3AuthClientId,
     web3AuthLoginType,
     web3AuthVerifier,
@@ -52,7 +53,7 @@ export enum LOGGED_IN {
 export default function Home() {
     const {
         dispatch,
-        state: { loggedInVia },
+        state: { loggedInVia, chainSelected },
     } = useContext(GlobalContext);
     const [loader, setLoader] = useState(false);
     const [initLoader, setInitLoader] = useState(false);
@@ -68,12 +69,12 @@ export default function Home() {
     const { address, isConnecting, isConnected } = useAccount();
     const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
     const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
-
+    console.log(chainSelected, "chain slected in index")
     useEffect(() => {
         const item = localStorage.getItem("isGoogleLogin");
         console.log(
             localStorage.getItem("isGoogleLogin ") &&
-                localStorage.getItem("isGoogleLogin ") === "true",
+            localStorage.getItem("isGoogleLogin ") === "true",
             "storage",
         );
         if (item) {
@@ -86,24 +87,25 @@ export default function Home() {
             setInitLoader(true);
             const chainConfig = {
                 chainNamespace: CHAIN_NAMESPACES.EIP155,
-                chainId: BaseGoerli.chainIdHex,
-                rpcTarget: BaseGoerli.info.rpc,
-                displayName: BaseGoerli.name,
-                blockExplorer: BaseGoerli.explorer.url,
-                ticker: BaseGoerli.symbol,
+                chainId: chainSelected.chainIdHex,
+                rpcTarget: chainSelected.info.rpc,
+                displayName: chainSelected.name,
+                blockExplorer: chainSelected.explorer.url,
+                ticker: chainSelected.symbol,
                 tickerName: "Ethereum",
             };
-
+            console.log(chainConfig, "chain config");
             const web3auth = new Web3AuthNoModal({
                 clientId: web3AuthClientId,
                 web3AuthNetwork: "testnet",
                 chainConfig: chainConfig,
             });
+            console.log(web3auth, "web3 auth");
 
             const privateKeyProvider = new EthereumPrivateKeyProvider({
                 config: { chainConfig },
             });
-
+            console.log(privateKeyProvider, "privateKeyProvider auth");
             const openloginAdapter = new OpenloginAdapter({
                 adapterSettings: {
                     uxMode: "popup",
@@ -121,6 +123,7 @@ export default function Home() {
                 },
                 privateKeyProvider,
             });
+            console.log(openloginAdapter, "openloginAdapter")
 
             web3auth.configureAdapter(openloginAdapter);
             setWeb3auth(web3auth);
@@ -130,7 +133,7 @@ export default function Home() {
         }
 
         initializeOpenLogin();
-    }, []);
+    }, [chainSelected]);
 
     useEffect(() => {
         if (web3auth && web3auth.connected) {
@@ -214,7 +217,9 @@ export default function Home() {
         };
         const safeSdkOwnerPredicted = await safeFactory.predictSafeAddress(
             safeAccountConfig,
+            saltNonce
         );
+        console.log(safeSdkOwnerPredicted, "safe address prediction")
         return safeSdkOwnerPredicted;
     };
 

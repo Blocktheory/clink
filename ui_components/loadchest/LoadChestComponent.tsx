@@ -38,14 +38,14 @@ import {
     getTokenValueFormatted,
     hexToNumber,
 } from "../../utils";
-import { BaseGoerli } from "../../utils/chain/baseGoerli";
-import { icons } from "../../utils/images";
-import { useWagmi } from "../../utils/wagmi/WagmiContext";
-import { Wallet } from "../../utils/wallet";
+import { icons } from "utils/images";
+import { useWagmi } from "utils/wagmi/WagmiContext";
+import { Wallet } from "utils/wallet";
 import PrimaryBtn from "../PrimaryBtn";
 import SecondaryBtn from "../SecondaryBtn";
 import DepositAmountModal from "./DepositAmountModal";
 import { ProfileCard } from "./ProfileCard";
+import { BaseGoerli } from "utils/chain/chains";
 
 export interface ILoadChestComponent {
     provider?: any;
@@ -473,28 +473,25 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                             </div>
                             <div className="relative mt-10">
                                 <div
-                                    className={`${
-                                        !btnDisable && value
-                                            ? "opacity-100"
-                                            : "opacity-50"
-                                    } flex gap-2 justify-between`}
+                                    className={`${!btnDisable && value
+                                        ? "opacity-100"
+                                        : "opacity-50"
+                                        } flex gap-2 justify-between`}
                                 >
                                     <PrimaryBtn
-                                        className={`w-[45%] lg:w-[185px] max-w-[185px] mx-0 ${
-                                            btnDisable || !value
-                                                ? "cursor-not-allowed"
-                                                : ""
-                                        }`}
+                                        className={`w-[45%] lg:w-[185px] max-w-[185px] mx-0 ${btnDisable || !value
+                                            ? "cursor-not-allowed"
+                                            : ""
+                                            }`}
                                         title={"Create Link"}
                                         onClick={createWallet}
                                         btnDisable={btnDisable || !value}
                                     />
                                     <SecondaryBtn
-                                        className={`w-[45%] lg:w-[185px] text-[#CEDDE0] max-w-[185px] mx-0 ${
-                                            btnDisable || !value
-                                                ? "cursor-not-allowed"
-                                                : ""
-                                        }`}
+                                        className={`w-[45%] lg:w-[185px] text-[#CEDDE0] max-w-[185px] mx-0 ${btnDisable || !value
+                                            ? "cursor-not-allowed"
+                                            : ""
+                                            }`}
                                         title={"Send"}
                                         onClick={createWallet}
                                     />

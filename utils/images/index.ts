@@ -27,6 +27,7 @@ import tokensLoading from "../../public/assets/images/tokens_loading.png";
 import transferIcon from "../../public/assets/images/transfer_icon.svg";
 import walletIcon from "../../public/assets/images/wallet_btn_image.svg";
 import x from "../../public/assets/images/x.svg";
+import chevronDown from "../../public/assets/images/chevron_down.svg";
 
 export type TImages =
     | "logo"
@@ -57,6 +58,7 @@ export type TImages =
     | "linkWhite"
     | "qrWhite"
     | "ethLogo"
+    | "chevronDown"
     | "loadAvatar";
 
 export type TNextImage = {
@@ -95,4 +97,5 @@ export const icons: Record<TImages, TNextImage> = {
     linkWhite,
     qrWhite,
     loadAvatar,
+    chevronDown
 };

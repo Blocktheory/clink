@@ -3,12 +3,16 @@ import "tailwindcss/tailwind.css";
 
 import Image from "next/image";
 import Link from "next/link";
-import { FC, useContext, useState } from "react";
+import { FC, Fragment, useContext, useEffect, useState } from "react";
 
-import { GlobalContext } from "../../context/GlobalContext";
+import { ACTIONS, GlobalContext } from "../../context/GlobalContext";
 import { trimAddress } from "../../utils";
 import { icons } from "../../utils/images";
 import QrModal from "../QrModal";
+import { Listbox, Transition } from "@headlessui/react";
+// import { chainSelection } from "../../constants";
+import { CHAIN_LIST } from "utils/chain/chains";
+
 
 export interface IProfileCard {
     profileImage?: string;
@@ -17,9 +21,11 @@ export interface IProfileCard {
     transactionLoading: boolean;
 }
 export const ProfileCard: FC<IProfileCard> = (props) => {
+    const [selectedChain, setSelectedChain] = useState(CHAIN_LIST[0])
     const { transactionLoading } = props;
     const {
-        state: { address },
+        dispatch,
+        state: { address, chainSelected },
     } = useContext(GlobalContext);
     const [showQr, setShowQr] = useState(false);
 
@@ -28,10 +34,52 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
         e.stopPropagation();
         navigator.clipboard.writeText(address);
     };
+    useEffect(() => {
+        dispatch({
+            type: ACTIONS.SET_CHAIN,
+            payload: selectedChain
+        })
+    }, [selectedChain])
 
     return (
         <>
-            <div className="w-full h-auto bg-[#0C0421] rounded-lg mb-4 profileBackgroundImage flex-col justify-center items-center text-center pb-2">
+            <div className="relative w-full h-auto bg-[#0C0421] rounded-lg mb-4 profileBackgroundImage flex-col justify-center items-center text-center pb-2">
+                <div className="absolute right-5 top-2 cursor-pointer">
+                    <Listbox value={selectedChain} onChange={setSelectedChain}>
+                        <Listbox.Button className="relative min-w-[120px] flex items-center justify-between cursor-pointer rounded-lg pl-3 pr-3 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm border border-slate-400">
+                            <span className="block truncate text-slate-400">{selectedChain.name}</span>
+                            <Image src={icons.chevronDown} alt="more chains" />
+                        </Listbox.Button>
+                        <Transition as={Fragment}
+                            leave="transition ease-in duration-100"
+                            leaveFrom="opacity-100"
+                            leaveTo="opacity-0">
+                            <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-slate-600 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                {CHAIN_LIST.map((chain, index) => (
+                                    <Listbox.Option
+                                        key={index}
+                                        className={({ active }) =>
+                                            `relative cursor-pointer select-none py-2 px-2 rounded-lg ${active ? 'bg-white/20 text-white' : 'text-white'
+                                            }`
+                                        }
+                                        value={chain}
+                                    >
+                                        {({ selected }) => (
+                                            <>
+                                                <span
+                                                    className={`block truncate ${selected ? 'font-medium' : 'font-normal'
+                                                        }`}
+                                                >
+                                                    {chain.name}
+                                                </span>
+                                            </>
+                                        )}
+                                    </Listbox.Option>
+                                ))}
+                            </Listbox.Options>
+                        </Transition>
+                    </Listbox>
+                </div>
                 <div className="pt-2">
                     <Image
                         src={
@@ -109,6 +157,7 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
             ) : null} */}
 
             <QrModal open={showQr} setOpen={setShowQr} address={address} />
+
         </>
     );
 };

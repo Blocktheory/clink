@@ -1,6 +1,8 @@
 import { createContext, Dispatch, ReactNode, useReducer } from "react";
 
 import { saveStore } from "../store/GlobalStore";
+import { CHAINS_ENUMS, CHAINS_IDS } from "utils/chain";
+import { BaseGoerli } from "utils/chain/baseGoerli";
 
 export enum ACTIONS {
     CLEAR_TOAST = "CLEAR_TOAST",
@@ -10,6 +12,7 @@ export enum ACTIONS {
     GOOGLE_USER_INFO = "GOOGLE_USER_INFO",
     LOGGED_IN_VIA = "LOGGED_IN_VIA",
     LOGOUT = "LOGOUT",
+    SET_CHAIN = "SET_CHAIN",
 }
 
 export type TInitialStateType = {
@@ -18,11 +21,41 @@ export type TInitialStateType = {
     googleUserInfo: any;
     loggedInVia: string;
     isConnected: boolean;
+    chainSelected: any;
 };
 
 export type TActionType = {
     type: string;
     payload: unknown;
+};
+
+export type TChainDetail = {
+    index: number;
+    id: CHAINS_IDS;
+    name: string;
+    logo: string;
+    coinId: number;
+    symbol: string;
+    chainId: string;
+    chainIdHex: string;
+    decimals: number;
+    blockchain: CHAINS_ENUMS;
+    derivation: {
+        path: string,
+    },
+    curve: string;
+    publicKeyType: string;
+    explorer: {
+        url: string;
+        explorerName: string;
+        txPath: string;
+        accountPath: string
+    },
+    info: {
+        url: string;
+        rpc: string;
+    },
+
 };
 
 type TToastType = {
@@ -45,6 +78,7 @@ const initialState: TInitialStateType = {
     googleUserInfo: {},
     loggedInVia: "",
     isConnected: false,
+    chainSelected: BaseGoerli,
 };
 
 export const GlobalContext = createContext<TGlobalContextType>({
@@ -105,6 +139,14 @@ function reducer(state: TInitialStateType, action: TActionType) {
             return {
                 ...state,
                 address: action.payload as string,
+                isConnected: true,
+            };
+        }
+        //type has to be defined
+        case ACTIONS.SET_CHAIN: {
+            return {
+                ...state,
+                chainSelected: action.payload as TChainDetail,
                 isConnected: true,
             };
         }

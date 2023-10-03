@@ -1,15 +1,14 @@
 import { CHAINS_ENUMS, CHAINS_IDS } from ".";
 
-
-export const Base = {
+export const OptimismGoerli = {
     index: 10,
-    id: CHAINS_IDS.BASE,
-    name: "Base Mainnet",
+    id: CHAINS_IDS.OPTIMISM,
+    name: "OP Goerli",
     logo: "https://storage.googleapis.com/frontier-wallet/blockchains/base/info/logo.svg",
     coinId: 8453,
     symbol: "ETH",
-    chainId: "8453",
-    chainIdHex: "0x2105",
+    chainId: "420",
+    chainIdHex: "0x1a4",
     decimals: 18,
     blockchain: CHAINS_ENUMS.ETHEREUM,
     derivation: [
@@ -21,13 +20,13 @@ export const Base = {
     curve: "secp256k1",
     publicKeyType: "secp256k1Extended",
     explorer: {
-        url: "https://basescan.org",
-        explorerName: "BaseScan",
-        txPath: "/tx/",
+        url: "https://optimism-goerli.blockscout.com/",
+        explorerName: "Blockscout",
+        txPath: "/txs/",
         accountPath: "/address/",
     },
     info: {
-        url: "https://mainnet.base.org/",
-        rpc: "https://mainnet.base.org/",
+        url: "https://goerli.optimism.io",
+        rpc: "https://goerli.optimism.io",
     },
 };

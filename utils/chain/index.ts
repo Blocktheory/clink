@@ -1,3 +1,5 @@
+
+
 export enum CHAINS_IDS {
     ETHEREUM = "ethereum",
     BSC = "bsc",
@@ -6,8 +8,11 @@ export enum CHAINS_IDS {
     BASEGOERLI = "base-testnet",
     OPTIMISM = "optimism",
     CUSTOM = "custom_evm",
+    OPTIMISMGOERLI = "optimism_goerli"
 }
+
 
 export enum CHAINS_ENUMS {
     ETHEREUM = "Ethereum",
 }
+
