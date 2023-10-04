@@ -153,7 +153,9 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         setChestLoadingText("Setting up destination signer and address");
 
         const destinationSigner = new ethers.Wallet(payData.key, ethersProvider);
+        console.log(destinationSigner, "destinationSigner")
         const destinationEOAAddress = await destinationSigner.getAddress();
+        console.log(destinationEOAAddress, "destinationEOAAddress")
         const ethAdapter = new EthersAdapter({
             ethers,
             signerOrProvider: destinationSigner,
@@ -167,6 +169,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
             threshold: 1,
         };
         const destinationAdd = await safeFactory.predictSafeAddress(safeAccountConfig);
+        console.log(destinationAdd, "destinationAdd")
         setDestinationAddress(destinationAdd);
         const destinatinoHash = encodeAddress(destinationAdd);
         const fullHash = payData.link + "|" + destinatinoHash;
@@ -200,7 +203,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                         };
 
                         const options: MetaTransactionOptions = {
-                            gasLimit: "100000",
+                            gasLimit: "100000000",
                             isSponsored: true,
                         };
 
