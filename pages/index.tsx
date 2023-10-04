@@ -51,9 +51,9 @@ import {
   BiconomySmartAccountV2,
   DEFAULT_ENTRYPOINT_ADDRESS,
 } from "@biconomy/account";
-import { Wallet, providers, ethers } from "ethers";
-import { ChainId } from "@biconomy/core-types";
+import { ethers } from "ethers";
 import { saveToLocalStorage } from "../utils";
+import { useRouter } from "next/router";
 
 export type THandleStep = {
   handleSteps: (step: number) => void;
@@ -95,6 +95,8 @@ export default function Home() {
   const { data: wallet, loading } = useActiveProfile();
   const { disconnectAsync } = useDisconnect();
 
+  const router = useRouter();
+
   const { connectAsync } = useConnect({
     connector: new InjectedConnector(),
   });
@@ -117,11 +119,6 @@ export default function Home() {
 
   useEffect(() => {
     const item = localStorage.getItem("isGoogleLogin");
-    console.log(
-      localStorage.getItem("isGoogleLogin ") &&
-        localStorage.getItem("isGoogleLogin ") === "true",
-      "storage"
-    );
     if (item) {
       handleSteps(ESTEPS.THREE);
     } else {
@@ -311,25 +308,22 @@ export default function Home() {
         setLoader(true);
         const magicSdk = new Magic("pk_live_8A226AACC0D8D290");
         const prov = await magicSdk.wallet.getProvider();
-        console.log(prov, "provider");
         setProvider(prov);
         setMagic(magicSdk);
         const isLoggedIn = await magicSdk.user.isLoggedIn();
-        if (window.location.pathname === "/callback") {
+        if (router && router.query) {
           try {
             await magicSdk.auth.loginWithCredential();
 
             const userMetadata = await magicSdk.user.getMetadata();
             saveToLocalStorage("email", userMetadata.email);
-            console.log(userMetadata, "user meta data");
             connectWithBiconomy(magicSdk.rpcProvider);
-          } catch {
-            window.location.href = window.location.origin;
+          } catch (e) {
+            console.error(e);
           }
         } else if (isLoggedIn) {
           const userMetadata = await magicSdk.user.getMetadata();
           saveToLocalStorage("email", userMetadata.email);
-          console.log(userMetadata, "user meta data");
           connectWithBiconomy(magicSdk.rpcProvider);
         } else {
           setLoader(false);
@@ -401,7 +395,6 @@ export default function Home() {
       setLoader(false);
       saveToLocalStorage("address", scw);
       handleSteps(ESTEPS.THREE);
-      console.log(scw, "scw");
     } catch (error) {
       setLoader(false);
       toast.error("Something went wrong");
@@ -415,7 +408,7 @@ export default function Home() {
     //   email: val,
     //   showUI: false,
     // });
-    const redirectURI = `${window.location.origin}/callback`;
+    const redirectURI = `${window.location.origin}`;
     const loginWithLink = magic.auth.loginWithMagicLink({
       email: val,
       showUI: false,
@@ -426,10 +419,9 @@ export default function Home() {
         setSigninLoading(false);
         setShowMsg(true);
         toast.success("Magic link has been sent!. Check your mail");
-        console.log("email sent");
       })
       .on("done", (result: any) => {
-        console.log(result, "Login sussessful through magic link");
+        toast.success("Login sussessful through magic link");
       })
       .on("error", (reason: any) => {
         setSigninLoading(false);
