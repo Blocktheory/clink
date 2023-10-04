@@ -25,11 +25,7 @@ import { parseEther } from "viem";
 
 import {
     getBalance,
-    getEstimatedGas,
-    getNonce,
     getRelayTransactionStatus,
-    getSendRawTransaction,
-    getSendTransactionStatus,
     getUsdPrice,
 } from "../apiServices";
 import { GlobalContext } from "../context/GlobalContext";
@@ -61,11 +57,12 @@ export interface IShareLink {
 }
 
 const ShareLink: FC<IShareLink> = (props) => {
-    const { connect, baseGoerli, injectConnector, getAccount } = useWagmi();
+    const { connect, supportedChains, injectConnector, getAccount } = useWagmi();
     const {
-        state: { isConnected },
+        state: { isConnected, chainSelected },
     } = useContext(GlobalContext);
     const { uuid } = props;
+    const rpcUrl = chainSelected.info.url;
     const [toAddress, setToAddress] = useState("");
     const [walletBalanceHex, setWalletBalanceHex] = useState("");
     const [fromAddress, setFromAddress] = useState("");
@@ -83,7 +80,7 @@ const ShareLink: FC<IShareLink> = (props) => {
     const [showQr, setShowQr] = useState(false);
     const [isClaimSuccessful, setIsClaimSuccessful] = useState(false);
     const [txHash, setTxHash] = useState("");
-    const ethersProvider = new ethers.providers.JsonRpcProvider(BaseGoerli.info.rpc);
+    const ethersProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
     const relayPack = new GelatoRelayPack(process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY);
     const options: MetaTransactionOptions = {
         gasLimit: "100000",
@@ -150,7 +147,8 @@ const ShareLink: FC<IShareLink> = (props) => {
     }, [uuid]);
 
     const fetchBalance = async (address: string) => {
-        const balance = (await getBalance(address)) as any;
+        const rpcUrl = chainSelected.info.url;
+        const balance = (await getBalance(address, rpcUrl)) as any;
         const hexValue = balance.result;
         const bgBal = BigNumber(hexValue);
         const bgNum = bgBal.dividedBy(Math.pow(10, 18)).toNumber();
@@ -194,7 +192,7 @@ const ShareLink: FC<IShareLink> = (props) => {
         } else {
             try {
                 const result = await connect({
-                    chainId: baseGoerli.id,
+                    chainId: chainSelected.id,
                     connector: injectConnector,
                 });
                 setToAddress(result.account);
@@ -341,9 +339,9 @@ const ShareLink: FC<IShareLink> = (props) => {
     const roundDownToTenth = (number: number) => {
         const decimalPart = number - Math.floor(number);
         if (decimalPart < 0.7) {
-        return Math.round(number * 10) / 10;
+            return Math.round(number * 10) / 10;
         } else {
-        return Math.ceil(number);
+            return Math.ceil(number);
         }
     };
 
@@ -448,9 +446,8 @@ const ShareLink: FC<IShareLink> = (props) => {
                         {!processing && (
                             <div className="lg:hidden block w-full">
                                 <PrimaryBtn
-                                    className={`${
-                                        handleDisableBtn() ? "opacity-60" : "opacity-100"
-                                    }`}
+                                    className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"
+                                        }`}
                                     title="Share"
                                     onClick={() => {
                                         handleShareURL();
@@ -465,9 +462,8 @@ const ShareLink: FC<IShareLink> = (props) => {
                         {!processing && (
                             <div className="hidden lg:block w-full max-w-[400px]">
                                 <PrimaryBtn
-                                    className={`${
-                                        handleDisableBtn() ? "opacity-60" : "opacity-100"
-                                    }`}
+                                    className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"
+                                        }`}
                                     title={shareText}
                                     onClick={() => {
                                         setOpenShareModal(true);
@@ -479,9 +475,8 @@ const ShareLink: FC<IShareLink> = (props) => {
                             </div>
                         )}
                         <SecondaryBtn
-                            className={`${
-                                handleDisableBtn() ? "opacity-60" : "opacity-100"
-                            }`}
+                            className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"
+                                }`}
                             title={"Claim"}
                             onClick={() => handleClaimClick()}
                             rightImage={processing ? undefined : icons.downloadBtnIcon}
@@ -497,9 +492,8 @@ const ShareLink: FC<IShareLink> = (props) => {
                 ) : (
                     <>
                         <PrimaryBtn
-                            className={`${
-                                handleDisableBtn() ? "opacity-60" : "opacity-100"
-                            }`}
+                            className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"
+                                }`}
                             title={"Claim"}
                             onClick={() => handleClaimClick()}
                             rightImage={
@@ -517,9 +511,8 @@ const ShareLink: FC<IShareLink> = (props) => {
                         {!processing && (
                             <div className="lg:hidden block w-full">
                                 <SecondaryBtn
-                                    className={`${
-                                        handleDisableBtn() ? "opacity-60" : "opacity-100"
-                                    }`}
+                                    className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"
+                                        }`}
                                     title="Share"
                                     onClick={() => {
                                         handleShareURL();
@@ -536,9 +529,8 @@ const ShareLink: FC<IShareLink> = (props) => {
                         {!processing && (
                             <div className="hidden lg:block w-full max-w-[400px]">
                                 <SecondaryBtn
-                                    className={`${
-                                        handleDisableBtn() ? "opacity-60" : "opacity-100"
-                                    }`}
+                                    className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"
+                                        }`}
                                     title={shareText}
                                     onClick={() => {
                                         setOpenShareModal(true);

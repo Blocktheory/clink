@@ -37,7 +37,7 @@ const Header = (props: IHeader) => {
     } = props;
     const {
         dispatch,
-        state: { googleUserInfo, address, isConnected, loggedInVia },
+        state: { googleUserInfo, address, isConnected, loggedInVia, chainSelected },
     } = useContext(GlobalContext);
     const [copyText, setCopyText] = useState("Copy Address");
     const [opacity, setOpacity] = useState(false);
@@ -105,7 +105,7 @@ const Header = (props: IHeader) => {
                         <div className="flex gap-1 pl-2">
                             <Image src={icons.logo2} alt="logo" className="w-10" />
                             <p className="text-[16px] font-bold text-white self-center">
-                                Clink Safe
+                                Clink
                             </p>
                         </div>
                     ) : (
@@ -123,7 +123,7 @@ const Header = (props: IHeader) => {
                             disabled={address || loader || initLoader ? true : false}
                         >
                             <Image
-                                src={!address ? icons.googleIcon : icons.baseLogo}
+                                src={!address ? icons.googleIcon : chainSelected.logo}
                                 alt="google login"
                                 width={20}
                                 height={20}
@@ -184,7 +184,7 @@ const Header = (props: IHeader) => {
                                                     </div>
                                                     {isConnected &&
                                                         loggedInVia ===
-                                                            LOGGED_IN.EXTERNAL_WALLET && (
+                                                        LOGGED_IN.EXTERNAL_WALLET && (
                                                             <div
                                                                 className="w-[95%] h-[52px] bg-white rounded-lg mx-auto flex justify-between items-center px-4 mb-6"
                                                                 role="presentation"
@@ -247,7 +247,7 @@ const Header = (props: IHeader) => {
                                                     </div>
                                                 </Link>
                                                 {isConnected &&
-                                                loggedInVia === LOGGED_IN.GOOGLE ? (
+                                                    loggedInVia === LOGGED_IN.GOOGLE ? (
                                                     <div
                                                         className="flex justify-between items-center py-6 cursor-pointer"
                                                         role="presentation"

@@ -4,7 +4,7 @@ export const OptimismGoerli = {
     index: 10,
     id: CHAINS_IDS.OPTIMISM,
     name: "OP Goerli",
-    logo: "https://storage.googleapis.com/frontier-wallet/blockchains/base/info/logo.svg",
+    logo: "https://storage.googleapis.com/frontier-wallet/blockchains/optimism/info/logo.png",
     coinId: 8453,
     symbol: "ETH",
     chainId: "420",

@@ -21,25 +21,29 @@ export interface IProfileCard {
     transactionLoading: boolean;
 }
 export const ProfileCard: FC<IProfileCard> = (props) => {
-    const [selectedChain, setSelectedChain] = useState(CHAIN_LIST[0])
-    const { transactionLoading } = props;
     const {
         dispatch,
         state: { address, chainSelected },
     } = useContext(GlobalContext);
     const [showQr, setShowQr] = useState(false);
 
+    const selectedChainFromLocalStorage = localStorage.getItem("chain");
+    const initialChain = selectedChainFromLocalStorage && JSON.parse(selectedChainFromLocalStorage) || CHAIN_LIST[0];
+    const [selectedChain, setSelectedChain] = useState(initialChain)
+    const { transactionLoading } = props;
+
     const copyToClipBoard = (e: any) => {
         e.preventDefault();
         e.stopPropagation();
         navigator.clipboard.writeText(address);
-    };
+    }; // move to UTIL 
     useEffect(() => {
         dispatch({
             type: ACTIONS.SET_CHAIN,
             payload: selectedChain
-        })
-    }, [selectedChain])
+        });
+        localStorage.setItem("chain", JSON.stringify(selectedChain))
+    }, [selectedChain]);
 
     return (
         <>
@@ -127,12 +131,12 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
                     </Link>
                 </div>
                 <Link href={"https://safe.global/"} target="_blank">
-                    <p className="inline text-[10px] text-white/50">Powered by: </p>
-                    <Image
+                    <p className="inline text-[10px] text-white/50">Powered by: logo here</p>
+                    {/* <Image
                         src={icons.safeLogo}
                         alt="safe logo"
                         className="w-10 inline-block"
-                    />
+                    /> */}
                 </Link>
 
                 {/* {showActivity ? (

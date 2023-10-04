@@ -9,9 +9,10 @@ import { TApiResponse } from "../types";
 import { toastFlashMessage } from ".";
 import { BaseGoerli } from "./chain/baseGoerli";
 
+
 const axiosInstance: AxiosInstance = axios.create();
 
-axiosInstance.defaults.baseURL = `${BaseGoerli.info.rpc}`;
+// axiosInstance.defaults.baseURL = `${BaseGoerli.info.rpc}`;
 axiosInstance.interceptors.request.use(
     function (config: AxiosRequestConfig) {
         return config;

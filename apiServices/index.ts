@@ -10,9 +10,10 @@ enum ETHEREUM_REQUESTS {
     ethTransactionStatus = "eth_getTransactionReceipt",
 }
 
-export const getBalance = async (address: string) => {
+
+export const getBalance = async (address: string, url: string) => {
     return new Promise(function (resolve, reject) {
-        globalApiService(ETHEREUM_REQUESTS.ethBalance, [address, "latest"])
+        globalApiService(ETHEREUM_REQUESTS.ethBalance,url, [address, "latest"], )
             .then((response) => {
                 resolve(response);
             })
@@ -24,10 +25,10 @@ export const getEstimatedGas = async (params: {
     from: string;
     to: string;
     value: string;
-}) => {
+}, url:string) => {
     const { from, to, value } = params;
     return new Promise(function (resolve, reject) {
-        globalApiService(ETHEREUM_REQUESTS.ethEstimatedGas, [
+        globalApiService(ETHEREUM_REQUESTS.ethEstimatedGas, url, [
             { from: from, to: to, value: value },
         ])
             .then((response) => {
@@ -37,9 +38,9 @@ export const getEstimatedGas = async (params: {
     });
 };
 
-export const getGasPrice = async () => {
+export const getGasPrice = async (url:string) => {
     return new Promise(function (resolve, reject) {
-        globalApiService(ETHEREUM_REQUESTS.ethGasPrice, [])
+        globalApiService(ETHEREUM_REQUESTS.ethGasPrice,url, [])
             .then((response) => {
                 resolve(response);
             })
@@ -47,9 +48,9 @@ export const getGasPrice = async () => {
     });
 };
 
-export const getNonce = async (address: string) => {
+export const getNonce = async (address: string, url:string) => {
     return new Promise(function (resolve, reject) {
-        globalApiService(ETHEREUM_REQUESTS.ethGetTransactionCount, [address, "latest"])
+        globalApiService(ETHEREUM_REQUESTS.ethGetTransactionCount, url, [address, "latest"])
             .then((response) => {
                 resolve(response);
             })
@@ -57,9 +58,9 @@ export const getNonce = async (address: string) => {
     });
 };
 
-export const getSendRawTransaction = async (tx: string) => {
+export const getSendRawTransaction = async (tx: string, url:string) => {
     return new Promise(function (resolve, reject) {
-        globalApiService(ETHEREUM_REQUESTS.ethSendRawTransaction, [tx])
+        globalApiService(ETHEREUM_REQUESTS.ethSendRawTransaction, url, [tx])
             .then((response) => {
                 resolve(response);
             })
@@ -67,9 +68,9 @@ export const getSendRawTransaction = async (tx: string) => {
     });
 };
 
-export const getSendTransactionStatus = async (hash: string) => {
+export const getSendTransactionStatus = async (hash: string , url:string) => {
     return new Promise(function (resolve, reject) {
-        globalApiService(ETHEREUM_REQUESTS.ethTransactionStatus, [hash])
+        globalApiService(ETHEREUM_REQUESTS.ethTransactionStatus, url,  [hash])
             .then((response) => {
                 resolve(response);
             })

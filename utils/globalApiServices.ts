@@ -1,7 +1,14 @@
 import axios from "axios";
 import { BaseGoerli } from "./chain/baseGoerli";
+import { useContext } from "react";
+import { GlobalContext } from "../context/GlobalContext";
 
-export const globalApiService = (method: string, params?: any) => {
+
+
+export const globalApiService = (method: string, url:string, params?: any ) => {
+
+    if(!url) throw new Error("url cannot be empty");
+
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
 
@@ -18,9 +25,9 @@ export const globalApiService = (method: string, params?: any) => {
         body,
     };
 
-    const jsonRpcUrl = BaseGoerli.info.url;
+    // const jsonRpcUrl = chainSelected.info.url;
 
-    return fetch(jsonRpcUrl, requestOptions)
+    return fetch(url, requestOptions)
         .then((response) => response.json())
         .catch((e) => e);
 };

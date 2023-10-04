@@ -1,5 +1,5 @@
 import { serializeError } from "eth-rpc-errors";
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { parseEther } from "viem";
 
@@ -7,6 +7,7 @@ import { getSendTransactionStatus } from "../../apiServices";
 import { getTokenFormattedNumber } from "../../utils";
 import { useWagmi } from "../../utils/wagmi/WagmiContext";
 import PrimaryBtn from "../PrimaryBtn";
+import { GlobalContext } from "../../context/GlobalContext";
 export interface IDepositAmountComponent {
     tokenPrice: string;
     walletAddress: string;
@@ -14,6 +15,10 @@ export interface IDepositAmountComponent {
     fetchBalance: () => void;
 }
 export const DepositAmountComponent: FC<IDepositAmountComponent> = (props) => {
+    const {
+        state: { chainSelected },
+    } = useContext(GlobalContext);
+    const rpcUrl = chainSelected.info.url;
     const { tokenPrice, walletAddress, handleClose, fetchBalance } = props;
     const { sendTransaction } = useWagmi();
 
@@ -48,7 +53,7 @@ export const DepositAmountComponent: FC<IDepositAmountComponent> = (props) => {
     const handleTransactionStatus = (hash: string) => {
         const intervalInMilliseconds = 2000;
         const interval = setInterval(() => {
-            getSendTransactionStatus(hash)
+            getSendTransactionStatus(hash, rpcUrl)
                 .then((res: any) => {
                     if (res.result) {
                         const status = Number(res.result.status);

@@ -348,7 +348,7 @@ export default function Home() {
                     signIn={signIn}
                     handleSteps={handleSteps}
                 />
-                <Footer />
+                {/* <Footer /> */}
             </div>
         </>
     );

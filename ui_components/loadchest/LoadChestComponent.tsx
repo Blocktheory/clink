@@ -55,11 +55,10 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     const { provider, loader } = props;
 
     const {
-        state: { loggedInVia, address },
+        state: { loggedInVia, address, chainSelected },
     } = useContext(GlobalContext);
-
     const router = useRouter();
-
+    const rpcUrl = chainSelected.info.url;
     const [value, setValue] = useState("");
     const [price, setPrice] = useState("");
     const [inputValue, setInputValue] = useState("");
@@ -74,7 +73,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     const [balanceInUsd, setBalanceInUsd] = useState("");
     const [showActivity, setShowActivity] = useState(false);
     const [chestLoadingText, setChestLoadingText] = useState("");
-    const ethersProvider = new ethers.providers.JsonRpcProvider(BaseGoerli.info.rpc);
+    const ethersProvider = new ethers.providers.JsonRpcProvider(rpcUrl);
     const relayPack = new GelatoRelayPack(process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY);
     const isRelayInitiated = useRef(false);
     const handleToggle = () => {
@@ -88,7 +87,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
             fetchBalance();
             handleInitWallet();
         }
-    }, [address]);
+    }, [address, chainSelected]);
 
     const fetchBalance = async () => {
         setLoading(true);
@@ -96,13 +95,14 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
             .then(async (res: any) => {
                 setTokenPrice(res.data.ethereum.usd);
                 setFromAddress(address);
-                const balance = (await getBalance(address)) as any;
+                const balance = (await getBalance(address, rpcUrl)) as any;
                 setTokenValue(
                     getTokenFormattedNumber(
                         hexToNumber(balance.result) as unknown as string,
                         18,
                     ),
                 );
+                console.log(balance, "balance")
                 const formatBal = (
                     (hexToNumber(balance.result) / Math.pow(10, 18)) *
                     res.data.ethereum.usd
@@ -285,7 +285,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                         }
                     });
             } else {
-                getSendTransactionStatus(hash)
+                getSendTransactionStatus(hash, rpcUrl)
                     .then((res: any) => {
                         if (res.result) {
                             const status = Number(res.result.status);

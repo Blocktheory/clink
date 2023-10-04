@@ -11,6 +11,7 @@ import { productName } from "../constants";
 import ShareLink from "../ui_components/ShareLinkPage";
 import MetaHead from "../ui_components/siteMeta";
 import { BaseGoerli } from "../utils/chain/baseGoerli";
+import { CHAIN_LIST } from "utils/chain/chains";
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
     [baseGoerli],
