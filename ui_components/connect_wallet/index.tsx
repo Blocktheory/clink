@@ -84,31 +84,45 @@ export default function ConnectWallet(props: IConnectWallet) {
             </div>
           ) : (
             <>
-              <div className="flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto rounded-lg mt-10">
-                <button
-                  className={`py-4 w-full rounded-lg bg-white flex gap-2 items-center justify-center max-w-[400px]`}
-                  onClick={handleLensLogin}
-                >
-                  <Image
-                    src={icons.lensLogo}
-                    alt="lens login"
-                    className="w-6 rounded-full"
-                  />
-                  <span className="text-[16px] leading-1 font-medium text-black/50 self-center my-auto">
-                    {"Sign in with Lens"}
-                  </span>
-                </button>
-              </div>
-              <div className="flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto rounded-lg mt-10">
+              {!showMsg ? (
+                <div className="flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto rounded-lg mt-10 mb-5">
+                  <button
+                    className={`py-4 w-full rounded-lg bg-white flex gap-2 items-center justify-center max-w-[400px]`}
+                    onClick={handleLensLogin}
+                  >
+                    <Image
+                      src={icons.lensLogo}
+                      alt="lens login"
+                      className="w-6 rounded-full"
+                    />
+                    <span className="text-[16px] leading-1 font-medium text-black/50 self-center my-auto">
+                      {"Sign in with Lens"}
+                    </span>
+                  </button>
+                </div>
+              ) : null}
+              {!showMsg ? (
+                <div className="flex items-center justify-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto">
+                  <div className="border-t border-white/50 flex-grow"></div>
+                  <p className="text-white/50 mx-4">OR</p>
+                  <div className="border-t border-white/50 flex-grow"></div>
+                </div>
+              ) : null}
+              <div className="flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto rounded-lg mt-5">
                 <>
                   {showMsg ? (
-                    <p>
-                      Check your email We emailed a magic link and one-time PIN
-                      to punith@blocktheory.com Please click the link to
-                      continue.
-                    </p>
+                    <div className="text-center">
+                      <p className="font-semibold text-[20px] text-white mb-4">
+                        Check your email!
+                      </p>
+                      <p className="text-white/50 leading-[30px]">
+                        We emailed a magic link to <br />
+                        <span className="text-white">{value}</span> <br />
+                        Please click the link to continue.
+                      </p>
+                    </div>
                   ) : (
-                    <div className="w-[80%]">
+                    <div className="w-full">
                       <input
                         name={"Enter email address"}
                         style={{
@@ -116,8 +130,8 @@ export default function ConnectWallet(props: IConnectWallet) {
                         }}
                         inputMode="text"
                         type="string"
-                        className={`rounded-lg border border-gray-500 bg-white/5 p-2 cursor-pointer mb-5 pl-0 pt-2 pb-1 backdrop-blur-xl text-[14px] border-none text-center  text-white placeholder-white/40 block w-full focus:outline-none focus:ring-transparent`}
-                        placeholder={"Enter email "}
+                        className={`rounded-lg border border-gray-500 bg-white/5 p-2 cursor-pointer mb-5 pl-0 py-3 backdrop-blur-xl text-[14px] border-none text-center  text-white placeholder-white/40 block w-full focus:outline-none focus:ring-transparent`}
+                        placeholder={"Enter your email address"}
                         value={value}
                         onChange={(e) => {
                           handleInputChange(`${e.target.value}`);

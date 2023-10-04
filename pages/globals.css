@@ -227,3 +227,15 @@ body {
   font-weight: bold;
   line-height: 1;
 }
+.test{
+  position: relative;
+}
+.test::before{
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background-color: red;
+  height: 1px;
+  width: 100%;
+}

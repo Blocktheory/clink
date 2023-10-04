@@ -18,8 +18,6 @@ interface IHome {
 export default function HomePage(props: IHome) {
   const { handleSetupChest, loader } = props;
 
-  
-
   return (
     <div className="h-[100vh] w-full">
       {loader ? (
@@ -27,7 +25,7 @@ export default function HomePage(props: IHome) {
           <div className="spinnerLoader"></div>
 
           <p className=" mt-5 opacity-50 mb-14 text-[16px] leading-14 text-white">
-            Setting up Smart Account!
+            Setting up!
           </p>
         </div>
       ) : (

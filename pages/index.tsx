@@ -339,6 +339,27 @@ export default function Home() {
     initMagic();
   }, []);
 
+  const signOutMagic = async () => {
+    await magic.user.logout();
+    localStorage.removeItem("isGoogleLogin");
+    localStorage.removeItem("isConnected");
+    setWalletAddress("");
+    setStep(ESTEPS.ONE);
+
+    dispatch({
+      type: ACTIONS.LOGGED_IN_VIA,
+      payload: "",
+    });
+    dispatch({
+      type: ACTIONS.LOGOUT,
+      payload: "",
+    });
+    dispatch({
+      type: ACTIONS.SET_ADDRESS,
+      payload: "",
+    });
+  };
+
   const connectWithBiconomy = async (rpcProvider: any) => {
     setLoader(true);
     try {
@@ -536,7 +557,7 @@ export default function Home() {
         step={step}
         handleSteps={handleSteps}
         onHamburgerClick={onHamburgerClick}
-        signOut={signOut}
+        signOut={signOutMagic}
         setWalletAddress={setWalletAddress}
         loader={loader}
         initLoader={initLoader}
