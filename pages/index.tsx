@@ -44,6 +44,7 @@ import {
 } from "@lens-protocol/react-web";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
+import { Magic } from "magic-sdk";
 
 export type THandleStep = {
   handleSteps: (step: number) => void;
@@ -288,6 +289,75 @@ export default function Home() {
     setStep(step);
   };
 
+  const [account, setAccount] = useState<any>();
+  const [idToken, setIdToken] = useState<any>();
+  const [magic, setMagic] = useState<any>();
+  const [showOtp, setShowOtp] = useState(false);
+  const [signinLoading, setSigninLoading] = useState(false);
+  const [verifyOtpLoader, setVerifyOtpLoader] = useState(false);
+  const [loginItem, setLoginItem] = useState<any>();
+  useEffect(() => {
+    if (window !== undefined) {
+      const magicSdk = new Magic("pk_live_8A226AACC0D8D290");
+      // magicSdk.wallet.connectWithUI();
+      setMagic(magicSdk);
+    }
+  }, []);
+
+  const handleVerifyOtp = (val: string) => {
+    setVerifyOtpLoader(true);
+    if (val.length === 6) {
+      loginItem.emit("verify-email-otp", val);
+      loginItem
+        .on("invalid-email-otp", () => {
+          loginItem.emit("cancel");
+        })
+        .on("done", (result: any) => {
+          // is called when the Promise resolves
+          // convey login success to user
+          console.log(result, "success");
+          // DID Token returned in result
+          const didToken = result;
+        });
+    }
+  };
+
+  const connectMagicWallet = async (val: string) => {
+    setSigninLoading(true);
+    const login = magic.auth.loginWithEmailOTP({
+      email: val,
+      showUI: false,
+    });
+    setLoginItem(login);
+
+    login
+      .on("email-otp-sent", () => {
+        // The email has been sent to the user
+        console.log("OTP sent");
+        setSigninLoading(false);
+        toast.success("OTP sent!");
+        setShowOtp(true);
+      })
+      .on("invalid-email-otp", () => {
+        login.emit("cancel");
+      })
+      .on("done", (result: any) => {
+        // is called when the Promise resolves
+        // convey login success to user
+        console.log(result, "success");
+
+        // DID Token returned in result
+        const didToken = result;
+      })
+      .on("error", (reason: any) => {
+        setSigninLoading(false);
+        console.error(reason, "errorqw");
+      })
+      .on("settled", () => {
+        // is called when the Promise either resolves or rejects
+      });
+  };
+
   const getUIComponent = (step: number) => {
     switch (step) {
       case ESTEPS.ONE:
@@ -295,10 +365,13 @@ export default function Home() {
       case ESTEPS.TWO:
         return (
           <ConnectWallet
-            signIn={signIn}
+            signIn={connectMagicWallet}
             handleSteps={handleSteps}
             loader={loader}
             handleLensLogin={onLoginClick}
+            showOtp={showOtp}
+            loading={signinLoading}
+            verifyLoading={verifyOtpLoader}
           />
         );
       case ESTEPS.THREE:
