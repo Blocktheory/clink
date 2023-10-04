@@ -43,6 +43,7 @@ const nextConfig = {
         });
         return config;
     },
+    transpilePackages: ["@lens-protocol"],
 };
 
 module.exports = nextConfig;
