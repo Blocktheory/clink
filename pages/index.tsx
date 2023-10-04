@@ -16,7 +16,6 @@ import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { serializeError } from "eth-rpc-errors";
-import { ethers } from "ethers";
 import React, { useContext, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
@@ -45,6 +44,16 @@ import {
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { Magic } from "magic-sdk";
+import { IPaymaster, BiconomyPaymaster } from "@biconomy/paymaster";
+import { IBundler, Bundler } from "@biconomy/bundler";
+import {
+  BiconomySmartAccount,
+  BiconomySmartAccountV2,
+  DEFAULT_ENTRYPOINT_ADDRESS,
+} from "@biconomy/account";
+import { Wallet, providers, ethers } from "ethers";
+import { ChainId } from "@biconomy/core-types";
+import { saveToLocalStorage } from "../utils";
 
 export type THandleStep = {
   handleSteps: (step: number) => void;
@@ -294,68 +303,166 @@ export default function Home() {
   const [magic, setMagic] = useState<any>();
   const [showOtp, setShowOtp] = useState(false);
   const [signinLoading, setSigninLoading] = useState(false);
-  const [verifyOtpLoader, setVerifyOtpLoader] = useState(false);
-  const [loginItem, setLoginItem] = useState<any>();
+  const [showMsg, setShowMsg] = useState(false);
+
   useEffect(() => {
-    if (window !== undefined) {
-      const magicSdk = new Magic("pk_live_8A226AACC0D8D290");
-      // magicSdk.wallet.connectWithUI();
-      setMagic(magicSdk);
+    async function initMagic() {
+      if (window !== undefined) {
+        setLoader(true);
+        const magicSdk = new Magic("pk_live_8A226AACC0D8D290");
+        const prov = await magicSdk.wallet.getProvider();
+        console.log(prov, "provider");
+        setProvider(prov);
+        setMagic(magicSdk);
+        const isLoggedIn = await magicSdk.user.isLoggedIn();
+        if (window.location.pathname === "/callback") {
+          try {
+            await magicSdk.auth.loginWithCredential();
+
+            const userMetadata = await magicSdk.user.getMetadata();
+            saveToLocalStorage("email", userMetadata.email);
+            console.log(userMetadata, "user meta data");
+            connectWithBiconomy(magicSdk.rpcProvider);
+          } catch {
+            window.location.href = window.location.origin;
+          }
+        } else if (isLoggedIn) {
+          const userMetadata = await magicSdk.user.getMetadata();
+          saveToLocalStorage("email", userMetadata.email);
+          console.log(userMetadata, "user meta data");
+          connectWithBiconomy(magicSdk.rpcProvider);
+        } else {
+          setLoader(false);
+        }
+      }
     }
+    initMagic();
   }, []);
 
-  const handleVerifyOtp = (val: string) => {
-    setVerifyOtpLoader(true);
-    if (val.length === 6) {
-      loginItem.emit("verify-email-otp", val);
-      loginItem
-        .on("invalid-email-otp", () => {
-          loginItem.emit("cancel");
-        })
-        .on("done", (result: any) => {
-          // is called when the Promise resolves
-          // convey login success to user
-          console.log(result, "success");
-          // DID Token returned in result
-          const didToken = result;
-        });
+  const connectWithBiconomy = async (rpcProvider: any) => {
+    setLoader(true);
+    try {
+      const web3Provider = new ethers.providers.Web3Provider(
+        rpcProvider,
+        "any"
+      );
+
+      const paymaster = new BiconomyPaymaster({
+        paymasterUrl:
+          "https://paymaster.biconomy.io/api/v1/84531/76v47JPQ6.7a881a9f-4cec-45e0-95e9-c39c71ca54f4",
+      });
+
+      const bundler: IBundler = new Bundler({
+        bundlerUrl:
+          "https://bundler.biconomy.io/api/v2/84531/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44",
+        chainId: 84531,
+        entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
+      });
+      let wallet = new BiconomySmartAccount({
+        signer: web3Provider.getSigner(),
+        chainId: 84531,
+        bundler: bundler,
+        paymaster: paymaster,
+      });
+      wallet = await wallet.init({
+        accountIndex: 0,
+      });
+      const scw = await wallet.getSmartAccountAddress();
+      dispatch({
+        type: ACTIONS.LOGGED_IN_VIA,
+        payload: LOGGED_IN.GOOGLE,
+      });
+      dispatch({
+        type: ACTIONS.SET_ADDRESS,
+        payload: scw,
+      });
+      setWalletAddress(scw ?? "");
+      setLoader(false);
+      saveToLocalStorage("address", scw);
+      handleSteps(ESTEPS.THREE);
+      console.log(scw, "scw");
+    } catch (error) {
+      setLoader(false);
+      toast.error("Something went wrong");
+      console.error(error);
     }
   };
 
   const connectMagicWallet = async (val: string) => {
     setSigninLoading(true);
-    const login = magic.auth.loginWithEmailOTP({
+    // const login = magic.auth.loginWithEmailOTP({
+    //   email: val,
+    //   showUI: false,
+    // });
+    const redirectURI = `${window.location.origin}/callback`;
+    const loginWithLink = magic.auth.loginWithMagicLink({
       email: val,
       showUI: false,
+      redirectURI: redirectURI,
     });
-    setLoginItem(login);
-
-    login
-      .on("email-otp-sent", () => {
-        // The email has been sent to the user
-        console.log("OTP sent");
+    loginWithLink
+      .on("email-sent", (result: any) => {
         setSigninLoading(false);
-        toast.success("OTP sent!");
-        setShowOtp(true);
-      })
-      .on("invalid-email-otp", () => {
-        login.emit("cancel");
+        setShowMsg(true);
+        toast.success("Magic link has been sent!. Check your mail");
+        console.log("email sent");
       })
       .on("done", (result: any) => {
-        // is called when the Promise resolves
-        // convey login success to user
-        console.log(result, "success");
-
-        // DID Token returned in result
-        const didToken = result;
+        console.log(result, "Login sussessful through magic link");
       })
       .on("error", (reason: any) => {
         setSigninLoading(false);
+        toast.error("Something went wrong!");
         console.error(reason, "errorqw");
       })
       .on("settled", () => {
         // is called when the Promise either resolves or rejects
       });
+    // setLoginItem(login);
+
+    // login
+    //   .on("email-otp-sent", () => {
+    //     // The email has been sent to the user
+    //     console.log("OTP sent");
+    //     setSigninLoading(false);
+    //     toast.success("OTP sent!");
+    //     setShowOtp(true);
+    //   })
+    //   .on("invalid-email-otp", () => {
+    //     login.emit("cancel");
+    //   })
+    //   .on("done", (result: any) => {
+    //     // is called when the Promise resolves
+    //     // convey login success to user
+    //     setProvider(magic.wallet.getProvider());
+    //     console.log(result, "success");
+    //     getAccounts()
+    //       .then((res: any) => {
+    //         setLoader(false);
+    //         console.log(res, "address is what");
+    //         dispatch({
+    //           type: ACTIONS.LOGGED_IN_VIA,
+    //           payload: LOGGED_IN.GOOGLE,
+    //         });
+    //         dispatch({
+    //           type: ACTIONS.SET_ADDRESS,
+    //           payload: res,
+    //         });
+    //         setWalletAddress(res);
+    //       })
+    //       .catch((e) => {
+    //         console.log(e, "error");
+    //       });
+    //     DID Token returned in result
+    //     const didToken = result;
+    //   })
+    //   .on("error", (reason: any) => {
+    //     setSigninLoading(false);
+    //     console.error(reason, "errorqw");
+    //   })
+    //   .on("settled", () => {
+    //     // is called when the Promise either resolves or rejects
+    //   });
   };
 
   const getUIComponent = (step: number) => {
@@ -371,7 +478,7 @@ export default function Home() {
             handleLensLogin={onLoginClick}
             showOtp={showOtp}
             loading={signinLoading}
-            verifyLoading={verifyOtpLoader}
+            showMsg={showMsg}
           />
         );
       case ESTEPS.THREE:
