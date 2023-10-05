@@ -10,12 +10,13 @@ import {
   LensProvider,
   LensConfig,
   development,
+  production,
 } from "@lens-protocol/react-web";
 
 const Layout: FC<AppProps> = ({ Component, pageProps }) => {
   const lensConfig: LensConfig = {
     bindings: wagmiBindings(),
-    environment: development,
+    environment: production,
   };
   return (
     <main>

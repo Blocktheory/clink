@@ -40,6 +40,7 @@ import {
   useWalletLogin,
   useWalletLogout,
   useActiveProfile,
+  useActiveWallet,
 } from "@lens-protocol/react-web";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
@@ -90,9 +91,20 @@ export default function Home() {
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
     null
   );
-  const { execute: login, isPending: isLoginPending } = useWalletLogin();
+  const [loggedIn, setLoggedIn] = useState(false);
+  const {
+    execute: login,
+    error: loginError,
+    isPending: isLoginPending,
+  } = useWalletLogin();
+
   const { execute: logout } = useWalletLogout();
-  const { data: wallet, loading } = useActiveProfile();
+  const { data: wallet, loading: walletLoading } = useActiveWallet();
+  const {
+    data: profile,
+    error: profileerror,
+    loading: profileLoading,
+  } = useActiveProfile();
   const { disconnectAsync } = useDisconnect();
 
   const router = useRouter();
@@ -100,6 +112,28 @@ export default function Home() {
   const { connectAsync } = useConnect({
     connector: new InjectedConnector(),
   });
+
+  useEffect(() => {
+    if (loggedIn) {
+      console.log(profile, "profile");
+      console.log(profileerror, "profileerror");
+      console.log(wallet, "wallet");
+      console.log(walletLoading, "walletLoading");
+      console.log(profileLoading, "profileLoading");
+      dispatch({
+        type: ACTIONS.LOGGED_IN_VIA,
+        payload: LOGGED_IN.GOOGLE,
+      });
+      dispatch({
+        type: ACTIONS.SET_ADDRESS,
+        payload: address,
+      });
+      setWalletAddress(address ?? "");
+      setLoader(false);
+      saveToLocalStorage("address", address);
+      handleSteps(ESTEPS.THREE);
+    }
+  }, [loggedIn]);
 
   const onLoginClick = async () => {
     if (isConnected) {
@@ -111,9 +145,10 @@ export default function Home() {
     if (connector instanceof InjectedConnector) {
       const walletClient = await connector.getWalletClient();
 
-      const loginRes = await login({
+      await login({
         address: walletClient.account.address,
       });
+      setLoggedIn(true);
     }
   };
 
