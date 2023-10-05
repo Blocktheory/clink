@@ -380,10 +380,10 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
 
           {!showActivity ? (
             <>
-              <div className="rounded-lg border border-white/40 bg-white/5 ">
+              <div className="rounded-lg border border-[#010101] bg-white/5 ">
                 <div className="flex items-center justify-between py-2 px-4">
                   <div>
-                    <p className="text-[#798593] paragraph">YOUR BALANCE</p>
+                    <p className="text-[#010101] paragraph">YOUR BALANCE</p>
                     <div className="flex items-start gap-3 my-2">
                       <Image
                         src={icons.transferIcon}
@@ -399,10 +399,10 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                           </div>
                         ) : (
                           <div>
-                            <p className="text-white/80 text-[24px] font-semibold leading-10 mb-2">
+                            <p className="text-[#010101] text-2xl font-semibold leading-10 mb-2">
                               {price}
                             </p>
-                            <p className="text-white/30 text-[12px] leading-[14px]">
+                            <p className="text-[#010101] text-xs leading-[14px]">
                               {tokenValue} ETH
                             </p>
                           </div>
@@ -414,10 +414,10 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                         </div>
                       ) : (
                         <div>
-                          <p className="text-white/80 text-[24px] font-semibold leading-10 mb-2">
+                          <p className="text-[#010101] text-2xl font-semibold leading-10 mb-2">
                             ~ {tokenValue} ETH
                           </p>
-                          <p className="text-white/30 text-[12px] leading-[14px]">
+                          <p className="text-[#010101] text-xs leading-[14px]">
                             {price}
                           </p>
                         </div>
@@ -433,7 +433,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                       alt="transferIcon"
                     />
                     {!loading && !loader ? (
-                      <p className="text-white text-[24px] font-normal leading-9">
+                      <p className="text-[#010101] text-2xl font-normal leading-9">
                         ETH
                       </p>
                     ) : (
@@ -442,29 +442,29 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                   </div>
                 </div>
                 <div
-                  className="bg-white/80 py-2 rounded-b-lg cursor-pointer"
+                  className="bg-[#010101]/20 py-2 rounded-b-lg cursor-pointer"
                   role="presentation"
                   onClick={() => {
                     setOpen(true);
                   }}
                 >
-                  <p className="text-[#010101] text-[14px] leading-[18px] font-medium text-center">
+                  <p className="text-[#010101] text-sm leading-[18px] font-medium text-center">
                     + Add funds to your account
                   </p>
                 </div>
               </div>
               <div className="w-full mt-5 ">
-                <div className="relative rounded-lg border bg-white/5 border-gray-500  h-auto  p-4">
+                <div className="relative rounded-lg border border-[#010101] h-auto p-4">
                   <div className="flex items-center justify-center">
                     <div>
                       <div className="flex items-center justify-center">
                         {/* <p className="text-[32px] text-white">$</p> */}
                         <input
                           name="usdValue"
-                          style={{ caretColor: "white" }}
+                          style={{ caretColor: "#010101/20" }}
                           inputMode="decimal"
                           type="text"
-                          className={`dollorInput pl-0 pt-2 pb-1 backdrop-blur-xl text-[32px] border-none text-center bg-transparent text-white dark:text-textDark-900 placeholder-white dark:placeholder-textDark-300 rounded-lg block w-full focus:outline-none focus:ring-transparent`}
+                          className={`dollorInput pl-0 pt-2 pb-1 backdrop-blur-xl text-[32px] border-none text-center bg-transparent text-black dark:text-textDark-900 placeholder-black/30 rounded-lg block w-full focus:outline-none focus:ring-transparent`}
                           placeholder="$0"
                           value={value}
                           onChange={(e) => {
@@ -477,7 +477,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                         />
                       </div>
                       {Number(inputValue) > 0 && (
-                        <p className="text-white/30 text-[12px] leading-[14px] text-center">
+                        <p className="text-[#010101] text-sm leading-[14px] text-center">
                           ~ {inputValue} ETH
                         </p>
                       )}
@@ -487,50 +487,48 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
               </div>
               <div className="grid grid-cols-3 gap-3 mt-5">
                 <div
-                  className="rounded-lg border border-gray-500 bg-white/5 p-2 cursor-pointer"
+                  className="rounded-lg border border-[#010101] p-2 cursor-pointer"
                   role="presentation"
                   onClick={() => {
                     handleValueClick("1");
                   }}
                 >
-                  <p className="text-center text-white">$1</p>
+                  <p className="text-center text-black">$1</p>
                 </div>
                 <div
-                  className="rounded-lg border border-gray-500 bg-white/5 p-2 cursor-pointer"
+                  className="rounded-lg border border-[#010101] p-2 cursor-pointer"
                   role="presentation"
                   onClick={() => {
                     handleValueClick("2");
                   }}
                 >
-                  <p className="text-center text-white">$2</p>
+                  <p className="text-center text-black">$2</p>
                 </div>
                 <div
-                  className="rounded-lg border border-gray-500 bg-white/5 p-2 cursor-pointer"
+                  className="rounded-lg border border-[#010101] p-2 cursor-pointer"
                   role="presentation"
                   onClick={() => {
                     handleValueClick("5");
                   }}
                 >
-                  <p className="text-center text-white">$5</p>
+                  <p className="text-center text-black">$5</p>
                 </div>
               </div>
               <div className="relative mt-10">
                 <div
-                  className={`${
-                    !btnDisable && value ? "opacity-100" : "opacity-50"
-                  } flex gap-2 justify-between`}
+                  className={`flex gap-2 justify-between`}
                 >
                   <PrimaryBtn
-                    className={`w-[45%] lg:w-[185px] max-w-[185px] mx-0 ${
-                      btnDisable || !value ? "cursor-not-allowed" : ""
-                    }`}
+                    className={`${!btnDisable && value ? "opacity-100" : "opacity-50"
+                      } !w-[45%] lg:w-[185px] max-w-[185px] !mx-0 ${btnDisable || !value ? "cursor-not-allowed" : ""
+                      }`}
                     title={"Create Link"}
                     onClick={createWallet}
                     btnDisable={btnDisable || !value}
                   />
                   <div id="overlay-button">
                     <SecondaryBtn
-                      className={`w-[45%] lg:w-[185px] text-[#CEDDE0] max-w-[185px] mx-0`}
+                      className={`w-full lg:w-[185px] text-[#010101] max-w-[185px] mx-0`}
                       title={"Buy Crypto"}
                       onClick={handleBuyCrypto}
                     />
@@ -558,6 +556,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         tokenPrice={tokenPrice}
         fetchBalance={fetchBalance}
       />
+      <div className="w-[400px] h-[400px] absolute -top-[200px] -right-[200px] -z-[10] bg-[#28D799] opacity-20 blur-[62px] rounded-full"></div>
     </div>
   );
 };

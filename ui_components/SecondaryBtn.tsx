@@ -13,6 +13,7 @@ interface ISecondaryBtn {
     showShareIcon?: boolean;
     btnDisable?: boolean;
     loading?: boolean;
+    shadowLarge?: boolean;
 }
 
 export default function SecondaryBtn(props: ISecondaryBtn) {
@@ -25,10 +26,11 @@ export default function SecondaryBtn(props: ISecondaryBtn) {
         className,
         btnDisable,
         loading,
+        shadowLarge
     } = props;
     return (
         <button
-            className={`py-4 text-white support_text_bold rounded-lg flex gap-1 items-center w-full justify-center border border-white max-w-[400px] mx-auto ${className}`}
+            className={`py-4 text-[#010101] support_text_bold rounded-lg flex gap-1 items-center w-full justify-center border border-[#010101] max-w-[400px] mx-auto ${shadowLarge ? "custom-shadow-lg" : "custom-shadow-sm"} ${className}`}
             disabled={btnDisable}
             onClick={onClick}
         >
