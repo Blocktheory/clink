@@ -305,13 +305,18 @@ export default function Home() {
   useEffect(() => {
     async function initMagic() {
       if (window !== undefined) {
+        console.log(window.location.origin, "window.location.origin");
+        console.log("came inside if");
         setLoader(true);
         const magicSdk = new Magic("pk_live_8A226AACC0D8D290");
         const prov = await magicSdk.wallet.getProvider();
         setProvider(prov);
         setMagic(magicSdk);
         const isLoggedIn = await magicSdk.user.isLoggedIn();
-        if (router && router.query) {
+        console.log(isLoggedIn, "isloggedin");
+        console.log(router.query, "query");
+        if (router && router.query.magic_credential) {
+          console.log("came inside callback");
           try {
             await magicSdk.auth.loginWithCredential();
 
@@ -322,6 +327,7 @@ export default function Home() {
             console.error(e);
           }
         } else if (isLoggedIn) {
+          console.log("came inside isloggedin");
           const userMetadata = await magicSdk.user.getMetadata();
           saveToLocalStorage("email", userMetadata.email);
           connectWithBiconomy(magicSdk.rpcProvider);
@@ -331,7 +337,7 @@ export default function Home() {
       }
     }
     initMagic();
-  }, []);
+  }, [router]);
 
   const signOutMagic = async () => {
     await magic.user.logout();
