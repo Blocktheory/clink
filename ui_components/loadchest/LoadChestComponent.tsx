@@ -541,7 +541,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
       ) : (
         <div className="w-[full] max-w-[600px] h-full relative flex flex-col text-center items-center gap-5 mx-auto mt-20">
           <ReactTyped
-            className="text-white text-[24px]"
+            className="text-black text-[24px]"
             strings={[chestLoadingText]}
             typeSpeed={40}
             loop={true}
