@@ -51,6 +51,18 @@ import {
   GateFiDisplayModeEnum,
   GateFiSDK,
 } from "@gatefi/js-sdk";
+import { IPaymaster, BiconomyPaymaster } from "@biconomy/paymaster";
+import { IBundler, Bundler } from "@biconomy/bundler";
+import {
+  BiconomySmartAccount,
+  BiconomySmartAccountV2,
+  DEFAULT_ENTRYPOINT_ADDRESS,
+} from "@biconomy/account";
+import {
+  IHybridPaymaster,
+  PaymasterMode,
+  SponsorUserOperationDto,
+} from "@biconomy/paymaster";
 
 export interface ILoadChestComponent {
   provider?: any;
@@ -60,7 +72,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
   const { provider, loader } = props;
 
   const {
-    state: { loggedInVia, address },
+    state: { loggedInVia, address, smartAccount: biconomyWallet },
   } = useContext(GlobalContext);
 
   const router = useRouter();
@@ -161,6 +173,8 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
 
   const [destinationAddress, setDestinationAddress] = useState("");
   const [linkHash, setLinkHash] = useState("");
+  const [isSucceed, setIsSucceed] = useState(false);
+  const [explorerUrl, setExplorerUrl] = useState("");
 
   const safeAccountAbstraction = useRef<AccountAbstraction>();
 
@@ -168,37 +182,65 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     const walletCore = await initWasm();
     const wallet = new Wallet(walletCore);
     const payData = await wallet.createPayLink();
+    const web3Provider = new ethers.Wallet(payData.key, ethersProvider);
 
     setChestLoadingText("Setting up destination signer and address");
 
-    const destinationSigner = new ethers.Wallet(payData.key, ethersProvider);
-    const destinationEOAAddress = await destinationSigner.getAddress();
-    const ethAdapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: destinationSigner,
+    const paymaster = new BiconomyPaymaster({
+      paymasterUrl:
+        "https://paymaster.biconomy.io/api/v1/84531/76v47JPQ6.7a881a9f-4cec-45e0-95e9-c39c71ca54f4",
     });
-    setChestLoadingText("Creating safe contract for chest");
-    const safeFactory = await SafeFactory.create({
-      ethAdapter: ethAdapter,
+
+    const bundler: IBundler = new Bundler({
+      bundlerUrl:
+        "https://bundler.biconomy.io/api/v2/84531/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44",
+      chainId: 84531,
+      entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
     });
-    const safeAccountConfig: SafeAccountConfig = {
-      owners: [destinationEOAAddress],
-      threshold: 1,
-    };
-    const destinationAdd = await safeFactory.predictSafeAddress(
-      safeAccountConfig
-    );
-    setDestinationAddress(destinationAdd);
-    const destinatinoHash = encodeAddress(destinationAdd);
+    let biWallet = new BiconomySmartAccount({
+      signer: web3Provider,
+      chainId: 84531,
+      bundler: bundler,
+      paymaster: paymaster,
+    });
+    biWallet = await biWallet.init({
+      accountIndex: 0,
+    });
+    const scw = await biWallet.getSmartAccountAddress();
+    const destinatinoHash = encodeAddress(scw);
     const fullHash = payData.link + "|" + destinatinoHash;
     setLinkHash(fullHash);
-    setChestLoadingText("Safe contract created");
-    const fromEthProvider = new ethers.providers.Web3Provider(provider);
-    const fromSigner = await fromEthProvider.getSigner();
-    const safeAccountAbs = new AccountAbstraction(fromSigner);
-    await safeAccountAbs.init({ relayPack });
-    safeAccountAbstraction.current = safeAccountAbs;
-    isRelayInitiated.current = true;
+    setDestinationAddress(scw);
+    console.log(scw, "smart address");
+
+    // const destinationSigner = new ethers.Wallet(payData.key, ethersProvider);
+    // const destinationEOAAddress = await destinationSigner.getAddress();
+    // const ethAdapter = new EthersAdapter({
+    //   ethers,
+    //   signerOrProvider: destinationSigner,
+    // });
+    // setChestLoadingText("Creating safe contract for chest");
+    // const safeFactory = await SafeFactory.create({
+    //   ethAdapter: ethAdapter,
+    // });
+    // const safeAccountConfig: SafeAccountConfig = {
+    //   owners: [destinationEOAAddress],
+    //   threshold: 1,
+    // };
+    // const destinationAdd = await safeFactory.predictSafeAddress(
+    //   safeAccountConfig
+    // );
+    // setDestinationAddress(destinationAdd);
+    // const destinatinoHash = encodeAddress(destinationAdd);
+    // const fullHash = payData.link + "|" + destinatinoHash;
+    // setLinkHash(fullHash);
+    // setChestLoadingText("Safe contract created");
+    // const fromEthProvider = new ethers.providers.Web3Provider(provider);
+    // const fromSigner = await fromEthProvider.getSigner();
+    // const safeAccountAbs = new AccountAbstraction(fromSigner);
+    // await safeAccountAbs.init({ relayPack });
+    // safeAccountAbstraction.current = safeAccountAbs;
+    // isRelayInitiated.current = true;
   };
 
   const createWallet = async () => {
@@ -206,59 +248,111 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     if (_inputValue) {
       setTransactionLoading(true);
       setChestLoadingText("Initializing wallet and creating link...");
+      const amount = ethers.utils.parseEther(_inputValue);
+      const data = "0x";
+      const tx = {
+        to: destinationAddress,
+        value: amount,
+        data,
+      };
+      console.log(tx, "tx");
+      const smartAccount = biconomyWallet;
+      let partialUserOp = await smartAccount.buildUserOp([tx]);
+      console.log(partialUserOp, "partialUserOp");
+      setChestLoadingText("Setting up smart account...");
+      const biconomyPaymaster =
+        smartAccount.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
+      console.log(biconomyPaymaster, "biconomyPaymaster");
+      let paymasterServiceData: SponsorUserOperationDto = {
+        mode: PaymasterMode.SPONSORED,
+        // optional params...
+      };
+      console.log(paymasterServiceData, "paymasterServiceData");
+
       try {
-        if (loggedInVia === LOGGED_IN.GOOGLE) {
-          if (isRelayInitiated.current) {
-            setChestLoadingText("Transaction process has begun...");
+        setChestLoadingText("Setting up paymaster...");
+        const paymasterAndDataResponse =
+          await biconomyPaymaster.getPaymasterAndData(
+            partialUserOp,
+            paymasterServiceData
+          );
+        console.log(paymasterAndDataResponse, "paymasterAndDataResponse");
+        partialUserOp.paymasterAndData =
+          paymasterAndDataResponse.paymasterAndData;
 
-            const safeTransactionData: MetaTransactionData = {
-              to: destinationAddress,
-              data: "0x",
-              value: parseEther(inputValue).toString(),
-              operation: OperationType.Call,
-            };
+        const userOpResponse = await smartAccount.sendUserOp(partialUserOp);
+        console.log(userOpResponse, "userOpResponse");
+        const transactionDetails = await userOpResponse.wait();
+        console.log(transactionDetails, "transactionDetails");
+        setExplorerUrl(
+          `https://goerli.basescan.org/tx/${transactionDetails.receipt.transactionHash}`
+        );
+        console.log(transactionDetails.receipt.transactionHash, "tx hash");
+        setChestLoadingText("Success! Transaction Processed");
+        setIsSucceed(true);
+        handleTransactionStatus(
+          transactionDetails.receipt.transactionHash,
+          linkHash
+        );
+        setChestLoadingText("Transaction Submitted!");
 
-            const options: MetaTransactionOptions = {
-              gasLimit: "100000",
-              isSponsored: true,
-            };
-
-            const gelatoTaskId =
-              await safeAccountAbstraction?.current?.relayTransaction(
-                [safeTransactionData],
-                options
-              );
-            if (gelatoTaskId) {
-              setChestLoadingText(
-                "Transaction on its way! Awaiting confirmation..."
-              );
-              handleTransactionStatus(gelatoTaskId, linkHash);
-            }
-          } else {
-            await handleInitWallet();
-            createWallet();
-            return;
-          }
-        } else {
-          try {
-            const sendAmount = await sendTransaction({
-              to: destinationAddress,
-              value: parseEther(inputValue),
-            });
-            handleTransactionStatus(sendAmount.hash, linkHash);
-          } catch (e: any) {
-            setTransactionLoading(false);
-            const err = serializeError(e);
-            toast.error(err.message);
-            console.log(e, "error");
-          }
-        }
-      } catch (e: any) {
-        setTransactionLoading(false);
-        const err = serializeError(e);
-        toast.error(err.message);
-        console.log(e, "e");
+        // router.push(linkHash);
+      } catch (error) {
+        console.error("Error executing transaction:", error);
       }
+      // try {
+      //   if (loggedInVia === LOGGED_IN.GOOGLE) {
+      //     if (isRelayInitiated.current) {
+      //       setChestLoadingText("Transaction process has begun...");
+
+      //       const safeTransactionData: MetaTransactionData = {
+      //         to: destinationAddress,
+      //         data: "0x",
+      //         value: parseEther(inputValue).toString(),
+      //         operation: OperationType.Call,
+      //       };
+
+      //       const options: MetaTransactionOptions = {
+      //         gasLimit: "100000",
+      //         isSponsored: true,
+      //       };
+
+      //       const gelatoTaskId =
+      //         await safeAccountAbstraction?.current?.relayTransaction(
+      //           [safeTransactionData],
+      //           options
+      //         );
+      //       if (gelatoTaskId) {
+      //         setChestLoadingText(
+      //           "Transaction on its way! Awaiting confirmation..."
+      //         );
+      //         handleTransactionStatus(gelatoTaskId, linkHash);
+      //       }
+      //     } else {
+      //       await handleInitWallet();
+      //       createWallet();
+      //       return;
+      //     }
+      //   } else {
+      //     try {
+      //       const sendAmount = await sendTransaction({
+      //         to: destinationAddress,
+      //         value: parseEther(inputValue),
+      //       });
+      //       handleTransactionStatus(sendAmount.hash, linkHash);
+      //     } catch (e: any) {
+      //       setTransactionLoading(false);
+      //       const err = serializeError(e);
+      //       toast.error(err.message);
+      //       console.log(e, "error");
+      //     }
+      //   }
+      // } catch (e: any) {
+      //   setTransactionLoading(false);
+      //   const err = serializeError(e);
+      //   toast.error(err.message);
+      //   console.log(e, "e");
+      // }
     }
   };
 
@@ -297,72 +391,105 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
   };
 
   const handleTransactionStatus = (hash: string, link: string) => {
-    const intervalInMilliseconds = 1000;
+    setChestLoadingText("Verifying Transaction status");
+    const intervalInMilliseconds = 2000;
     const interval = setInterval(() => {
-      if (loggedInVia === LOGGED_IN.GOOGLE) {
-        getRelayTransactionStatus(hash)
-          .then((res: any) => {
-            if (res) {
-              console.log(res, "res");
-              const task = res.data.task;
-              if (task) {
-                setChestLoadingText("Verifying Transaction Status...");
-                if (task.taskState === "ExecSuccess") {
-                  setChestLoadingText(
-                    "Operation Successful: Transaction Completed!"
-                  );
-                  router.push(link);
-                  if (interval !== null) {
-                    clearInterval(interval);
-                  }
-                }
-              } else {
-                setTransactionLoading(false);
-                toast.error("Failed to Load Chest. Try Again");
-                if (interval !== null) {
-                  clearInterval(interval);
-                }
-              }
+      getSendTransactionStatus(hash)
+        .then((res: any) => {
+          if (res.result) {
+            const status = Number(res.result.status);
+            if (status === 1) {
+              setChestLoadingText("Transaction Executed Successfully");
+              toast.success("Transaction Executed Successfully");
+              router.push(linkHash);
+              setTransactionLoading(false);
+              fetchBalance();
+              // handleClose();
+            } else {
+              setTransactionLoading(false);
+              toast.error("Failed to Deposit Amount. Try Again");
             }
-          })
-          .catch((e) => {
-            setTransactionLoading(false);
-            toast.error(e.message);
-            console.log(e, "e");
             if (interval !== null) {
               clearInterval(interval);
             }
-          });
-      } else {
-        getSendTransactionStatus(hash)
-          .then((res: any) => {
-            if (res.result) {
-              const status = Number(res.result.status);
-              if (status === 1) {
-                router.push(link);
-                if (interval !== null) {
-                  clearInterval(interval);
-                }
-              } else {
-                setTransactionLoading(false);
-                toast.error("Failed to Load Chest. Try Again");
-                if (interval !== null) {
-                  clearInterval(interval);
-                }
-              }
-            }
-          })
-          .catch((e) => {
-            setTransactionLoading(false);
-            toast.error(e.message);
-            console.log(e, "e");
-            if (interval !== null) {
-              clearInterval(interval);
-            }
-          });
-      }
+          }
+        })
+        .catch((e) => {
+          setTransactionLoading(false);
+          const err = serializeError(e);
+          toast.error(err.message);
+          console.log(e, "error");
+        });
     }, intervalInMilliseconds);
   };
+
+  // const handleTransactionStatus = (hash: string, link: string) => {
+  //   const intervalInMilliseconds = 1000;
+  //   const interval = setInterval(() => {
+  //     if (loggedInVia === LOGGED_IN.GOOGLE) {
+  //       getRelayTransactionStatus(hash)
+  //         .then((res: any) => {
+  //           if (res) {
+  //             console.log(res, "res");
+  //             const task = res.data.task;
+  //             if (task) {
+  //               setChestLoadingText("Verifying Transaction Status...");
+  //               if (task.taskState === "ExecSuccess") {
+  //                 setChestLoadingText(
+  //                   "Operation Successful: Transaction Completed!"
+  //                 );
+  //                 router.push(link);
+  //                 if (interval !== null) {
+  //                   clearInterval(interval);
+  //                 }
+  //               }
+  //             } else {
+  //               setTransactionLoading(false);
+  //               toast.error("Failed to Load Chest. Try Again");
+  //               if (interval !== null) {
+  //                 clearInterval(interval);
+  //               }
+  //             }
+  //           }
+  //         })
+  //         .catch((e) => {
+  //           setTransactionLoading(false);
+  //           toast.error(e.message);
+  //           console.log(e, "e");
+  //           if (interval !== null) {
+  //             clearInterval(interval);
+  //           }
+  //         });
+  //     } else {
+  //       getSendTransactionStatus(hash)
+  //         .then((res: any) => {
+  //           if (res.result) {
+  //             const status = Number(res.result.status);
+  //             if (status === 1) {
+  //               router.push(link);
+  //               if (interval !== null) {
+  //                 clearInterval(interval);
+  //               }
+  //             } else {
+  //               setTransactionLoading(false);
+  //               toast.error("Failed to Load Chest. Try Again");
+  //               if (interval !== null) {
+  //                 clearInterval(interval);
+  //               }
+  //             }
+  //           }
+  //         })
+  //         .catch((e) => {
+  //           setTransactionLoading(false);
+  //           toast.error(e.message);
+  //           console.log(e, "e");
+  //           if (interval !== null) {
+  //             clearInterval(interval);
+  //           }
+  //         });
+  //     }
+  //   }, intervalInMilliseconds);
+  // };
 
   const handleShowActivity = () => {
     setShowActivity(!showActivity);
@@ -515,13 +642,13 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                 </div>
               </div>
               <div className="relative mt-10">
-                <div
-                  className={`flex gap-2 justify-between`}
-                >
+                <div className={`flex gap-2 justify-between`}>
                   <PrimaryBtn
-                    className={`${!btnDisable && value ? "opacity-100" : "opacity-50"
-                      } !w-[45%] lg:w-[185px] max-w-[185px] !mx-0 ${btnDisable || !value ? "cursor-not-allowed" : ""
-                      }`}
+                    className={`${
+                      !btnDisable && value ? "opacity-100" : "opacity-50"
+                    } !w-[45%] lg:w-[185px] max-w-[185px] !mx-0 ${
+                      btnDisable || !value ? "cursor-not-allowed" : ""
+                    }`}
                     title={"Create Link"}
                     onClick={createWallet}
                     btnDisable={btnDisable || !value}

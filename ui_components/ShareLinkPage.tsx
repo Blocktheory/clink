@@ -2,7 +2,11 @@ import "react-toastify/dist/ReactToastify.css";
 import "tailwindcss/tailwind.css";
 
 import AccountAbstraction from "@safe-global/account-abstraction-kit-poc";
-import { EthersAdapter, SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
+import {
+  EthersAdapter,
+  SafeAccountConfig,
+  SafeFactory,
+} from "@safe-global/protocol-kit";
 import { GelatoRelayPack } from "@safe-global/relay-kit";
 import {
   MetaTransactionData,
@@ -55,6 +59,19 @@ import PrimaryBtn from "./PrimaryBtn";
 import QrModal from "./QrModal";
 import SecondaryBtn from "./SecondaryBtn";
 import { ShareBtnModal } from "./ShareBtnModal";
+import { IPaymaster, BiconomyPaymaster } from "@biconomy/paymaster";
+import { IBundler, Bundler } from "@biconomy/bundler";
+import {
+  BiconomySmartAccount,
+  BiconomySmartAccountV2,
+  DEFAULT_ENTRYPOINT_ADDRESS,
+  SmartAccount,
+} from "@biconomy/account";
+import {
+  IHybridPaymaster,
+  PaymasterMode,
+  SponsorUserOperationDto,
+} from "@biconomy/paymaster";
 
 export interface IShareLink {
   uuid: string;
@@ -73,7 +90,9 @@ const ShareLink: FC<IShareLink> = (props) => {
   const [shareText, setShareText] = useState("Share");
   const [showShareIcon, setShowShareIcon] = useState(true);
   const [tokenValue, setTokenValue] = useState("");
-  const [headingText, setHeadingText] = useState("Your Chest is ready to claim!");
+  const [headingText, setHeadingText] = useState(
+    "Your Chest is ready to claim!"
+  );
   const [linkValueUsd, setLinkValueUsd] = useState("");
   const [isRedirected, setIsRedirected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -83,8 +102,12 @@ const ShareLink: FC<IShareLink> = (props) => {
   const [showQr, setShowQr] = useState(false);
   const [isClaimSuccessful, setIsClaimSuccessful] = useState(false);
   const [txHash, setTxHash] = useState("");
-  const ethersProvider = new ethers.providers.JsonRpcProvider(BaseGoerli.info.rpc);
-  const relayPack = new GelatoRelayPack(process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY);
+  const ethersProvider = new ethers.providers.JsonRpcProvider(
+    BaseGoerli.info.rpc
+  );
+  const relayPack = new GelatoRelayPack(
+    process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY
+  );
   const options: MetaTransactionOptions = {
     gasLimit: "100000",
     isSponsored: true,
@@ -160,14 +183,14 @@ const ShareLink: FC<IShareLink> = (props) => {
       setIsLoading(false);
       const formatBal = bgNum * res.data.ethereum.usd;
       setLinkValueUsd(
-        getCurrencyFormattedNumber(roundDownToTenth(formatBal), 2, "USD", true),
+        getCurrencyFormattedNumber(roundDownToTenth(formatBal), 2, "USD", true)
       );
       const zeroBal =
         getCurrencyFormattedNumber(formatBal, 2, "USD", true) === "$0";
       setHeadingText(
         zeroBal
           ? "Chest have found their owner!"
-          : "Your Chest is ready to claim!",
+          : "Your Chest is ready to claim!"
       );
     });
   };
@@ -181,6 +204,7 @@ const ShareLink: FC<IShareLink> = (props) => {
   };
 
   const handlePublicAddressTransaction = (toAdd: string) => {
+    console.log(toAdd, "to add");
     handleCloseClaimModal();
     sendToken(toAdd);
   };
@@ -199,7 +223,7 @@ const ShareLink: FC<IShareLink> = (props) => {
         });
         setToAddress(result.account);
         toast.success(
-          `Please wait, wallet connected and claim initiated for the chest`,
+          `Please wait, wallet connected and claim initiated for the chest`
         );
         handleCloseClaimModal();
         sendToken(result.account);
@@ -216,6 +240,7 @@ const ShareLink: FC<IShareLink> = (props) => {
   //     useState<AccountAbstraction>();
   const isRelayInitiated = useRef(false);
   const safeAccountAbstraction = useRef<AccountAbstraction>();
+  const bicomomySmartAcc = useRef<BiconomySmartAccount>();
 
   const handleSendToken = async () => {
     const walletCore = await initWasm();
@@ -229,38 +254,131 @@ const ShareLink: FC<IShareLink> = (props) => {
 
     // from signer address
     const fromSigner = new ethers.Wallet(fromKey.key, ethersProvider);
-    const safeAccountAbs = new AccountAbstraction(fromSigner);
-    await safeAccountAbs.init({ relayPack });
-    safeAccountAbstraction.current = safeAccountAbs;
-    isRelayInitiated.current = true;
+
+    console.log(fromSigner, "fromSigner");
+
+    const paymaster = new BiconomyPaymaster({
+      paymasterUrl:
+        "https://paymaster.biconomy.io/api/v1/84531/76v47JPQ6.7a881a9f-4cec-45e0-95e9-c39c71ca54f4",
+    });
+    console.log(paymaster, "paymaster");
+
+    const bundler: IBundler = new Bundler({
+      bundlerUrl:
+        "https://bundler.biconomy.io/api/v2/84531/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44",
+      chainId: 84531,
+      entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
+    });
+    console.log(bundler, "bundler");
+    let biWallet = new BiconomySmartAccount({
+      signer: fromSigner,
+      chainId: 84531,
+      bundler: bundler,
+      paymaster: paymaster,
+    });
+    console.log(biWallet, "biWallet");
+    biWallet = await biWallet.init({
+      accountIndex: 0,
+    });
+    console.log("biWallet initiated");
+    bicomomySmartAcc.current = biWallet;
+    // const safeAccountAbs = new AccountAbstraction(fromSigner);
+    // await safeAccountAbs.init({ relayPack });
+    // safeAccountAbstraction.current = safeAccountAbs;
+    // isRelayInitiated.current = true;
   };
 
   const sendToken = async (toAdd: string) => {
     setProcessing(true);
     try {
-      if (isRelayInitiated.current) {
+      if (bicomomySmartAcc.current) {
+        // setTransactionLoading(true);
+        // setChestLoadingText("Initializing wallet and creating link...");
         const amountValue = hexToNumber(walletBalanceHex) / Math.pow(10, 18);
-
-        const safeTransactionData: MetaTransactionData = {
+        // const amount = ethers.utils.parseEther(
+        //   amountValue as unknown as string
+        // );
+        // console.log(amount, "amount");
+        console.log(amountValue, "amountValue");
+        const data = "0x";
+        const tx = {
           to: toAdd,
-          data: "0x",
           value: parseEther(amountValue.toString()).toString(),
-          operation: OperationType.Call,
+          data,
         };
+        console.log(tx, "tx");
+        const smartAccount = bicomomySmartAcc;
+        let partialUserOp = await smartAccount.current?.buildUserOp([tx]);
+        console.log(partialUserOp, "partialUserOp");
+        // setChestLoadingText("Setting up smart account...");
+        const biconomyPaymaster = smartAccount.current
+          ?.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
+        console.log(biconomyPaymaster, "biconomyPaymaster");
+        let paymasterServiceData: SponsorUserOperationDto = {
+          mode: PaymasterMode.SPONSORED,
+          // optional params...
+        };
+        console.log(paymasterServiceData, "paymasterServiceData");
 
-        const gelatoTaskId =
-          await safeAccountAbstraction?.current?.relayTransaction(
-            [safeTransactionData],
-            options,
+        try {
+          // setChestLoadingText("Setting up paymaster...");
+          const paymasterAndDataResponse =
+            await biconomyPaymaster.getPaymasterAndData(
+              partialUserOp!,
+              paymasterServiceData
+            );
+          console.log(paymasterAndDataResponse, "paymasterAndDataResponse");
+          partialUserOp!.paymasterAndData =
+            paymasterAndDataResponse.paymasterAndData;
+
+          const userOpResponse = await smartAccount.current?.sendUserOp(
+            partialUserOp!
           );
-        if (gelatoTaskId) {
-          handleTransactionStatus(gelatoTaskId);
+          console.log(userOpResponse, "userOpResponse");
+          const transactionDetails = await userOpResponse?.wait();
+          console.log(transactionDetails, "transactionDetails");
+          // setExplorerUrl(
+          //   `https://goerli.basescan.org/tx/${transactionDetails.receipt.transactionHash}`
+          // );
+          console.log(
+            `https://goerli.basescan.org/tx/${transactionDetails?.receipt.transactionHash}`,
+            "tx hash"
+          );
+          handleTransactionStatus(
+            transactionDetails?.receipt.transactionHash ?? ""
+          );
+          // setChestLoadingText("Success! Transaction Processed");
+          // setIsSucceed(true);
+          // setChestLoadingText("Operation Successful: Transaction Completed!");
+
+          // router.push(linkHash);
+        } catch (error) {
+          console.error("Error executing transaction:", error);
         }
-      } else {
-        await handleSendToken();
-        sendToken(toAdd);
-        return;
       }
+      // if (isRelayInitiated.current) {
+      //   const amountValue = hexToNumber(walletBalanceHex) / Math.pow(10, 18);
+
+      //   const safeTransactionData: MetaTransactionData = {
+      //     to: toAdd,
+      //     data: "0x",
+      //     value: parseEther(amountValue.toString()).toString(),
+      //     operation: OperationType.Call,
+      //   };
+
+      //   const gelatoTaskId =
+      //     await safeAccountAbstraction?.current?.relayTransaction(
+      //       [safeTransactionData],
+      //       options
+      //     );
+      //   if (gelatoTaskId) {
+      //     handleTransactionStatus(gelatoTaskId);
+      //   }
+      // } else {
+      //   await handleSendToken();
+      //   sendToken(toAdd);
+      //   return;
+      // }
     } catch (e: any) {
       setProcessing(false);
       toast.error(e.message);
@@ -269,46 +387,77 @@ const ShareLink: FC<IShareLink> = (props) => {
   };
 
   const handleTransactionStatus = (hash: string) => {
-    const intervalInMilliseconds = 1000;
+    const intervalInMilliseconds = 2000;
     const interval = setInterval(() => {
-      getRelayTransactionStatus(hash)
+      getSendTransactionStatus(hash)
         .then((res: any) => {
-          if (res) {
-            const task = res.data.task;
-            if (task) {
-              if (
-                task.taskState === "WaitingForConfirmation" ||
-                task.taskState === "ExecSuccess"
-              ) {
-                setLinkValueUsd("$0");
-                setTokenValue("0");
-                setTxHash(task.transactionHash);
-                setHeadingText("Chest have found their owner!");
-                handleClaimSuccess();
-                if (interval !== null) {
-                  clearInterval(interval);
-                }
-              }
+          if (res.result) {
+            const status = Number(res.result.status);
+            if (status === 1) {
+              setLinkValueUsd("$0");
+              setTokenValue("0");
+              setTxHash(hash);
+              setHeadingText("Chest have found their owner!");
+              handleClaimSuccess();
             } else {
               setProcessing(false);
-              const err = serializeError("Failed to Claim!");
-              toast.error(err.message);
-              if (interval !== null) {
-                clearInterval(interval);
-              }
+              toast.error("Failed to Claim Amount. Try Again");
+            }
+            if (interval !== null) {
+              clearInterval(interval);
             }
           }
         })
         .catch((e) => {
           setProcessing(false);
-          toast.error(e.message);
-          console.log(e, "e");
-          if (interval !== null) {
-            clearInterval(interval);
-          }
+          const err = serializeError(e);
+          toast.error(err.message);
+          console.log(e, "error");
         });
     }, intervalInMilliseconds);
   };
+
+  // const handleTransactionStatus = (hash: string) => {
+  //   const intervalInMilliseconds = 1000;
+  //   const interval = setInterval(() => {
+  //     getRelayTransactionStatus(hash)
+  //       .then((res: any) => {
+  //         if (res) {
+  //           const task = res.data.task;
+  //           if (task) {
+  //             if (
+  //               task.taskState === "WaitingForConfirmation" ||
+  //               task.taskState === "ExecSuccess"
+  //             ) {
+  //               setLinkValueUsd("$0");
+  //               setTokenValue("0");
+  //               setTxHash(task.transactionHash);
+  //               setHeadingText("Chest have found their owner!");
+  //               handleClaimSuccess();
+  //               if (interval !== null) {
+  //                 clearInterval(interval);
+  //               }
+  //             }
+  //           } else {
+  //             setProcessing(false);
+  //             const err = serializeError("Failed to Claim!");
+  //             toast.error(err.message);
+  //             if (interval !== null) {
+  //               clearInterval(interval);
+  //             }
+  //           }
+  //         }
+  //       })
+  //       .catch((e) => {
+  //         setProcessing(false);
+  //         toast.error(e.message);
+  //         console.log(e, "e");
+  //         if (interval !== null) {
+  //           clearInterval(interval);
+  //         }
+  //       });
+  //   }, intervalInMilliseconds);
+  // };
 
   const handleClaimSuccess = () => {
     setIsClaimSuccessful(true);
@@ -316,7 +465,7 @@ const ShareLink: FC<IShareLink> = (props) => {
     toast.success(
       <>
         <p>Claimed Successfully!</p>
-      </>,
+      </>
     );
   };
 
@@ -447,8 +596,9 @@ const ShareLink: FC<IShareLink> = (props) => {
             {!processing && (
               <div className="lg:hidden block w-full">
                 <PrimaryBtn
-                  className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"
-                    }`}
+                  className={`${
+                    handleDisableBtn() ? "opacity-60" : "opacity-100"
+                  }`}
                   title="Share"
                   onClick={() => {
                     handleShareURL();
@@ -463,8 +613,9 @@ const ShareLink: FC<IShareLink> = (props) => {
             {!processing && (
               <div className="hidden lg:block w-full max-w-[400px]">
                 <PrimaryBtn
-                  className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"
-                    }`}
+                  className={`${
+                    handleDisableBtn() ? "opacity-60" : "opacity-100"
+                  }`}
                   title={shareText}
                   onClick={() => {
                     setOpenShareModal(true);
@@ -476,8 +627,7 @@ const ShareLink: FC<IShareLink> = (props) => {
               </div>
             )}
             <SecondaryBtn
-              className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"
-                }`}
+              className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"}`}
               title={"Claim"}
               onClick={() => handleClaimClick()}
               rightImage={processing ? undefined : icons.downloadBtnIcon}
@@ -493,13 +643,10 @@ const ShareLink: FC<IShareLink> = (props) => {
         ) : (
           <>
             <PrimaryBtn
-              className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"
-                }`}
+              className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"}`}
               title={"Claim"}
               onClick={() => handleClaimClick()}
-              rightImage={
-                processing ? undefined : icons.downloadBtnIconBlack
-              }
+              rightImage={processing ? undefined : icons.downloadBtnIconBlack}
               btnDisable={handleDisableBtn()}
               loading={isLoading || processing}
             />
@@ -512,15 +659,14 @@ const ShareLink: FC<IShareLink> = (props) => {
             {!processing && (
               <div className="lg:hidden block w-full">
                 <SecondaryBtn
-                  className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"
-                    }`}
+                  className={`${
+                    handleDisableBtn() ? "opacity-60" : "opacity-100"
+                  }`}
                   title="Share"
                   onClick={() => {
                     handleShareURL();
                   }}
-                  rightImage={
-                    showShareIcon ? icons.shareBtnIconWhite : ""
-                  }
+                  rightImage={showShareIcon ? icons.shareBtnIconWhite : ""}
                   showShareIcon={showShareIcon}
                   btnDisable={handleDisableBtn()}
                   loading={isLoading}
@@ -530,15 +676,14 @@ const ShareLink: FC<IShareLink> = (props) => {
             {!processing && (
               <div className="hidden lg:block w-full max-w-[400px]">
                 <SecondaryBtn
-                  className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"
-                    }`}
+                  className={`${
+                    handleDisableBtn() ? "opacity-60" : "opacity-100"
+                  }`}
                   title={shareText}
                   onClick={() => {
                     setOpenShareModal(true);
                   }}
-                  rightImage={
-                    showShareIcon ? icons.shareBtnIconWhite : ""
-                  }
+                  rightImage={showShareIcon ? icons.shareBtnIconWhite : ""}
                   btnDisable={handleDisableBtn()}
                   loading={isLoading}
                 />
