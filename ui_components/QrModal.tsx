@@ -65,7 +65,7 @@ export const QrModal: FC<IQrModal> = (props) => {
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
                                 <Dialog.Panel
-                                    className={`bg-white/90 lg:min-w-[400px] rounded-[12px] w-[50%] lg:w-[400px]  py-5`}
+                                    className={`bg-white/90 lg:min-w-[400px] self-center rounded-[12px] w-[50%] lg:w-[400px]  py-5`}
                                 >
                                     {open && showOptions ? (
                                         <div className="flex flex-col items-center justify-center">

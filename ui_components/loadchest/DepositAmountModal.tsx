@@ -143,29 +143,29 @@ export const DepositAmountModal: FC<IDepositAmountModal> = (props) => {
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
                                 <Dialog.Panel
-                                    className={`bg-lightGray lg:min-w-[400px] rounded-[12px] w-full lg:w-[400px]  py-5`}
+                                    className={`bg-white/90 lg:min-w-[400px] rounded-[12px] self-center w-[60%] lg:w-[400px]  py-5`}
                                 >
                                     {open && showOptions ? (
                                         <div className="px-4">
                                             <div
                                                 role="presentation"
-                                                className="rounded-lg border border-gray-500 bg-white/5 p-2 cursor-pointer mb-5"
+                                                className="rounded-lg border border-black bg-white p-2 cursor-pointer mb-5 custom-shadow-sm"
                                                 onClick={() => {
                                                     handleExternalWalletClick();
                                                 }}
                                             >
-                                                <p className="text-center text-white">
+                                                <p className="text-center text-black">
                                                     {connecting ? "Connecting..." : "🔗 External Wallet"}
                                                 </p>
                                             </div>
                                             <div
                                                 role="presentation"
-                                                className="rounded-lg border border-gray-500 bg-white/5 p-2 cursor-pointer"
+                                                className="rounded-lg border border-black bg-white p-2 cursor-pointer mb-5 custom-shadow-sm"
                                                 onClick={() => {
                                                     handlePublicKeyClick();
                                                 }}
                                             >
-                                                <p className="text-center text-white">
+                                                <p className="text-center text-black">
                                                     #️⃣ Public Address
                                                 </p>
                                             </div>

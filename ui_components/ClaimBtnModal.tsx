@@ -72,7 +72,7 @@ export const ClaimBtnModal: FC<IClaimBtnModal> = (props) => {
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
                                 <Dialog.Panel
-                                    className={`bg-white/90 lg:min-w-[400px] rounded-[12px] w-[60%] lg:w-[400px]  py-5`}
+                                    className={`bg-white/90 lg:min-w-[400px] rounded-[12px] self-center w-[60%] lg:w-[400px]  py-5`}
                                 >
                                     {open ? (
                                         <div className="px-4">
