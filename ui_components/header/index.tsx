@@ -123,7 +123,7 @@ const Header = (props: IHeader) => {
                             disabled={address || loader || initLoader ? true : false}
                         >
                             <Image
-                                src={!address ? icons.googleIcon : icons.baseLogo}
+                                src={!address ? icons.lensLogo : icons.baseLogo}
                                 alt="google login"
                                 width={20}
                                 height={20}
@@ -205,7 +205,7 @@ const Header = (props: IHeader) => {
                                                     <div
                                                         className="flex justify-between items-center py-6 border-b-2 cursor-pointer"
                                                         role="presentation"
-                                                        onClick={signIn}
+                                                    // onClick={signIn}
                                                     >
                                                         <div className="flex gap-2 items-center">
                                                             <Image
@@ -213,7 +213,7 @@ const Header = (props: IHeader) => {
                                                                 alt="login with google"
                                                             />
                                                             <p className="text-black">
-                                                                Login with Google
+                                                                Login with Lens
                                                             </p>
                                                         </div>
                                                         <Image
@@ -251,13 +251,13 @@ const Header = (props: IHeader) => {
                                                     <div
                                                         className="flex justify-between items-center py-6 cursor-pointer"
                                                         role="presentation"
-                                                        onClick={handleLogout}
+                                                    // onClick={handleLogout}
                                                     >
                                                         <div className="flex gap-2 items-center">
-                                                            <Image
+                                                            {/* <Image
                                                                 src={icons.googleIcon}
                                                                 alt="login with google"
-                                                            />
+                                                            /> */}
                                                             <p className="text-black">
                                                                 Logout
                                                             </p>

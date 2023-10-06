@@ -630,7 +630,7 @@ const ShareLink: FC<IShareLink> = (props) => {
               className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"}`}
               title={"Claim"}
               onClick={() => handleClaimClick()}
-              rightImage={processing ? undefined : icons.downloadBtnIcon}
+              rightImage={processing ? undefined : icons.downloadBtnIconBlack}
               btnDisable={handleDisableBtn()}
               loading={isLoading || processing}
             />

@@ -614,7 +614,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
               </div>
               <div className="grid grid-cols-3 gap-3 mt-5">
                 <div
-                  className="rounded-lg border border-[#010101] p-2 cursor-pointer"
+                  className="rounded-lg border border-[#010101] p-2 cursor-pointer custom-shadow-sm"
                   role="presentation"
                   onClick={() => {
                     handleValueClick("1");
@@ -623,7 +623,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                   <p className="text-center text-black">$1</p>
                 </div>
                 <div
-                  className="rounded-lg border border-[#010101] p-2 cursor-pointer"
+                  className="rounded-lg border border-[#010101] p-2 cursor-pointer custom-shadow-sm"
                   role="presentation"
                   onClick={() => {
                     handleValueClick("2");
@@ -632,7 +632,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                   <p className="text-center text-black">$2</p>
                 </div>
                 <div
-                  className="rounded-lg border border-[#010101] p-2 cursor-pointer"
+                  className="rounded-lg border border-[#010101] p-2 cursor-pointer custom-shadow-sm"
                   role="presentation"
                   onClick={() => {
                     handleValueClick("5");
@@ -653,9 +653,9 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                     onClick={createWallet}
                     btnDisable={btnDisable || !value}
                   />
-                  <div id="overlay-button">
+                  <div id="overlay-button" className="w-full lg:w-[185px] max-w-[185px]">
                     <SecondaryBtn
-                      className={`w-full lg:w-[185px] text-[#010101] max-w-[185px] mx-0`}
+                      className={`w-full text-[#010101] max-w-[185px] mx-0`}
                       title={"Buy Crypto"}
                       onClick={handleBuyCrypto}
                     />
@@ -683,7 +683,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         tokenPrice={tokenPrice}
         fetchBalance={fetchBalance}
       />
-      <div className="w-[400px] h-[400px] absolute -top-[200px] -right-[200px] -z-[10] bg-[#28D799] opacity-20 blur-[62px] rounded-full"></div>
+      {/* <div className="w-[400px] h-[400px] absolute -top-[200px] -right-[200px] -z-[10] bg-[#28D799] opacity-20 blur-[62px] rounded-full"></div> */}
     </div>
   );
 };

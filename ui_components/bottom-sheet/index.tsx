@@ -106,7 +106,7 @@ const BottomSheet: FC<TProps> = (props) => {
                                                 </div>
                                                 {isConnected &&
                                                     loggedInVia ===
-                                                        LOGGED_IN.EXTERNAL_WALLET && (
+                                                    LOGGED_IN.EXTERNAL_WALLET && (
                                                         <div
                                                             className="w-[95%] h-[52px] bg-white rounded-lg mx-auto flex justify-between items-center px-4 mb-6"
                                                             role="presentation"
@@ -190,17 +190,17 @@ const BottomSheet: FC<TProps> = (props) => {
                                                 </div>
                                             </Link>
                                             {isConnected &&
-                                            loggedInVia === LOGGED_IN.GOOGLE ? (
+                                                loggedInVia === LOGGED_IN.GOOGLE ? (
                                                 <div
                                                     className="flex justify-between items-center py-6 cursor-pointer"
                                                     role="presentation"
-                                                    onClick={signOut}
+                                                // onClick={signOut}
                                                 >
                                                     <div className="flex gap-2 items-center">
-                                                        <Image
+                                                        {/* <Image
                                                             src={icons.googleIcon}
                                                             alt="login with google"
-                                                        />
+                                                        /> */}
                                                         <p className="text-black">
                                                             Logout
                                                         </p>

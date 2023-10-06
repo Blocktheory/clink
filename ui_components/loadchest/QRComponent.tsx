@@ -133,13 +133,13 @@ export const QRComponent: FC<IQRComponent> = (props) => {
             {!isShareQr ? (
                 <div>
                     <div className="flex items-center justify-center">
-                        <div className="w-fit mt-[15px] border-dashed border border-secondary-300 dark:border-secondaryDark-300 rounded-[10px] flex justify-center items-start md:items-center p-2">
-                            <div className=" text-white text-[14px] break-all">
+                        <div className="w-fit border-dashed border border-secondary-300 dark:border-secondaryDark-300 rounded-[10px] flex justify-center items-start md:items-center p-2">
+                            <div className=" text-black text-[14px] break-all">
                                 {trimAddress(walletAddress)}
                             </div>
                             <button className="ml-1 w-6 h-6" onClick={() => handleCopy()}>
                                 <Image
-                                    src={icons.copyIconWhite}
+                                    src={icons.copyBlack}
                                     alt="copyIcon"
                                     className="w-4 h-full"
                                 />

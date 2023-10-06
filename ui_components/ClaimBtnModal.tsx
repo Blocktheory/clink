@@ -72,7 +72,7 @@ export const ClaimBtnModal: FC<IClaimBtnModal> = (props) => {
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
                                 <Dialog.Panel
-                                    className={`bg-lightGray lg:min-w-[400px] rounded-[12px] w-full lg:w-[400px]  py-5`}
+                                    className={`bg-white/90 lg:min-w-[400px] rounded-[12px] w-[60%] lg:w-[400px]  py-5`}
                                 >
                                     {open ? (
                                         <div className="px-4">
@@ -86,7 +86,7 @@ export const ClaimBtnModal: FC<IClaimBtnModal> = (props) => {
                                                     />
                                                 </div>
                                             )}
-                                            <p className="text-center text-white text-[16px] mb-5">
+                                            <p className="text-center text-black text-[16px] mb-5">
                                                 {openInput
                                                     ? "Enter Public Address"
                                                     : "💰 Claim"}
@@ -94,33 +94,33 @@ export const ClaimBtnModal: FC<IClaimBtnModal> = (props) => {
                                             {!openInput && (
                                                 <>
                                                     <div
-                                                        className="rounded-lg border border-gray-500 bg-white/5 p-2 cursor-pointer mb-5"
+                                                        className="rounded-lg border border-black bg-white p-2 cursor-pointer mb-5 custom-shadow-sm"
                                                         onClick={() => {
                                                             handleConnect();
                                                         }}
                                                         role="presentation"
                                                     >
-                                                        <p className="text-center text-white">
+                                                        <p className="text-center text-black">
                                                             {"🔗  External Wallet"}
                                                         </p>
                                                     </div>
                                                     <div
-                                                        className="rounded-lg border border-gray-500 bg-white/5 p-2 cursor-pointer mb-5"
+                                                        className="rounded-lg border border-black bg-white p-2 cursor-pointer mb-5 custom-shadow-sm"
                                                         onClick={() => {
                                                             handleOpenInput();
                                                         }}
                                                         role="presentation"
                                                     >
-                                                        <p className="text-center text-white">
+                                                        <p className="text-center text-black">
                                                             #️⃣ Public Address
                                                         </p>
                                                     </div>
 
                                                     <div
-                                                        className="rounded-lg border border-gray-500 bg-white/5 p-2 cursor-pointer"
+                                                        className="rounded-lg border border-black bg-white p-2 cursor-pointer mb-5 custom-shadow-sm"
                                                         role="presentation"
                                                     >
-                                                        <p className="text-center text-white">
+                                                        <p className="text-center text-black">
                                                             {`🏦  Bank Transfer (Coming soon)`}
                                                         </p>
                                                     </div>
@@ -151,11 +151,10 @@ export const ClaimBtnModal: FC<IClaimBtnModal> = (props) => {
                                                     />
                                                     <div className="my-4 cursor-pointer">
                                                         <PrimaryBtn
-                                                            className={`lg:w-[90%] ${
-                                                                value
-                                                                    ? "opacity-100"
-                                                                    : "opacity-40"
-                                                            }`}
+                                                            className={`lg:w-[90%] ${value
+                                                                ? "opacity-100"
+                                                                : "opacity-40"
+                                                                }`}
                                                             title={"Send"}
                                                             btnDisable={!value}
                                                             onClick={() => {
