@@ -46,22 +46,22 @@ export default function ConnectWallet(props: IConnectWallet) {
   };
   return (
     <>
-      <div className="w-full relative lg:pt-10">
+      <div className="w-full relative lg:pt-5">
         <div className="w-full text-center p-2 relative">
           <div className="mb-[30px] lg:mb-5">
-            <p className="text-sm md:text-lg font-bold leading-1 text-white/50 mb-6 md:mb-10">
+            <p className="text-sm md:text-lg font-bold leading-1 text-black mb-4 md:mb-5">
               STEP 1
             </p>
-            <p className="text-lg md:text-xl font-bold leading-1 text-white mb-3 md:mb-5 lg:mb-10">
+            <p className="text-lg md:text-xl font-bold leading-1 text-black mb-3 md:mb-5">
               Connect your wallet
             </p>
-            <p className="text-sm md:text-lg font-regular leading-1 md:leading-[32px] text-white/50 md:mb-10">
+            <p className="text-sm md:text-lg font-regular leading-1 md:leading-[32px] text-black md:mb-5">
               Enable access to your wallet to load <br /> your assets to the
               chest
             </p>
           </div>
           <Image
-            className="m-auto mb-[30px] lg:mb-5"
+            className="m-auto mb-[30px] lg:mb-5 w-[60%] md:w-[25%]"
             src={icons.tchest}
             alt="Chest"
           />
@@ -78,14 +78,14 @@ export default function ConnectWallet(props: IConnectWallet) {
             <div className="h-full flex flex-col items-center justify-center">
               <div className="spinnerLoader"></div>
 
-              <p className=" mt-5 opacity-50 mb-14 text-[16px] leading-14 text-white">
+              <p className=" mt-5 opacity-50 mb-14 text-[16px] leading-14 text-black">
                 Setting up Smart Account!
               </p>
             </div>
           ) : (
             <>
               {!showMsg ? (
-                <div className="flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto rounded-lg mt-10 mb-5">
+                <div className={`flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto rounded-lg mt-10 mb-5 custom-shadow-sm border border-black`}>
                   <button
                     className={`py-4 w-full rounded-lg bg-white flex gap-2 items-center justify-center max-w-[400px]`}
                     onClick={handleLensLogin}
@@ -95,7 +95,7 @@ export default function ConnectWallet(props: IConnectWallet) {
                       alt="lens login"
                       className="w-6 rounded-full"
                     />
-                    <span className="text-[16px] leading-1 font-medium text-black/50 self-center my-auto">
+                    <span className="text-[16px] leading-1 font-medium text-black self-center my-auto">
                       {"Sign in with Lens"}
                     </span>
                   </button>
@@ -103,21 +103,21 @@ export default function ConnectWallet(props: IConnectWallet) {
               ) : null}
               {!showMsg ? (
                 <div className="flex items-center justify-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto">
-                  <div className="border-t border-white/50 flex-grow"></div>
-                  <p className="text-white/50 mx-4">OR</p>
-                  <div className="border-t border-white/50 flex-grow"></div>
+                  <div className="border-t border-black/20 flex-grow"></div>
+                  <p className="text-black/80 mx-4">OR</p>
+                  <div className="border-t border-black/20 flex-grow"></div>
                 </div>
               ) : null}
-              <div className="flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto rounded-lg mt-5">
+              <div className={`flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto rounded-lg mt-5 p-4 ${showMsg ? "custom-shadow-sm border border-black" : ""}`}>
                 <>
                   {showMsg ? (
                     <div className="text-center">
-                      <p className="font-semibold text-[20px] text-white mb-4">
+                      <p className="font-semibold text-[20px] text-black mb-4">
                         Check your email!
                       </p>
-                      <p className="text-white/50 leading-[30px]">
+                      <p className="text-black/80 leading-[30px]">
                         We emailed a magic link to <br />
-                        <span className="text-white">{value}</span> <br />
+                        <span className="text-black font-semibold">{value}</span> <br />
                         Please click the link to continue.
                       </p>
                     </div>
@@ -126,11 +126,11 @@ export default function ConnectWallet(props: IConnectWallet) {
                       <input
                         name={"Enter email address"}
                         style={{
-                          caretColor: "white",
+                          caretColor: "black",
                         }}
                         inputMode="text"
                         type="string"
-                        className={`rounded-lg border border-gray-500 bg-white/5 p-2 cursor-pointer mb-5 pl-0 py-3 backdrop-blur-xl text-[14px] border-none text-center  text-white placeholder-white/40 block w-full focus:outline-none focus:ring-transparent`}
+                        className={`rounded-lg border border-black/80 bg-white/5 p-2 cursor-pointer mb-5 pl-0 py-3 backdrop-blur-xl text-[14px] text-center  text-black placeholder-black/20 block w-full focus:outline-none focus:ring-transparent`}
                         placeholder={"Enter your email address"}
                         value={value}
                         onChange={(e) => {
@@ -142,9 +142,8 @@ export default function ConnectWallet(props: IConnectWallet) {
                       />
                       <div className="my-4 cursor-pointer">
                         <PrimaryBtn
-                          className={`lg:w-[90%] ${
-                            value ? "opacity-100" : "opacity-40"
-                          }`}
+                          className={`lg:w-[90%] ${value ? "opacity-100" : "opacity-40"
+                            }`}
                           title={loading ? "Loading..." : "Signin"}
                           btnDisable={!value}
                           onClick={() => {

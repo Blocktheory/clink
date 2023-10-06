@@ -20,7 +20,7 @@ import qrWhite from "../../public/assets/images/qr_white.svg";
 import safeLogo from "../../public/assets/images/safe_logo.svg";
 import shareBtnIcon from "../../public/assets/images/share_btn_icon.svg";
 import shareBtnIconWhite from "../../public/assets/images/share_btn_icon_white.svg";
-import tchest from "../../public/assets/images/tchest.svg";
+import tchest from "../../public/assets/images/tchest.png";
 import tchestopen from "../../public/assets/images/tchestopen.svg";
 import telegramBlue from "../../public/assets/images/telegram_blue.svg";
 import tokensLoading from "../../public/assets/images/tokens_loading.png";
@@ -28,6 +28,7 @@ import transferIcon from "../../public/assets/images/transfer_icon.svg";
 import walletIcon from "../../public/assets/images/wallet_btn_image.svg";
 import x from "../../public/assets/images/x.svg";
 import lensLogo from "../../public/assets/images/lens_logo.png";
+import shareLinkTChest from "../../public/assets/images/share_link_tchest.svg"
 
 export type TImages =
   | "logo"
@@ -59,6 +60,7 @@ export type TImages =
   | "qrWhite"
   | "ethLogo"
   | "loadAvatar"
+  | "shareLinkTChest"
   | "lensLogo";
 
 export type TNextImage = {
@@ -98,4 +100,5 @@ export const icons: Record<TImages, TNextImage> = {
   qrWhite,
   loadAvatar,
   lensLogo,
+  shareLinkTChest,
 };

@@ -13,14 +13,15 @@ interface IPrimaryBtn {
     className?: string;
     btnDisable?: boolean;
     loading?: boolean;
+    shadowLarge?: boolean;
 }
 
 export default function PrimaryBtn(props: IPrimaryBtn) {
-    const { title, onClick, rightImage, showShareIcon, className, btnDisable, loading } =
+    const { title, onClick, rightImage, showShareIcon, className, btnDisable, loading, shadowLarge } =
         props;
     return (
         <button
-            className={`${className} py-4 btnBg support_text_bold rounded-lg flex gap-1 items-center w-full justify-center my-0 mx-auto max-w-[400px] `}
+            className={`py-4 btnBg support_text_bold rounded-lg flex gap-1 items-center w-full justify-center my-0 mx-auto max-w-[400px] border border-[#010101] text-[#010101] ${shadowLarge ? "custom-shadow-lg" : "custom-shadow-sm"} ${className ?? ""}`}
             onClick={onClick}
             disabled={btnDisable}
         >
