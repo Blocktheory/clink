@@ -75,11 +75,11 @@ export const ClaimBtnModal: FC<IClaimBtnModal> = (props) => {
                                     className={`bg-white/90 lg:min-w-[400px] rounded-[12px] self-center w-[60%] lg:w-[400px]  py-5`}
                                 >
                                     {open ? (
-                                        <div className="px-4">
+                                        <div className="px-4 relative">
                                             {openInput && (
-                                                <div className="absolute">
+                                                <div className="absolute -top-2 left-3">
                                                     <Image
-                                                        src={icons.backIcon}
+                                                        src={icons.backIconGrey}
                                                         alt="backIcon"
                                                         onClick={handleOpenInput}
                                                         className="cursor-pointer w-10 h-10"
@@ -135,7 +135,7 @@ export const ClaimBtnModal: FC<IClaimBtnModal> = (props) => {
                                                         }}
                                                         inputMode="text"
                                                         type="string"
-                                                        className={`rounded-lg border border-gray-500 bg-white/5 p-2 cursor-pointer mb-5 pl-0 pt-2 pb-1 backdrop-blur-xl text-[14px] border-none text-center  text-white placeholder-white/40 block w-full focus:outline-none focus:ring-transparent`}
+                                                        className={`rounded-lg border border-black bg-white p-2 cursor-pointer mb-5 pl-0 pt-2 pb-1 backdrop-blur-xl text-[14px] border-none text-center  text-black placeholder-black/25 block w-full focus:outline-none focus:ring-transparent`}
                                                         placeholder={"0xfc...71de"}
                                                         value={value}
                                                         onChange={(e) => {

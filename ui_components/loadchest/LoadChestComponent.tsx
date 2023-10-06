@@ -644,11 +644,9 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
               <div className="relative mt-10">
                 <div className={`flex gap-2 justify-between`}>
                   <PrimaryBtn
-                    className={`${
-                      !btnDisable && value ? "opacity-100" : "opacity-50"
-                    } !w-[45%] lg:w-[185px] max-w-[185px] !mx-0 ${
-                      btnDisable || !value ? "cursor-not-allowed" : ""
-                    }`}
+                    className={`${!btnDisable && value ? "opacity-100" : "opacity-50"
+                      } !w-[45%] lg:w-[185px] max-w-[185px] !mx-0 ${btnDisable || !value ? "cursor-not-allowed" : ""
+                      }`}
                     title={"Create Link"}
                     onClick={createWallet}
                     btnDisable={btnDisable || !value}
@@ -656,7 +654,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                   <div id="overlay-button" className="w-full lg:w-[185px] max-w-[185px]">
                     <SecondaryBtn
                       className={`w-full text-[#010101] max-w-[185px] mx-0`}
-                      title={"Buy Crypto"}
+                      title={"Buy"}
                       onClick={handleBuyCrypto}
                     />
                   </div>

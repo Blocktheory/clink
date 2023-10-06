@@ -1,4 +1,5 @@
 import backIcon from "../../public/assets/images/back_icon.png";
+import backIconGrey from "../../public/assets/images/back_icon_grey.png";
 import baseLogo from "../../public/assets/images/base_logo.svg";
 import profileCardBg from "../../public/assets/images/bg_card_topology.svg";
 import chevronRight from "../../public/assets/images/chevron_right.svg";
@@ -61,6 +62,7 @@ export type TImages =
   | "ethLogo"
   | "loadAvatar"
   | "shareLinkTChest"
+  | "backIconGrey"
   | "lensLogo";
 
 export type TNextImage = {
@@ -101,4 +103,5 @@ export const icons: Record<TImages, TNextImage> = {
   loadAvatar,
   lensLogo,
   shareLinkTChest,
+  backIconGrey,
 };
