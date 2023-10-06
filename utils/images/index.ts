@@ -1,4 +1,5 @@
 import backIcon from "../../public/assets/images/back_icon.png";
+import backIconGrey from "../../public/assets/images/back_icon_grey.png";
 import baseLogo from "../../public/assets/images/base_logo.svg";
 import profileCardBg from "../../public/assets/images/bg_card_topology.svg";
 import chevronRight from "../../public/assets/images/chevron_right.svg";
@@ -21,13 +22,13 @@ import safeLogo from "../../public/assets/images/safe_logo.svg";
 import shareBtnIcon from "../../public/assets/images/share_btn_icon.svg";
 import shareBtnIconWhite from "../../public/assets/images/share_btn_icon_white.svg";
 import tchest from "../../public/assets/images/tchest.png";
-import tchestopen from "../../public/assets/images/tchestopen.svg";
+import tchestopen from "../../public/assets/images/chest_open.svg";
 import telegramBlue from "../../public/assets/images/telegram_blue.svg";
 import tokensLoading from "../../public/assets/images/tokens_loading.png";
 import transferIcon from "../../public/assets/images/transfer_icon.svg";
 import walletIcon from "../../public/assets/images/wallet_btn_image.svg";
 import x from "../../public/assets/images/x.svg";
-import lensLogo from "../../public/assets/images/lens_logo.png";
+import lensLogo from "../../public/assets/images/lens_logo.svg";
 import shareLinkTChest from "../../public/assets/images/share_link_tchest.svg"
 
 export type TImages =
@@ -61,6 +62,7 @@ export type TImages =
   | "ethLogo"
   | "loadAvatar"
   | "shareLinkTChest"
+  | "backIconGrey"
   | "lensLogo";
 
 export type TNextImage = {
@@ -101,4 +103,5 @@ export const icons: Record<TImages, TNextImage> = {
   loadAvatar,
   lensLogo,
   shareLinkTChest,
+  backIconGrey,
 };

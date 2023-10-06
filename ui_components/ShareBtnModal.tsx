@@ -151,7 +151,7 @@ export const ShareBtnModal: FC<IClaimBtnModal> = (props) => {
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
                                 <Dialog.Panel
-                                    className={`bg-lightGray lg:min-w-[400px] rounded-[12px] w-full lg:w-[400px]  py-5`}
+                                    className={`bg-white/90 lg:min-w-[400px] rounded-[12px] lg:w-[400px] w-[60%] py-5`}
                                 >
                                     {open && showOptions ? (
                                         <div>
@@ -208,16 +208,15 @@ export const ShareBtnModal: FC<IClaimBtnModal> = (props) => {
                                                 </li>
                                             </ul>
                                             <div className="relative rounded-lg border border-black px-2 py-2 bg-white/20 flex items-center justify-between w-[95%] mx-auto">
-                                                <p className="font-medium text-[12px] text-white">
+                                                <p className="font-medium text-[12px] text-black">
                                                     {trimLink(url)}
                                                 </p>
                                                 <button
                                                     type="button"
-                                                    className={`font-bold text-[16px] border border-black py-2 min-w-[80px] rounded-[36px] ${
-                                                        color
-                                                            ? "bg-black text-white"
-                                                            : "bg-white text-black"
-                                                    }`}
+                                                    className={`font-bold text-[16px] border border-black py-2 min-w-[80px] rounded-[36px] ${color
+                                                        ? "bg-black text-white"
+                                                        : "bg-white text-black"
+                                                        }`}
                                                     onClick={(e) => copyToClipBoard(e)}
                                                 >
                                                     {copyText}

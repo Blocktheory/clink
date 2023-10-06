@@ -34,9 +34,9 @@ export default function SecondaryBtn(props: ISecondaryBtn) {
             disabled={btnDisable}
             onClick={onClick}
         >
-            {leftImage && !loading && <Image src={leftImage} alt="right-image" />}
+            {leftImage && !loading && <Image src={leftImage} alt="left-btn-image" />}
             {!loading && title}
-            {!loading && rightImage && <Image src={rightImage} alt="right-image" />}
+            {!loading && rightImage && <Image src={rightImage ?? ""} alt="right-image" className="w-3" />}
             {loading && (
                 <div className="bouncing-loader">
                     <div></div>

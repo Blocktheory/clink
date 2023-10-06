@@ -65,7 +65,7 @@ export const QrModal: FC<IQrModal> = (props) => {
                                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                             >
                                 <Dialog.Panel
-                                    className={`bg-lightGray lg:min-w-[400px] rounded-[12px] w-[50%] lg:w-[400px]  py-5`}
+                                    className={`bg-white/90 lg:min-w-[400px] self-center rounded-[12px] w-[50%] lg:w-[400px]  py-5`}
                                 >
                                     {open && showOptions ? (
                                         <div className="flex flex-col items-center justify-center">
@@ -77,16 +77,16 @@ export const QrModal: FC<IQrModal> = (props) => {
                                                     heightPx={240}
                                                 />
                                             </div>
-                                            <div className="w-fit mt-[15px] border-dashed border border-secondary-300 dark:border-secondaryDark-300 rounded-[10px] flex justify-center items-center md:items-center p-2">
+                                            <div className="w-fit mt-[15px] border bg-white border-black rounded-[10px] flex justify-center items-center md:items-center p-2">
                                                 <Link
                                                     href={`https://goerli.basescan.org/address/${address}`}
                                                     target="_blank"
-                                                    className="text-sm text-white pb-2 underline"
+                                                    className="text-sm text-black underline"
                                                 >{`${trimAddress(address)}`}</Link>
                                                 <Image
-                                                    src={icons.copyIconWhite}
+                                                    src={icons.copyBlack}
                                                     alt="copy address"
-                                                    className="w-5 ml-2 mb-1 cursor-pointer opacity-60 hover:opacity-100"
+                                                    className="w-3 ml-2 cursor-pointer opacity-100 hover:opacity-60"
                                                     onClick={copyToClipBoard}
                                                 />
                                             </div>

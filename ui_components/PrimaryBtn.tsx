@@ -7,7 +7,7 @@ import { icons } from "../utils/images";
 interface IPrimaryBtn {
     title: string;
     onClick: React.MouseEventHandler<HTMLButtonElement>;
-    leftImage?: Record<TImages, TNextImage>;
+    leftImage?: TNextImage | TImages | string;
     rightImage?: TNextImage | TImages | string;
     showShareIcon?: boolean;
     className?: string;
@@ -17,7 +17,7 @@ interface IPrimaryBtn {
 }
 
 export default function PrimaryBtn(props: IPrimaryBtn) {
-    const { title, onClick, rightImage, showShareIcon, className, btnDisable, loading, shadowLarge } =
+    const { title, onClick, rightImage, showShareIcon, className, btnDisable, loading, shadowLarge, leftImage } =
         props;
     return (
         <button
@@ -25,9 +25,10 @@ export default function PrimaryBtn(props: IPrimaryBtn) {
             onClick={onClick}
             disabled={btnDisable}
         >
+            {leftImage && !loading && <Image src={leftImage} alt="btn-left-image" className="w-5 h-5 rounded-full mr-2" />}
             {!loading && title}
             {rightImage && !loading ? (
-                <Image src={rightImage ?? ""} alt="right-image" />
+                <Image src={rightImage ?? ""} alt="right-image" className="w-5 h-5" />
             ) : null}
             {loading && (
                 <div className="bouncing-loader-black">

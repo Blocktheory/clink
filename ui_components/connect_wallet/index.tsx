@@ -4,7 +4,7 @@ import { THandleStep } from "../../pages";
 import { icons } from "../../utils/images";
 import SecondaryBtn from "../SecondaryBtn";
 import PrimaryBtn from "../PrimaryBtn";
-import { useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import OtpInput from "../OtpInput";
 
 interface IConnectWallet extends THandleStep {
@@ -46,22 +46,22 @@ export default function ConnectWallet(props: IConnectWallet) {
   };
   return (
     <>
-      <div className="w-full relative lg:pt-5">
+      <div className="w-full relative">
         <div className="w-full text-center p-2 relative">
-          <div className="mb-[30px] lg:mb-5">
-            <p className="text-sm md:text-lg font-bold leading-1 text-black mb-4 md:mb-5">
+          <div className="mb-4 lg:mb-5">
+            <p className="text-sm md:text-base font-bold leading-1 text-black mb-4 md:mb-4">
               STEP 1
             </p>
-            <p className="text-lg md:text-xl font-bold leading-1 text-black mb-3 md:mb-5">
+            <p className="text-md md:text-lg font-bold leading-1 text-black mb-3 md:mb-4">
               Connect your wallet
             </p>
-            <p className="text-sm md:text-lg font-regular leading-1 md:leading-[32px] text-black md:mb-5">
+            <p className="text-sm md:text-base font-regular leading-1 md:leading-[30px] text-black">
               Enable access to your wallet to load <br /> your assets to the
               chest
             </p>
           </div>
           <Image
-            className="m-auto mb-[30px] lg:mb-5 w-[60%] md:w-[25%]"
+            className="m-auto mb-[30px] lg:mb-5 w-[50%] md:w-[25%] lg:w-[20%]"
             src={icons.tchest}
             alt="Chest"
           />
@@ -85,30 +85,31 @@ export default function ConnectWallet(props: IConnectWallet) {
           ) : (
             <>
               {!showMsg ? (
-                <div className={`flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto rounded-lg mt-10 mb-5 custom-shadow-sm border border-black`}>
-                  <button
-                    className={`py-4 w-full rounded-lg bg-white flex gap-2 items-center justify-center max-w-[400px]`}
-                    onClick={handleLensLogin}
-                  >
-                    <Image
-                      src={icons.lensLogo}
-                      alt="lens login"
-                      className="w-6 rounded-full"
-                    />
-                    <span className="text-[16px] leading-1 font-medium text-black self-center my-auto">
-                      {"Sign in with Lens"}
-                    </span>
-                  </button>
-                </div>
+                // <div className={`flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto rounded-lg mt-10 mb-5 custom-shadow-sm border border-black`}>
+                //   <button
+                //     className={`py-4 w-full rounded-lg btnBg flex gap-2 items-center justify-center max-w-[400px]`}
+                //     onClick={handleLensLogin}
+                //   >
+                //     <Image
+                //       src={icons.lensLogo}
+                //       alt="lens login"
+                //       className="w-6 rounded-full"
+                //     />
+                //     <span className="text-[16px] leading-1 font-medium text-black self-center my-auto">
+                //       {"Sign in with Lens"}
+                //     </span>
+                //   </button>
+                // </div>
+                <PrimaryBtn title={"Sign in With Lens"} leftImage={icons.lensLogo} onClick={handleLensLogin} className="mb-4" />
               ) : null}
               {!showMsg ? (
-                <div className="flex items-center justify-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto">
+                <div className="flex items-center justify-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto mb-4">
                   <div className="border-t border-black/20 flex-grow"></div>
                   <p className="text-black/80 mx-4">OR</p>
                   <div className="border-t border-black/20 flex-grow"></div>
                 </div>
               ) : null}
-              <div className={`flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto rounded-lg mt-5 p-4 ${showMsg ? "custom-shadow-sm border border-black" : ""}`}>
+              <div className={`flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[400px] mx-auto rounded-lg ${showMsg ? "custom-shadow-sm border border-black" : ""}`}>
                 <>
                   {showMsg ? (
                     <div className="text-center">
@@ -122,7 +123,7 @@ export default function ConnectWallet(props: IConnectWallet) {
                       </p>
                     </div>
                   ) : (
-                    <div className="w-full">
+                    <div className="w-full mx-auto max-w-[400px]">
                       <input
                         name={"Enter email address"}
                         style={{
@@ -130,7 +131,7 @@ export default function ConnectWallet(props: IConnectWallet) {
                         }}
                         inputMode="text"
                         type="string"
-                        className={`rounded-lg border border-black/80 bg-white/5 p-2 cursor-pointer mb-5 pl-0 py-3 backdrop-blur-xl text-[14px] text-center  text-black placeholder-black/20 block w-full focus:outline-none focus:ring-transparent`}
+                        className={`rounded-lg border border-black/80 bg-white/5 p-2 cursor-pointer mb-4 pl-0 py-3 backdrop-blur-xl text-[14px] text-center  text-black placeholder-black/20 block w-full focus:outline-none focus:ring-transparent`}
                         placeholder={"Enter your email address"}
                         value={value}
                         onChange={(e) => {
@@ -141,10 +142,10 @@ export default function ConnectWallet(props: IConnectWallet) {
                         }
                       />
                       <div className="my-4 cursor-pointer">
-                        <PrimaryBtn
-                          className={`lg:w-[90%] ${value ? "opacity-100" : "opacity-40"
+                        <SecondaryBtn
+                          className={`${value ? "opacity-100" : "opacity-40"
                             }`}
-                          title={loading ? "Loading..." : "Signin"}
+                          title={loading ? "Loading..." : "Sign in with Magic Link"}
                           btnDisable={!value}
                           onClick={() => {
                             signIn(value);
