@@ -114,29 +114,32 @@ export default function Home() {
   });
 
   useEffect(() => {
-    if (loggedIn) {
-      console.log(profile, "profile");
-      console.log(profileerror, "profileerror");
-      console.log(wallet, "wallet");
-      console.log(walletLoading, "walletLoading");
-      console.log(profileLoading, "profileLoading");
-      if (profile !== null) {
-        dispatch({
-          type: ACTIONS.LOGGED_IN_VIA,
-          payload: LOGGED_IN.GOOGLE,
-        });
-        dispatch({
-          type: ACTIONS.SET_ADDRESS,
-          payload: address,
-        });
-        setWalletAddress(address ?? "");
-        setLoader(false);
-        saveToLocalStorage("address", address);
-        handleSteps(ESTEPS.THREE);
-      } else {
-        toast.info("Your wallet doesn't have lens account");
+    async function initLens() {
+      if (loggedIn) {
+        console.log(profile, "profile");
+        console.log(profileerror, "profileerror");
+        console.log(wallet, "wallet");
+        console.log(walletLoading, "walletLoading");
+        console.log(profileLoading, "profileLoading");
+        if (profile !== null) {
+          dispatch({
+            type: ACTIONS.LOGGED_IN_VIA,
+            payload: LOGGED_IN.GOOGLE,
+          });
+          dispatch({
+            type: ACTIONS.SET_ADDRESS,
+            payload: address,
+          });
+          setWalletAddress(address ?? "");
+          setLoader(false);
+          saveToLocalStorage("address", address);
+          handleSteps(ESTEPS.THREE);
+        } else {
+          toast.info("Your wallet doesn't have lens account");
+        }
       }
     }
+    initLens();
   }, [loggedIn]);
 
   const onLoginClick = async () => {
@@ -152,6 +155,7 @@ export default function Home() {
       await login({
         address: walletClient.account.address,
       });
+      await connectWithBiconomy(await connector?.getProvider(), "lens");
       setLoggedIn(true);
     }
   };
@@ -361,7 +365,7 @@ export default function Home() {
 
             const userMetadata = await magicSdk.user.getMetadata();
             saveToLocalStorage("email", userMetadata.email);
-            connectWithBiconomy(magicSdk.rpcProvider);
+            connectWithBiconomy(magicSdk.rpcProvider, "magic");
           } catch (e) {
             console.error(e);
           }
@@ -369,7 +373,7 @@ export default function Home() {
           console.log("came inside isloggedin");
           const userMetadata = await magicSdk.user.getMetadata();
           saveToLocalStorage("email", userMetadata.email);
-          connectWithBiconomy(magicSdk.rpcProvider);
+          connectWithBiconomy(magicSdk.rpcProvider, "magic");
         } else {
           setLoader(false);
         }
@@ -399,7 +403,7 @@ export default function Home() {
     });
   };
 
-  const connectWithBiconomy = async (rpcProvider: any) => {
+  const connectWithBiconomy = async (rpcProvider: any, logintype: string) => {
     setLoader(true);
     try {
       const web3Provider = new ethers.providers.Web3Provider(
@@ -428,6 +432,7 @@ export default function Home() {
         accountIndex: 0,
       });
       const scw = await wallet.getSmartAccountAddress();
+      console.log(scw, "new scw");
       dispatch({
         type: ACTIONS.LOGGED_IN_VIA,
         payload: LOGGED_IN.GOOGLE,
@@ -443,6 +448,7 @@ export default function Home() {
       setWalletAddress(scw ?? "");
       setLoader(false);
       saveToLocalStorage("address", scw);
+      saveToLocalStorage("loginType", logintype);
       handleSteps(ESTEPS.THREE);
     } catch (error) {
       setLoader(false);
@@ -453,10 +459,6 @@ export default function Home() {
 
   const connectMagicWallet = async (val: string) => {
     setSigninLoading(true);
-    // const login = magic.auth.loginWithEmailOTP({
-    //   email: val,
-    //   showUI: false,
-    // });
     const redirectURI = `${window.location.origin}`;
     const loginWithLink = magic.auth.loginWithMagicLink({
       email: val,
@@ -480,51 +482,6 @@ export default function Home() {
       .on("settled", () => {
         // is called when the Promise either resolves or rejects
       });
-    // setLoginItem(login);
-
-    // login
-    //   .on("email-otp-sent", () => {
-    //     // The email has been sent to the user
-    //     console.log("OTP sent");
-    //     setSigninLoading(false);
-    //     toast.success("OTP sent!");
-    //     setShowOtp(true);
-    //   })
-    //   .on("invalid-email-otp", () => {
-    //     login.emit("cancel");
-    //   })
-    //   .on("done", (result: any) => {
-    //     // is called when the Promise resolves
-    //     // convey login success to user
-    //     setProvider(magic.wallet.getProvider());
-    //     console.log(result, "success");
-    //     getAccounts()
-    //       .then((res: any) => {
-    //         setLoader(false);
-    //         console.log(res, "address is what");
-    //         dispatch({
-    //           type: ACTIONS.LOGGED_IN_VIA,
-    //           payload: LOGGED_IN.GOOGLE,
-    //         });
-    //         dispatch({
-    //           type: ACTIONS.SET_ADDRESS,
-    //           payload: res,
-    //         });
-    //         setWalletAddress(res);
-    //       })
-    //       .catch((e) => {
-    //         console.log(e, "error");
-    //       });
-    //     DID Token returned in result
-    //     const didToken = result;
-    //   })
-    //   .on("error", (reason: any) => {
-    //     setSigninLoading(false);
-    //     console.error(reason, "errorqw");
-    //   })
-    //   .on("settled", () => {
-    //     // is called when the Promise either resolves or rejects
-    //   });
   };
 
   const getUIComponent = (step: number) => {
