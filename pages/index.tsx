@@ -53,7 +53,7 @@ import {
   DEFAULT_ENTRYPOINT_ADDRESS,
 } from "@biconomy/account";
 import { ethers } from "ethers";
-import { saveToLocalStorage } from "../utils";
+import { getFromLocalStorage, saveToLocalStorage } from "../utils";
 import { useRouter } from "next/router";
 
 export type THandleStep = {
@@ -68,6 +68,8 @@ export enum ESTEPS {
 export enum LOGGED_IN {
   GOOGLE = "google",
   EXTERNAL_WALLET = "external_wallet",
+  MAGIC = "magic",
+  LENS = "lens",
 }
 
 export default function Home() {
@@ -122,18 +124,18 @@ export default function Home() {
         console.log(walletLoading, "walletLoading");
         console.log(profileLoading, "profileLoading");
         if (profile !== null) {
-          dispatch({
-            type: ACTIONS.LOGGED_IN_VIA,
-            payload: LOGGED_IN.GOOGLE,
-          });
-          dispatch({
-            type: ACTIONS.SET_ADDRESS,
-            payload: address,
-          });
-          setWalletAddress(address ?? "");
-          setLoader(false);
-          saveToLocalStorage("address", address);
-          handleSteps(ESTEPS.THREE);
+          // dispatch({
+          //   type: ACTIONS.LOGGED_IN_VIA,
+          //   payload: LOGGED_IN.LENS,
+          // });
+          // dispatch({
+          //   type: ACTIONS.SET_ADDRESS,
+          //   payload: address,
+          // });
+          // setWalletAddress(address ?? "");
+          // setLoader(false);
+          // saveToLocalStorage("address", address);
+          // handleSteps(ESTEPS.THREE);
         } else {
           toast.info("Your wallet doesn't have lens account");
         }
@@ -155,9 +157,36 @@ export default function Home() {
       await login({
         address: walletClient.account.address,
       });
-      await connectWithBiconomy(await connector?.getProvider(), "lens");
+      const prov = await connector?.getProvider();
+      saveToLocalStorage("lensProvider", prov);
+      await connectWithBiconomy(prov, LOGGED_IN.LENS);
       setLoggedIn(true);
     }
+  };
+
+  const handleDisconnect = async () => {
+    if (isConnected) {
+      await disconnectAsync();
+    }
+    // await logout();
+    await disconnect();
+    saveToLocalStorage("loginType", "");
+    localStorage.removeItem("isGoogleLogin");
+    localStorage.removeItem("isConnected");
+    handleSteps(ESTEPS.ONE);
+    setWalletAddress("");
+    dispatch({
+      type: ACTIONS.LOGOUT,
+      payload: "",
+    });
+    dispatch({
+      type: ACTIONS.LOGGED_IN_VIA,
+      payload: "",
+    });
+    dispatch({
+      type: ACTIONS.SET_ADDRESS,
+      payload: "",
+    });
   };
 
   useEffect(() => {
@@ -347,6 +376,8 @@ export default function Home() {
 
   useEffect(() => {
     async function initMagic() {
+      const loggedInVia = getFromLocalStorage("loginType");
+      const add = getFromLocalStorage("address");
       if (window !== undefined) {
         console.log(window.location.origin, "window.location.origin");
         console.log("came inside if");
@@ -362,10 +393,9 @@ export default function Home() {
           console.log("came inside callback");
           try {
             await magicSdk.auth.loginWithCredential();
-
             const userMetadata = await magicSdk.user.getMetadata();
             saveToLocalStorage("email", userMetadata.email);
-            connectWithBiconomy(magicSdk.rpcProvider, "magic");
+            connectWithBiconomy(magicSdk.rpcProvider, LOGGED_IN.MAGIC);
           } catch (e) {
             console.error(e);
           }
@@ -373,7 +403,10 @@ export default function Home() {
           console.log("came inside isloggedin");
           const userMetadata = await magicSdk.user.getMetadata();
           saveToLocalStorage("email", userMetadata.email);
-          connectWithBiconomy(magicSdk.rpcProvider, "magic");
+          connectWithBiconomy(magicSdk.rpcProvider, LOGGED_IN.MAGIC);
+        } else if (loggedInVia && loggedInVia === LOGGED_IN.LENS && add) {
+          const { connector } = await connectAsync();
+          connectWithBiconomy(await connector?.getProvider(), LOGGED_IN.LENS);
         } else {
           setLoader(false);
         }
@@ -403,7 +436,10 @@ export default function Home() {
     });
   };
 
-  const connectWithBiconomy = async (rpcProvider: any, logintype: string) => {
+  const connectWithBiconomy = async (
+    rpcProvider: any,
+    logintype: LOGGED_IN
+  ) => {
     setLoader(true);
     try {
       const web3Provider = new ethers.providers.Web3Provider(
@@ -435,7 +471,7 @@ export default function Home() {
       console.log(scw, "new scw");
       dispatch({
         type: ACTIONS.LOGGED_IN_VIA,
-        payload: LOGGED_IN.GOOGLE,
+        payload: logintype,
       });
       dispatch({
         type: ACTIONS.SET_ADDRESS,
@@ -551,7 +587,7 @@ export default function Home() {
     <>
       <Header
         walletAddress={walletAddress}
-        signIn={signIn}
+        signIn={onLoginClick}
         step={step}
         handleSteps={handleSteps}
         onHamburgerClick={onHamburgerClick}
@@ -559,6 +595,7 @@ export default function Home() {
         setWalletAddress={setWalletAddress}
         loader={loader}
         initLoader={initLoader}
+        handleDisconnect={handleDisconnect}
       />
       <div className="p-4 relative">
         <ToastContainer
