@@ -4,11 +4,7 @@ import AccountAbstraction from "@safe-global/account-abstraction-kit-poc";
 import { EthersAdapter } from "@safe-global/protocol-kit";
 import { SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
 import { GelatoRelayPack } from "@safe-global/relay-kit";
-import {
-  MetaTransactionData,
-  MetaTransactionOptions,
-  OperationType,
-} from "@safe-global/safe-core-sdk-types";
+import { MetaTransactionData, MetaTransactionOptions, OperationType } from "@safe-global/safe-core-sdk-types";
 import { initWasm } from "@trustwallet/wallet-core";
 import { serializeError } from "eth-rpc-errors";
 import { ethers } from "ethers";
@@ -22,22 +18,11 @@ import { ToastContainer } from "react-toastify";
 import ReactTyped from "react-typed";
 import { parseEther } from "viem";
 
-import {
-  getBalance,
-  getRelayTransactionStatus,
-  getSendTransactionStatus,
-  getUsdPrice,
-} from "../../apiServices";
+import { getBalance, getRelayTransactionStatus, getSendTransactionStatus, getUsdPrice } from "../../apiServices";
 import { GlobalContext } from "../../context/GlobalContext";
 import { LOGGED_IN, THandleStep } from "../../pages";
 import * as loaderAnimation from "../../public/lottie/loader.json";
-import {
-  encodeAddress,
-  getCurrencyFormattedNumber,
-  getTokenFormattedNumber,
-  getTokenValueFormatted,
-  hexToNumber,
-} from "../../utils";
+import { encodeAddress, getCurrencyFormattedNumber, getTokenFormattedNumber, getTokenValueFormatted, hexToNumber } from "../../utils";
 import { BaseGoerli } from "../../utils/chain/baseGoerli";
 import { icons } from "../../utils/images";
 import { useWagmi } from "../../utils/wagmi/WagmiContext";
@@ -46,23 +31,11 @@ import PrimaryBtn from "../PrimaryBtn";
 import SecondaryBtn from "../SecondaryBtn";
 import DepositAmountModal from "./DepositAmountModal";
 import { ProfileCard } from "./ProfileCard";
-import {
-  GateFiEventTypes,
-  GateFiDisplayModeEnum,
-  GateFiSDK,
-} from "@gatefi/js-sdk";
+import { GateFiEventTypes, GateFiDisplayModeEnum, GateFiSDK } from "@gatefi/js-sdk";
 import { IPaymaster, BiconomyPaymaster } from "@biconomy/paymaster";
 import { IBundler, Bundler } from "@biconomy/bundler";
-import {
-  BiconomySmartAccount,
-  BiconomySmartAccountV2,
-  DEFAULT_ENTRYPOINT_ADDRESS,
-} from "@biconomy/account";
-import {
-  IHybridPaymaster,
-  PaymasterMode,
-  SponsorUserOperationDto,
-} from "@biconomy/paymaster";
+import { BiconomySmartAccount, BiconomySmartAccountV2, DEFAULT_ENTRYPOINT_ADDRESS } from "@biconomy/account";
+import { IHybridPaymaster, PaymasterMode, SponsorUserOperationDto } from "@biconomy/paymaster";
 
 export interface ILoadChestComponent {
   provider?: any;
@@ -91,12 +64,8 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
   const [balanceInUsd, setBalanceInUsd] = useState("");
   const [showActivity, setShowActivity] = useState(false);
   const [chestLoadingText, setChestLoadingText] = useState("");
-  const ethersProvider = new ethers.providers.JsonRpcProvider(
-    BaseGoerli.info.rpc
-  );
-  const relayPack = new GelatoRelayPack(
-    process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY
-  );
+  const ethersProvider = new ethers.providers.JsonRpcProvider(BaseGoerli.info.rpc);
+  const relayPack = new GelatoRelayPack(process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY);
   const isRelayInitiated = useRef(false);
   const handleToggle = () => {
     setToggle(!toggle);
@@ -128,16 +97,8 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         setTokenPrice(res.data.ethereum.usd);
         setFromAddress(address);
         const balance = (await getBalance(address)) as any;
-        setTokenValue(
-          getTokenFormattedNumber(
-            hexToNumber(balance.result) as unknown as string,
-            18
-          )
-        );
-        const formatBal = (
-          (hexToNumber(balance.result) / Math.pow(10, 18)) *
-          res.data.ethereum.usd
-        ).toFixed(3);
+        setTokenValue(getTokenFormattedNumber(hexToNumber(balance.result) as unknown as string, 18));
+        const formatBal = ((hexToNumber(balance.result) / Math.pow(10, 18)) * res.data.ethereum.usd).toFixed(3);
         setPrice(getCurrencyFormattedNumber(formatBal));
         setBalanceInUsd(formatBal);
         setLoading(false);
@@ -187,13 +148,11 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     setChestLoadingText("Setting up destination signer and address");
 
     const paymaster = new BiconomyPaymaster({
-      paymasterUrl:
-        "https://paymaster.biconomy.io/api/v1/84531/76v47JPQ6.7a881a9f-4cec-45e0-95e9-c39c71ca54f4",
+      paymasterUrl: "https://paymaster.biconomy.io/api/v1/84531/76v47JPQ6.7a881a9f-4cec-45e0-95e9-c39c71ca54f4",
     });
 
     const bundler: IBundler = new Bundler({
-      bundlerUrl:
-        "https://bundler.biconomy.io/api/v2/84531/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44",
+      bundlerUrl: "https://bundler.biconomy.io/api/v2/84531/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44",
       chainId: 84531,
       entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
     });
@@ -208,7 +167,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     });
     const scw = await biWallet.getSmartAccountAddress();
     const destinatinoHash = encodeAddress(scw);
-    const fullHash = payData.link + "|" + destinatinoHash;
+    const fullHash = payData.link + "~" + destinatinoHash;
     setLinkHash(fullHash);
     setDestinationAddress(scw);
     console.log(scw, "smart address");
@@ -232,7 +191,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     // );
     // setDestinationAddress(destinationAdd);
     // const destinatinoHash = encodeAddress(destinationAdd);
-    // const fullHash = payData.link + "|" + destinatinoHash;
+    // const fullHash = payData.link + "~" + destinatinoHash;
     // setLinkHash(fullHash);
     // setChestLoadingText("Safe contract created");
     // const fromEthProvider = new ethers.providers.Web3Provider(provider);
@@ -260,8 +219,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
       let partialUserOp = await smartAccount.buildUserOp([tx]);
       console.log(partialUserOp, "partialUserOp");
       setChestLoadingText("Setting up smart account...");
-      const biconomyPaymaster =
-        smartAccount.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
+      const biconomyPaymaster = smartAccount.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
       console.log(biconomyPaymaster, "biconomyPaymaster");
       let paymasterServiceData: SponsorUserOperationDto = {
         mode: PaymasterMode.SPONSORED,
@@ -271,29 +229,19 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
 
       try {
         setChestLoadingText("Setting up paymaster...");
-        const paymasterAndDataResponse =
-          await biconomyPaymaster.getPaymasterAndData(
-            partialUserOp,
-            paymasterServiceData
-          );
+        const paymasterAndDataResponse = await biconomyPaymaster.getPaymasterAndData(partialUserOp, paymasterServiceData);
         console.log(paymasterAndDataResponse, "paymasterAndDataResponse");
-        partialUserOp.paymasterAndData =
-          paymasterAndDataResponse.paymasterAndData;
+        partialUserOp.paymasterAndData = paymasterAndDataResponse.paymasterAndData;
 
         const userOpResponse = await smartAccount.sendUserOp(partialUserOp);
         console.log(userOpResponse, "userOpResponse");
         const transactionDetails = await userOpResponse.wait();
         console.log(transactionDetails, "transactionDetails");
-        setExplorerUrl(
-          `https://goerli.basescan.org/tx/${transactionDetails.receipt.transactionHash}`
-        );
+        setExplorerUrl(`https://goerli.basescan.org/tx/${transactionDetails.receipt.transactionHash}`);
         console.log(transactionDetails.receipt.transactionHash, "tx hash");
         setChestLoadingText("Success! Transaction Processed");
         setIsSucceed(true);
-        handleTransactionStatus(
-          transactionDetails.receipt.transactionHash,
-          linkHash
-        );
+        handleTransactionStatus(transactionDetails.receipt.transactionHash, linkHash);
         setChestLoadingText("Transaction Submitted!");
 
         // router.push(linkHash);
@@ -499,11 +447,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     <div className="mx-auto relative max-w-[400px]">
       {!transactionLoading ? (
         <div>
-          <ProfileCard
-            balance={price}
-            showActivity={false}
-            transactionLoading={loader}
-          ></ProfileCard>
+          <ProfileCard balance={price} showActivity={false} transactionLoading={loader}></ProfileCard>
 
           {!showActivity ? (
             <>
@@ -512,12 +456,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                   <div>
                     <p className="text-[#010101] paragraph">YOUR BALANCE</p>
                     <div className="flex items-start gap-3 my-2">
-                      <Image
-                        src={icons.transferIcon}
-                        alt="transferIcon"
-                        onClick={handleToggle}
-                        className="cursor-pointer"
-                      />
+                      <Image src={icons.transferIcon} alt="transferIcon" onClick={handleToggle} className="cursor-pointer" />
                       {toggle ? (
                         loading || loader ? (
                           <div className="w-full h-full">
@@ -526,12 +465,8 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                           </div>
                         ) : (
                           <div>
-                            <p className="text-[#010101] text-2xl font-semibold leading-10 mb-2">
-                              {price}
-                            </p>
-                            <p className="text-[#010101] text-xs leading-[14px]">
-                              {tokenValue} ETH
-                            </p>
+                            <p className="text-[#010101] text-2xl font-semibold leading-10 mb-2">{price}</p>
+                            <p className="text-[#010101] text-xs leading-[14px]">{tokenValue} ETH</p>
                           </div>
                         )
                       ) : loading ? (
@@ -541,31 +476,15 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                         </div>
                       ) : (
                         <div>
-                          <p className="text-[#010101] text-2xl font-semibold leading-10 mb-2">
-                            ~ {tokenValue} ETH
-                          </p>
-                          <p className="text-[#010101] text-xs leading-[14px]">
-                            {price}
-                          </p>
+                          <p className="text-[#010101] text-2xl font-semibold leading-10 mb-2">~ {tokenValue} ETH</p>
+                          <p className="text-[#010101] text-xs leading-[14px]">{price}</p>
                         </div>
                       )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Image
-                      src={
-                        !loading && !loader ? icons.ethLogo : icons.loadAvatar
-                      }
-                      className="w-8 h-8"
-                      alt="transferIcon"
-                    />
-                    {!loading && !loader ? (
-                      <p className="text-[#010101] text-2xl font-normal leading-9">
-                        ETH
-                      </p>
-                    ) : (
-                      <div className="w-10 h-3 my-2 animate-pulse bg-white/10 rounded-lg mx-auto"></div>
-                    )}
+                    <Image src={!loading && !loader ? icons.ethLogo : icons.loadAvatar} className="w-8 h-8" alt="transferIcon" />
+                    {!loading && !loader ? <p className="text-[#010101] text-2xl font-normal leading-9">ETH</p> : <div className="w-10 h-3 my-2 animate-pulse bg-white/10 rounded-lg mx-auto"></div>}
                   </div>
                 </div>
                 <div
@@ -575,9 +494,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                     setOpen(true);
                   }}
                 >
-                  <p className="text-[#010101] text-sm leading-[18px] font-medium text-center">
-                    + Add funds to your account
-                  </p>
+                  <p className="text-[#010101] text-sm leading-[18px] font-medium text-center">+ Add funds to your account</p>
                 </div>
               </div>
               <div className="w-full mt-5 ">
@@ -598,16 +515,10 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                             handleInputChange(e.target.value);
                           }}
                           disabled={loading}
-                          onWheel={() =>
-                            (document.activeElement as HTMLElement).blur()
-                          }
+                          onWheel={() => (document.activeElement as HTMLElement).blur()}
                         />
                       </div>
-                      {Number(inputValue) > 0 && (
-                        <p className="text-[#010101] text-sm leading-[14px] text-center">
-                          ~ {inputValue} ETH
-                        </p>
-                      )}
+                      {Number(inputValue) > 0 && <p className="text-[#010101] text-sm leading-[14px] text-center">~ {inputValue} ETH</p>}
                     </div>
                   </div>
                 </div>
@@ -643,20 +554,9 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
               </div>
               <div className="relative mt-10">
                 <div className={`flex gap-2 justify-between`}>
-                  <PrimaryBtn
-                    className={`${!btnDisable && value ? "opacity-100" : "opacity-50"
-                      } !w-[45%] lg:w-[185px] max-w-[185px] !mx-0 ${btnDisable || !value ? "cursor-not-allowed" : ""
-                      }`}
-                    title={"Create Link"}
-                    onClick={createWallet}
-                    btnDisable={btnDisable || !value}
-                  />
+                  <PrimaryBtn className={`${!btnDisable && value ? "opacity-100" : "opacity-50"} !w-[45%] lg:w-[185px] max-w-[185px] !mx-0 ${btnDisable || !value ? "cursor-not-allowed" : ""}`} title={"Create Link"} onClick={createWallet} btnDisable={btnDisable || !value} />
                   <div id="overlay-button" className="w-full lg:w-[185px] max-w-[185px]">
-                    <SecondaryBtn
-                      className={`w-full text-[#010101] max-w-[185px] mx-0`}
-                      title={"Buy"}
-                      onClick={handleBuyCrypto}
-                    />
+                    <SecondaryBtn className={`w-full text-[#010101] max-w-[185px] mx-0`} title={"Buy"} onClick={handleBuyCrypto} />
                   </div>
                 </div>
               </div>
@@ -665,22 +565,11 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         </div>
       ) : (
         <div className="w-[full] max-w-[600px] h-full relative flex flex-col text-center items-center gap-5 mx-auto mt-20">
-          <ReactTyped
-            className="text-black text-[24px]"
-            strings={[chestLoadingText]}
-            typeSpeed={40}
-            loop={true}
-          />
+          <ReactTyped className="text-black text-[24px]" strings={[chestLoadingText]} typeSpeed={40} loop={true} />
           <Lottie animationData={loaderAnimation} />
         </div>
       )}
-      <DepositAmountModal
-        open={open}
-        setOpen={setOpen}
-        walletAddress={fromAddress}
-        tokenPrice={tokenPrice}
-        fetchBalance={fetchBalance}
-      />
+      <DepositAmountModal open={open} setOpen={setOpen} walletAddress={fromAddress} tokenPrice={tokenPrice} fetchBalance={fetchBalance} />
       {/* <div className="w-[400px] h-[400px] absolute -top-[200px] -right-[200px] -z-[10] bg-[#28D799] opacity-20 blur-[62px] rounded-full"></div> */}
     </div>
   );

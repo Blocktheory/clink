@@ -87,7 +87,7 @@ export const QRComponent: FC<IQRComponent> = (props) => {
         },
         dotsOptions: {
             type: "extra-rounded",
-            color: "#FFFFFF",
+            color: "#000000",
         },
         // imageOptions: {
         //     hideBackgroundDots: true,
@@ -96,7 +96,7 @@ export const QRComponent: FC<IQRComponent> = (props) => {
         //     crossOrigin: "anonymous",
         // },
         backgroundOptions: {
-            color: "#2B2D30",
+            color: "#FFFF",
         },
     });
     const [showcopyText, setShowCopyText] = useState(false);
@@ -123,7 +123,7 @@ export const QRComponent: FC<IQRComponent> = (props) => {
     };
     return (
         <div>
-            <p className="text-white text-[20px] text-center m-2">
+            <p className="text-black text-[20px] text-center m-2">
                 {!isShareQr
                     ? "You can deposit crypto into your account via address"
                     : null}
@@ -133,13 +133,13 @@ export const QRComponent: FC<IQRComponent> = (props) => {
             {!isShareQr ? (
                 <div>
                     <div className="flex items-center justify-center">
-                        <div className="w-fit border-dashed border border-secondary-300 dark:border-secondaryDark-300 rounded-[10px] flex justify-center items-start md:items-center p-2">
-                            <div className=" text-black text-[14px] break-all">
+                        <div className="bg-black w-fit border-dashed border border-secondary-300 dark:border-secondaryDark-300 rounded-[10px] flex justify-center items-start md:items-center p-2">
+                            <div className=" text-white text-[14px] break-all">
                                 {trimAddress(walletAddress)}
                             </div>
                             <button className="ml-1 w-6 h-6" onClick={() => handleCopy()}>
                                 <Image
-                                    src={icons.copyBlack}
+                                    src={icons.copyIconWhite}
                                     alt="copyIcon"
                                     className="w-4 h-full"
                                 />
@@ -147,7 +147,7 @@ export const QRComponent: FC<IQRComponent> = (props) => {
                         </div>
                     </div>
                     {showcopyText && (
-                        <p className="text-white text-[14px] text-center mt-2">Copied!</p>
+                        <p className="text-black text-[14px] text-center mt-2">Copied!</p>
                     )}
                 </div>
             ) : null}

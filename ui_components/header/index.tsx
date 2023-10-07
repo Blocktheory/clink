@@ -105,7 +105,7 @@ const Header = (props: IHeader) => {
                         <div className="flex gap-1 pl-2">
                             <Image src={icons.logo2} alt="logo" className="w-10" />
                             <p className="text-[16px] font-bold text-white self-center">
-                                Clink
+                                Micropay
                             </p>
                         </div>
                     ) : (
@@ -209,8 +209,9 @@ const Header = (props: IHeader) => {
                                                     >
                                                         <div className="flex gap-2 items-center">
                                                             <Image
-                                                                src={icons.googleIcon}
-                                                                alt="login with google"
+                                                                src={icons.lensLogo}
+                                                                className="w-8"
+                                                                alt="login with lens"
                                                             />
                                                             <p className="text-black">
                                                                 Login with Lens

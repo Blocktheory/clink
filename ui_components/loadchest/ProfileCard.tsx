@@ -80,11 +80,11 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
                 </div>
                 <Link href={"https://safe.global/"} target="_blank">
                     <p className="inline text-[10px] text-white/80">Powered by: </p>
-                    {/* <Image
-                        src={icons.safeLogo}
+                    <Image
+                        src={icons.bicoLogo}
                         alt="safe logo"
-                        className="w-10 inline-block"
-                    /> */}
+                        className="w-20 inline-block"
+                    />
                 </Link>
 
                 {/* {showActivity ? (
