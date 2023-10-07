@@ -23,20 +23,15 @@ export default function ConnectWallet(props: IConnectWallet) {
   const [enableVerifyBtn, setEnableVerifyBtn] = useState(false);
 
   const onChange = (val: string) => {
-    console.log(val, "value");
     setOtp(val);
   };
 
   useEffect(() => {
-    // This effect runs after each render when 'otp' changes.
-    console.log(otp.length, "otp");
 
     // Check the length and set 'enableVerifyBtn' accordingly.
     if (otp.trim().length === 6) {
-      console.log("came to if");
       setEnableVerifyBtn(true);
     } else {
-      console.log("came to else");
       setEnableVerifyBtn(false);
     }
   }, [otp]);

@@ -170,36 +170,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     const fullHash = payData.link + "~" + destinatinoHash;
     setLinkHash(fullHash);
     setDestinationAddress(scw);
-    console.log(scw, "smart address");
-
-    // const destinationSigner = new ethers.Wallet(payData.key, ethersProvider);
-    // const destinationEOAAddress = await destinationSigner.getAddress();
-    // const ethAdapter = new EthersAdapter({
-    //   ethers,
-    //   signerOrProvider: destinationSigner,
-    // });
-    // setChestLoadingText("Creating safe contract for chest");
-    // const safeFactory = await SafeFactory.create({
-    //   ethAdapter: ethAdapter,
-    // });
-    // const safeAccountConfig: SafeAccountConfig = {
-    //   owners: [destinationEOAAddress],
-    //   threshold: 1,
-    // };
-    // const destinationAdd = await safeFactory.predictSafeAddress(
-    //   safeAccountConfig
-    // );
-    // setDestinationAddress(destinationAdd);
-    // const destinatinoHash = encodeAddress(destinationAdd);
-    // const fullHash = payData.link + "~" + destinatinoHash;
-    // setLinkHash(fullHash);
-    // setChestLoadingText("Safe contract created");
-    // const fromEthProvider = new ethers.providers.Web3Provider(provider);
-    // const fromSigner = await fromEthProvider.getSigner();
-    // const safeAccountAbs = new AccountAbstraction(fromSigner);
-    // await safeAccountAbs.init({ relayPack });
-    // safeAccountAbstraction.current = safeAccountAbs;
-    // isRelayInitiated.current = true;
   };
 
   const createWallet = async () => {
@@ -214,31 +184,23 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         value: amount,
         data,
       };
-      console.log(tx, "tx");
       const smartAccount = biconomyWallet;
       let partialUserOp = await smartAccount.buildUserOp([tx]);
-      console.log(partialUserOp, "partialUserOp");
       setChestLoadingText("Setting up smart account...");
       const biconomyPaymaster = smartAccount.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
-      console.log(biconomyPaymaster, "biconomyPaymaster");
       let paymasterServiceData: SponsorUserOperationDto = {
         mode: PaymasterMode.SPONSORED,
         // optional params...
       };
-      console.log(paymasterServiceData, "paymasterServiceData");
 
       try {
         setChestLoadingText("Setting up paymaster...");
         const paymasterAndDataResponse = await biconomyPaymaster.getPaymasterAndData(partialUserOp, paymasterServiceData);
-        console.log(paymasterAndDataResponse, "paymasterAndDataResponse");
         partialUserOp.paymasterAndData = paymasterAndDataResponse.paymasterAndData;
 
         const userOpResponse = await smartAccount.sendUserOp(partialUserOp);
-        console.log(userOpResponse, "userOpResponse");
         const transactionDetails = await userOpResponse.wait();
-        console.log(transactionDetails, "transactionDetails");
         setExplorerUrl(`https://goerli.basescan.org/tx/${transactionDetails.receipt.transactionHash}`);
-        console.log(transactionDetails.receipt.transactionHash, "tx hash");
         setChestLoadingText("Success! Transaction Processed");
         setIsSucceed(true);
         handleTransactionStatus(transactionDetails.receipt.transactionHash, linkHash);
@@ -248,59 +210,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
       } catch (error) {
         console.error("Error executing transaction:", error);
       }
-      // try {
-      //   if (loggedInVia === LOGGED_IN.GOOGLE) {
-      //     if (isRelayInitiated.current) {
-      //       setChestLoadingText("Transaction process has begun...");
-
-      //       const safeTransactionData: MetaTransactionData = {
-      //         to: destinationAddress,
-      //         data: "0x",
-      //         value: parseEther(inputValue).toString(),
-      //         operation: OperationType.Call,
-      //       };
-
-      //       const options: MetaTransactionOptions = {
-      //         gasLimit: "100000",
-      //         isSponsored: true,
-      //       };
-
-      //       const gelatoTaskId =
-      //         await safeAccountAbstraction?.current?.relayTransaction(
-      //           [safeTransactionData],
-      //           options
-      //         );
-      //       if (gelatoTaskId) {
-      //         setChestLoadingText(
-      //           "Transaction on its way! Awaiting confirmation..."
-      //         );
-      //         handleTransactionStatus(gelatoTaskId, linkHash);
-      //       }
-      //     } else {
-      //       await handleInitWallet();
-      //       createWallet();
-      //       return;
-      //     }
-      //   } else {
-      //     try {
-      //       const sendAmount = await sendTransaction({
-      //         to: destinationAddress,
-      //         value: parseEther(inputValue),
-      //       });
-      //       handleTransactionStatus(sendAmount.hash, linkHash);
-      //     } catch (e: any) {
-      //       setTransactionLoading(false);
-      //       const err = serializeError(e);
-      //       toast.error(err.message);
-      //       console.log(e, "error");
-      //     }
-      //   }
-      // } catch (e: any) {
-      //   setTransactionLoading(false);
-      //   const err = serializeError(e);
-      //   toast.error(err.message);
-      //   console.log(e, "e");
-      // }
     }
   };
 
@@ -370,74 +279,6 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
         });
     }, intervalInMilliseconds);
   };
-
-  // const handleTransactionStatus = (hash: string, link: string) => {
-  //   const intervalInMilliseconds = 1000;
-  //   const interval = setInterval(() => {
-  //     if (loggedInVia === LOGGED_IN.GOOGLE) {
-  //       getRelayTransactionStatus(hash)
-  //         .then((res: any) => {
-  //           if (res) {
-  //             console.log(res, "res");
-  //             const task = res.data.task;
-  //             if (task) {
-  //               setChestLoadingText("Verifying Transaction Status...");
-  //               if (task.taskState === "ExecSuccess") {
-  //                 setChestLoadingText(
-  //                   "Operation Successful: Transaction Completed!"
-  //                 );
-  //                 router.push(link);
-  //                 if (interval !== null) {
-  //                   clearInterval(interval);
-  //                 }
-  //               }
-  //             } else {
-  //               setTransactionLoading(false);
-  //               toast.error("Failed to Load Chest. Try Again");
-  //               if (interval !== null) {
-  //                 clearInterval(interval);
-  //               }
-  //             }
-  //           }
-  //         })
-  //         .catch((e) => {
-  //           setTransactionLoading(false);
-  //           toast.error(e.message);
-  //           console.log(e, "e");
-  //           if (interval !== null) {
-  //             clearInterval(interval);
-  //           }
-  //         });
-  //     } else {
-  //       getSendTransactionStatus(hash)
-  //         .then((res: any) => {
-  //           if (res.result) {
-  //             const status = Number(res.result.status);
-  //             if (status === 1) {
-  //               router.push(link);
-  //               if (interval !== null) {
-  //                 clearInterval(interval);
-  //               }
-  //             } else {
-  //               setTransactionLoading(false);
-  //               toast.error("Failed to Load Chest. Try Again");
-  //               if (interval !== null) {
-  //                 clearInterval(interval);
-  //               }
-  //             }
-  //           }
-  //         })
-  //         .catch((e) => {
-  //           setTransactionLoading(false);
-  //           toast.error(e.message);
-  //           console.log(e, "e");
-  //           if (interval !== null) {
-  //             clearInterval(interval);
-  //           }
-  //         });
-  //     }
-  //   }, intervalInMilliseconds);
-  // };
 
   const handleShowActivity = () => {
     setShowActivity(!showActivity);

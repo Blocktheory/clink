@@ -2,16 +2,8 @@ import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import {
-  EthersAdapter,
-  SafeAccountConfig,
-  SafeFactory,
-} from "@safe-global/protocol-kit";
-import {
-  CHAIN_NAMESPACES,
-  SafeEventEmitterProvider,
-  WALLET_ADAPTERS,
-} from "@web3auth/base";
+import { EthersAdapter, SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
+import { CHAIN_NAMESPACES, SafeEventEmitterProvider, WALLET_ADAPTERS } from "@web3auth/base";
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
@@ -20,13 +12,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
 
-import {
-  oauthClientId,
-  productName,
-  web3AuthClientId,
-  web3AuthLoginType,
-  web3AuthVerifier,
-} from "../constants";
+import { oauthClientId, productName, web3AuthClientId, web3AuthLoginType, web3AuthVerifier } from "../constants";
 import { ACTIONS, GlobalContext } from "../context/GlobalContext";
 import BottomSheet from "../ui_components/bottom-sheet";
 import ConnectWallet from "../ui_components/connect_wallet/";
@@ -36,22 +22,13 @@ import HomePage from "../ui_components/home/HomePage";
 import { LoadChestComponent } from "../ui_components/loadchest/LoadChestComponent";
 import { BaseGoerli } from "../utils/chain/baseGoerli";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
-import {
-  useWalletLogin,
-  useWalletLogout,
-  useActiveProfile,
-  useActiveWallet,
-} from "@lens-protocol/react-web";
+import { useWalletLogin, useWalletLogout, useActiveProfile } from "@lens-protocol/react-web";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { Magic } from "magic-sdk";
 import { IPaymaster, BiconomyPaymaster } from "@biconomy/paymaster";
 import { IBundler, Bundler } from "@biconomy/bundler";
-import {
-  BiconomySmartAccount,
-  BiconomySmartAccountV2,
-  DEFAULT_ENTRYPOINT_ADDRESS,
-} from "@biconomy/account";
+import { BiconomySmartAccount, BiconomySmartAccountV2, DEFAULT_ENTRYPOINT_ADDRESS } from "@biconomy/account";
 import { ethers } from "ethers";
 import { getFromLocalStorage, saveToLocalStorage } from "../utils";
 import { useRouter } from "next/router";
@@ -90,23 +67,11 @@ export default function Home() {
   const { getAccount, disconnect } = useWagmi();
   const { address, isConnecting, isConnected } = useAccount();
   const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
-  const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
-    null
-  );
+  const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
-  const {
-    execute: login,
-    error: loginError,
-    isPending: isLoginPending,
-  } = useWalletLogin();
+  const { execute: login, error: loginError, isPending: isLoginPending } = useWalletLogin();
 
   const { execute: logout } = useWalletLogout();
-  const { data: wallet, loading: walletLoading } = useActiveWallet();
-  const {
-    data: profile,
-    error: profileerror,
-    loading: profileLoading,
-  } = useActiveProfile();
   const { disconnectAsync } = useDisconnect();
 
   const router = useRouter();
@@ -118,26 +83,16 @@ export default function Home() {
   useEffect(() => {
     async function initLens() {
       if (loggedIn) {
-        console.log(profile, "profile");
-        console.log(profileerror, "profileerror");
-        console.log(wallet, "wallet");
-        console.log(walletLoading, "walletLoading");
-        console.log(profileLoading, "profileLoading");
-        if (profile !== null) {
-          // dispatch({
-          //   type: ACTIONS.LOGGED_IN_VIA,
-          //   payload: LOGGED_IN.LENS,
-          // });
-          // dispatch({
-          //   type: ACTIONS.SET_ADDRESS,
-          //   payload: address,
-          // });
-          // setWalletAddress(address ?? "");
-          // setLoader(false);
-          // saveToLocalStorage("address", address);
-          // handleSteps(ESTEPS.THREE);
-        } else {
-          toast.info("Your wallet doesn't have lens account");
+        try {
+            const activeProfile = useActiveProfile();
+            const { data: profile } = activeProfile;
+            if (profile == null) {
+                await disconnect();
+                toast.info("Your wallet doesn't have lens account");
+            }
+        } catch(e){
+            await disconnect();
+            toast.info("Your wallet doesn't have lens account");
         }
       }
     }
@@ -145,22 +100,26 @@ export default function Home() {
   }, [loggedIn]);
 
   const onLoginClick = async () => {
-    if (isConnected) {
-      await disconnectAsync();
-    }
+    try {
+      if (isConnected) {
+        await disconnectAsync();
+      }
 
-    const { connector } = await connectAsync();
+      const { connector } = await connectAsync();
 
-    if (connector instanceof InjectedConnector) {
-      const walletClient = await connector.getWalletClient();
+      if (connector instanceof InjectedConnector) {
+        const walletClient = await connector.getWalletClient();
 
-      await login({
-        address: walletClient.account.address,
-      });
-      const prov = await connector?.getProvider();
-      saveToLocalStorage("lensProvider", prov);
-      await connectWithBiconomy(prov, LOGGED_IN.LENS);
-      setLoggedIn(true);
+        const resp = await login({
+          address: walletClient.account.address,
+        });
+        const prov = await connector?.getProvider();
+        saveToLocalStorage("lensProvider", prov);
+        setLoggedIn(true);
+        await connectWithBiconomy(prov, LOGGED_IN.LENS);
+      }
+    } catch (error) {
+      toast.error("Something went wrong!");
     }
   };
 
@@ -278,12 +237,9 @@ export default function Home() {
       if (web3auth.connected) {
         return;
       }
-      const web3authProvider = await web3auth.connectTo(
-        WALLET_ADAPTERS.OPENLOGIN,
-        {
-          loginProvider: "google",
-        }
-      );
+      const web3authProvider = await web3auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
+        loginProvider: "google",
+      });
       setProvider(web3authProvider);
       const acc = (await getAccounts()) as any;
       const email = await (await web3auth.getUserInfo()).email;
@@ -332,9 +288,7 @@ export default function Home() {
       owners: [await signer.getAddress()],
       threshold: 1,
     };
-    const safeSdkOwnerPredicted = await safeFactory.predictSafeAddress(
-      safeAccountConfig
-    );
+    const safeSdkOwnerPredicted = await safeFactory.predictSafeAddress(safeAccountConfig);
     return safeSdkOwnerPredicted;
   };
 
@@ -379,18 +333,13 @@ export default function Home() {
       const loggedInVia = getFromLocalStorage("loginType");
       const add = getFromLocalStorage("address");
       if (window !== undefined) {
-        console.log(window.location.origin, "window.location.origin");
-        console.log("came inside if");
         setLoader(true);
         const magicSdk = new Magic("pk_live_8A226AACC0D8D290");
         const prov = await magicSdk.wallet.getProvider();
         setProvider(prov);
         setMagic(magicSdk);
         const isLoggedIn = await magicSdk.user.isLoggedIn();
-        console.log(isLoggedIn, "isloggedin");
-        console.log(router.query, "query");
         if (router && router.query.magic_credential) {
-          console.log("came inside callback");
           try {
             await magicSdk.auth.loginWithCredential();
             const userMetadata = await magicSdk.user.getMetadata();
@@ -400,7 +349,6 @@ export default function Home() {
             console.error(e);
           }
         } else if (isLoggedIn) {
-          console.log("came inside isloggedin");
           const userMetadata = await magicSdk.user.getMetadata();
           saveToLocalStorage("email", userMetadata.email);
           connectWithBiconomy(magicSdk.rpcProvider, LOGGED_IN.MAGIC);
@@ -436,25 +384,17 @@ export default function Home() {
     });
   };
 
-  const connectWithBiconomy = async (
-    rpcProvider: any,
-    logintype: LOGGED_IN
-  ) => {
+  const connectWithBiconomy = async (rpcProvider: any, logintype: LOGGED_IN) => {
     setLoader(true);
     try {
-      const web3Provider = new ethers.providers.Web3Provider(
-        rpcProvider,
-        "any"
-      );
+      const web3Provider = new ethers.providers.Web3Provider(rpcProvider, "any");
 
       const paymaster = new BiconomyPaymaster({
-        paymasterUrl:
-          "https://paymaster.biconomy.io/api/v1/84531/76v47JPQ6.7a881a9f-4cec-45e0-95e9-c39c71ca54f4",
+        paymasterUrl: "https://paymaster.biconomy.io/api/v1/84531/76v47JPQ6.7a881a9f-4cec-45e0-95e9-c39c71ca54f4",
       });
 
       const bundler: IBundler = new Bundler({
-        bundlerUrl:
-          "https://bundler.biconomy.io/api/v2/84531/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44",
+        bundlerUrl: "https://bundler.biconomy.io/api/v2/84531/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44",
         chainId: 84531,
         entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
       });
@@ -468,7 +408,6 @@ export default function Home() {
         accountIndex: 0,
       });
       const scw = await wallet.getSmartAccountAddress();
-      console.log(scw, "new scw");
       dispatch({
         type: ACTIONS.LOGGED_IN_VIA,
         payload: logintype,
@@ -525,17 +464,7 @@ export default function Home() {
       case ESTEPS.ONE:
         return <HomePage handleSetupChest={handleSetupChest} loader={loader} />;
       case ESTEPS.TWO:
-        return (
-          <ConnectWallet
-            signIn={connectMagicWallet}
-            handleSteps={handleSteps}
-            loader={loader}
-            handleLensLogin={onLoginClick}
-            showOtp={showOtp}
-            loading={signinLoading}
-            showMsg={showMsg}
-          />
-        );
+        return <ConnectWallet signIn={connectMagicWallet} handleSteps={handleSteps} loader={loader} handleLensLogin={onLoginClick} showOtp={showOtp} loading={signinLoading} showMsg={showMsg} />;
       case ESTEPS.THREE:
         return <LoadChestComponent provider={provider} loader={loader} />;
       default:
@@ -585,31 +514,9 @@ export default function Home() {
 
   return (
     <>
-      <Header
-        walletAddress={walletAddress}
-        signIn={onLoginClick}
-        step={step}
-        handleSteps={handleSteps}
-        onHamburgerClick={onHamburgerClick}
-        signOut={signOutMagic}
-        setWalletAddress={setWalletAddress}
-        loader={loader}
-        initLoader={initLoader}
-        handleDisconnect={handleDisconnect}
-      />
+      <Header walletAddress={walletAddress} signIn={onLoginClick} step={step} handleSteps={handleSteps} onHamburgerClick={onHamburgerClick} signOut={signOutMagic} setWalletAddress={setWalletAddress} loader={loader} initLoader={initLoader} handleDisconnect={handleDisconnect} />
       <div className="p-4 relative">
-        <ToastContainer
-          toastStyle={{ backgroundColor: "#282B30" }}
-          className={`w-50`}
-          style={{ width: "600px" }}
-          position="bottom-center"
-          autoClose={6000}
-          hideProgressBar={true}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          theme="dark"
-        />
+        <ToastContainer toastStyle={{ backgroundColor: "#282B30" }} className={`w-50`} style={{ width: "600px" }} position="bottom-center" autoClose={6000} hideProgressBar={true} newestOnTop={false} closeOnClick rtl={false} theme="dark" />
         {getUIComponent(step)}
         <BottomSheet
           isOpen={openBottomSheet}
