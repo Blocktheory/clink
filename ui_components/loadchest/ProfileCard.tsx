@@ -23,7 +23,7 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
   const {
     state: { address, loggedInVia },
   } = useContext(GlobalContext);
-  let handle = "My Smart Account";
+  let handle = "Lens Smart Account";
   try {
     const { data: profile } = useActiveProfile();
     handle = `@` + profile?.handle;
