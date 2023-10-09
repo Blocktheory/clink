@@ -535,6 +535,16 @@ const ShareLink: FC<IShareLink> = (props) => {
                   btnDisable={handleDisableBtn()}
                   loading={isLoading}
                 />
+                <SecondaryBtn
+                  className={`${
+                    handleDisableBtn() ? "opacity-60" : "opacity-100"
+                  } mt-4`}
+                  title={"Redeem Gift Card"}
+                  onClick={() => handleBidaliClaim()}
+                  rightImage={processing ? undefined : icons.giftRedeem}
+                  btnDisable={handleDisableBtn()}
+                  loading={isLoading || processing}
+                />
               </div>
             )}
             <SecondaryBtn
