@@ -13,14 +13,17 @@ import { Web3AuthNoModal } from "@web3auth/no-modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { serializeError } from "eth-rpc-errors";
 import { ethers } from "ethers";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { toast } from "react-toastify";
 import { useAccount } from "wagmi";
+import { ECDSAProvider, getRPCProviderOwner } from '@zerodev/sdk'
+import { ZeroDevWeb3Auth, ZeroDevWeb3AuthWithModal } from '@zerodev/web3auth';
 
 import {
     oauthClientId,
     productName,
+    projectId,
     web3AuthClientId,
     web3AuthLoginType,
     web3AuthVerifier,
@@ -68,12 +71,13 @@ export default function Home() {
     const { address, isConnecting, isConnected } = useAccount();
     const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
     const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
+    const [zeroDevaddress, setZeroDevAddress] = useState('')
 
     useEffect(() => {
         const item = localStorage.getItem("isGoogleLogin");
         console.log(
             localStorage.getItem("isGoogleLogin ") &&
-                localStorage.getItem("isGoogleLogin ") === "true",
+            localStorage.getItem("isGoogleLogin ") === "true",
             "storage",
         );
         if (item) {
@@ -187,6 +191,44 @@ export default function Home() {
         }
     };
 
+    //Zerodev wallet//
+
+    const setWallet = async (provider) => {
+        const ecdsaProvider = await ECDSAProvider.init({
+            projectId: "71aa9275-8c9a-4591-aad0-347443678b47",
+            owner: await getRPCProviderOwner(provider)
+        })
+        setZeroDevAddress(await ecdsaProvider.getAddress())
+    }
+    const zeroDevWeb3Auth = useMemo(() => {
+        const instance = new ZeroDevWeb3AuthWithModal(['71aa9275-8c9a-4591-aad0-347443678b47'])
+        instance.initialize({
+            onConnect: async () => {
+                setLoader(true)
+                setWallet(zeroDevWeb3Auth.provider)
+                setLoader(false)
+            }
+        })
+        return instance
+    }, [])
+
+    const disconnectZero = async () => {
+        await zeroDevWeb3Auth.logout()
+        setZeroDevAddress('')
+    }
+    const zeroDevSignIn = async () => {
+        setLoader(true)
+        zeroDevWeb3Auth.login().then(provider => {
+            console.log(provider)
+            setWallet(provider)
+            setLoader(false)
+        })
+            .catch(console.log)
+            .finally(() => {
+                setLoader(false)
+            })
+    }
+
     const getAccounts = async () => {
         if (!provider) {
             return;
@@ -257,6 +299,7 @@ export default function Home() {
                         signIn={signIn}
                         handleSteps={handleSteps}
                         loader={loader}
+                        zerodevSignIn={zeroDevSignIn}
                     />
                 );
             case ESTEPS.THREE:
