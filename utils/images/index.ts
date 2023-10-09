@@ -15,10 +15,10 @@ import linkWhite from "../../public/assets/images/link_white.svg";
 import linkedinBlue from "../../public/assets/images/linkedin_blue.svg";
 import loadAvatar from "../../public/assets/images/load_avatar.png";
 import logo from "../../public/assets/images/logo.svg";
-import logo2 from "../../public/assets/images/logo_clink.png";
+import logo2 from "../../public/assets/images/logo_micropay.png";
 import logoutIcon from "../../public/assets/images/logout_icon.svg";
 import qrWhite from "../../public/assets/images/qr_white.svg";
-import safeLogo from "../../public/assets/images/safe_logo.svg";
+import bicoLogo from "../../public/assets/images/biconomy_logo.png";
 import shareBtnIcon from "../../public/assets/images/share_btn_icon.svg";
 import shareBtnIconWhite from "../../public/assets/images/share_btn_icon_white.svg";
 import tchest from "../../public/assets/images/tchest.png";
@@ -54,7 +54,7 @@ export type TImages =
   | "x"
   | "telegramBlue"
   | "linkedinBlue"
-  | "safeLogo"
+  | "bicoLogo"
   | "baseLogo"
   | "copyIconWhite"
   | "linkWhite"
@@ -95,7 +95,7 @@ export const icons: Record<TImages, TNextImage> = {
   x,
   linkedinBlue,
   telegramBlue,
-  safeLogo,
+  bicoLogo,
   baseLogo,
   copyIconWhite,
   linkWhite,

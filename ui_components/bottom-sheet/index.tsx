@@ -158,11 +158,11 @@ const BottomSheet: FC<TProps> = (props) => {
                                                 >
                                                     <div className="flex gap-2 items-center">
                                                         <Image
-                                                            src={icons.googleIcon}
-                                                            alt="login with google"
+                                                            src={icons.lensLogo}
+                                                            alt="login with lens"
                                                         />
                                                         <p className="text-black">
-                                                            Login with Google
+                                                            Login with Lens
                                                         </p>
                                                     </div>
                                                     <Image
