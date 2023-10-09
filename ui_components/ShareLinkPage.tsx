@@ -153,7 +153,7 @@ const ShareLink: FC<IShareLink> = (props) => {
         const walletCore = await initWasm();
         const wallet = new Wallet(walletCore);
         setWallet(wallet);
-        const chars = uuid.split("|");
+        const chars = uuid.split("~");
         if (chars.length < 1) {
           return;
         }
@@ -195,6 +195,17 @@ const ShareLink: FC<IShareLink> = (props) => {
     });
   };
 
+  const handleBidaliClaim = () => {
+    // @ts-ignore
+    if (window && window.bidaliSdk) {
+      // @ts-ignore
+      window.bidaliSdk.Commerce.render({
+        apiKey: "YOUR API KEY",
+        email: "punith@designstring.com",
+      });
+    }
+  };
+
   const handleClaimClick = () => {
     setOpenClaimModal(true);
   };
@@ -204,7 +215,6 @@ const ShareLink: FC<IShareLink> = (props) => {
   };
 
   const handlePublicAddressTransaction = (toAdd: string) => {
-    console.log(toAdd, "to add");
     handleCloseClaimModal();
     sendToken(toAdd);
   };
@@ -245,7 +255,7 @@ const ShareLink: FC<IShareLink> = (props) => {
   const handleSendToken = async () => {
     const walletCore = await initWasm();
     const wallet = new Wallet(walletCore);
-    const chars = uuid.split("|");
+    const chars = uuid.split("~");
     if (chars.length < 1) {
       return;
     }
@@ -255,13 +265,10 @@ const ShareLink: FC<IShareLink> = (props) => {
     // from signer address
     const fromSigner = new ethers.Wallet(fromKey.key, ethersProvider);
 
-    console.log(fromSigner, "fromSigner");
-
     const paymaster = new BiconomyPaymaster({
       paymasterUrl:
         "https://paymaster.biconomy.io/api/v1/84531/76v47JPQ6.7a881a9f-4cec-45e0-95e9-c39c71ca54f4",
     });
-    console.log(paymaster, "paymaster");
 
     const bundler: IBundler = new Bundler({
       bundlerUrl:
@@ -269,56 +276,37 @@ const ShareLink: FC<IShareLink> = (props) => {
       chainId: 84531,
       entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
     });
-    console.log(bundler, "bundler");
     let biWallet = new BiconomySmartAccount({
       signer: fromSigner,
       chainId: 84531,
       bundler: bundler,
       paymaster: paymaster,
     });
-    console.log(biWallet, "biWallet");
     biWallet = await biWallet.init({
       accountIndex: 0,
     });
-    console.log("biWallet initiated");
     bicomomySmartAcc.current = biWallet;
-    // const safeAccountAbs = new AccountAbstraction(fromSigner);
-    // await safeAccountAbs.init({ relayPack });
-    // safeAccountAbstraction.current = safeAccountAbs;
-    // isRelayInitiated.current = true;
   };
 
   const sendToken = async (toAdd: string) => {
     setProcessing(true);
     try {
       if (bicomomySmartAcc.current) {
-        // setTransactionLoading(true);
-        // setChestLoadingText("Initializing wallet and creating link...");
         const amountValue = hexToNumber(walletBalanceHex) / Math.pow(10, 18);
-        // const amount = ethers.utils.parseEther(
-        //   amountValue as unknown as string
-        // );
-        // console.log(amount, "amount");
-        console.log(amountValue, "amountValue");
         const data = "0x";
         const tx = {
           to: toAdd,
           value: parseEther(amountValue.toString()).toString(),
           data,
         };
-        console.log(tx, "tx");
         const smartAccount = bicomomySmartAcc;
         let partialUserOp = await smartAccount.current?.buildUserOp([tx]);
-        console.log(partialUserOp, "partialUserOp");
-        // setChestLoadingText("Setting up smart account...");
         const biconomyPaymaster = smartAccount.current
           ?.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
-        console.log(biconomyPaymaster, "biconomyPaymaster");
         let paymasterServiceData: SponsorUserOperationDto = {
           mode: PaymasterMode.SPONSORED,
           // optional params...
         };
-        console.log(paymasterServiceData, "paymasterServiceData");
 
         try {
           // setChestLoadingText("Setting up paymaster...");
@@ -327,62 +315,23 @@ const ShareLink: FC<IShareLink> = (props) => {
               partialUserOp!,
               paymasterServiceData
             );
-          console.log(paymasterAndDataResponse, "paymasterAndDataResponse");
           partialUserOp!.paymasterAndData =
             paymasterAndDataResponse.paymasterAndData;
 
           const userOpResponse = await smartAccount.current?.sendUserOp(
             partialUserOp!
           );
-          console.log(userOpResponse, "userOpResponse");
           const transactionDetails = await userOpResponse?.wait();
-          console.log(transactionDetails, "transactionDetails");
-          // setExplorerUrl(
-          //   `https://goerli.basescan.org/tx/${transactionDetails.receipt.transactionHash}`
-          // );
-          console.log(
-            `https://goerli.basescan.org/tx/${transactionDetails?.receipt.transactionHash}`,
-            "tx hash"
-          );
           handleTransactionStatus(
             transactionDetails?.receipt.transactionHash ?? ""
           );
-          // setChestLoadingText("Success! Transaction Processed");
-          // setIsSucceed(true);
-          // setChestLoadingText("Operation Successful: Transaction Completed!");
-
-          // router.push(linkHash);
         } catch (error) {
           console.error("Error executing transaction:", error);
         }
       }
-      // if (isRelayInitiated.current) {
-      //   const amountValue = hexToNumber(walletBalanceHex) / Math.pow(10, 18);
-
-      //   const safeTransactionData: MetaTransactionData = {
-      //     to: toAdd,
-      //     data: "0x",
-      //     value: parseEther(amountValue.toString()).toString(),
-      //     operation: OperationType.Call,
-      //   };
-
-      //   const gelatoTaskId =
-      //     await safeAccountAbstraction?.current?.relayTransaction(
-      //       [safeTransactionData],
-      //       options
-      //     );
-      //   if (gelatoTaskId) {
-      //     handleTransactionStatus(gelatoTaskId);
-      //   }
-      // } else {
-      //   await handleSendToken();
-      //   sendToken(toAdd);
-      //   return;
-      // }
     } catch (e: any) {
       setProcessing(false);
       toast.error(e.message);
-      console.log(e, "e");
     }
   };
 
@@ -416,48 +365,6 @@ const ShareLink: FC<IShareLink> = (props) => {
         });
     }, intervalInMilliseconds);
   };
-
-  // const handleTransactionStatus = (hash: string) => {
-  //   const intervalInMilliseconds = 1000;
-  //   const interval = setInterval(() => {
-  //     getRelayTransactionStatus(hash)
-  //       .then((res: any) => {
-  //         if (res) {
-  //           const task = res.data.task;
-  //           if (task) {
-  //             if (
-  //               task.taskState === "WaitingForConfirmation" ||
-  //               task.taskState === "ExecSuccess"
-  //             ) {
-  //               setLinkValueUsd("$0");
-  //               setTokenValue("0");
-  //               setTxHash(task.transactionHash);
-  //               setHeadingText("Chest have found their owner!");
-  //               handleClaimSuccess();
-  //               if (interval !== null) {
-  //                 clearInterval(interval);
-  //               }
-  //             }
-  //           } else {
-  //             setProcessing(false);
-  //             const err = serializeError("Failed to Claim!");
-  //             toast.error(err.message);
-  //             if (interval !== null) {
-  //               clearInterval(interval);
-  //             }
-  //           }
-  //         }
-  //       })
-  //       .catch((e) => {
-  //         setProcessing(false);
-  //         toast.error(e.message);
-  //         console.log(e, "e");
-  //         if (interval !== null) {
-  //           clearInterval(interval);
-  //         }
-  //       });
-  //   }, intervalInMilliseconds);
-  // };
 
   const handleClaimSuccess = () => {
     setIsClaimSuccessful(true);
@@ -509,6 +416,10 @@ const ShareLink: FC<IShareLink> = (props) => {
         rtl={false}
         theme="dark"
       />
+      <script
+        type="text/javascript"
+        src="https://commerce.staging.bidali.com/commerce.min.js"
+      ></script>
       <div className="w-full h-[70%] text-center p-4  flex flex-col gap-5 items-center">
         {!processing && (
           <p className="text-black text-[20px] font-bold">{headingText}</p>
@@ -671,6 +582,16 @@ const ShareLink: FC<IShareLink> = (props) => {
                   btnDisable={handleDisableBtn()}
                   loading={isLoading}
                 />
+                <SecondaryBtn
+                  className={`${
+                    handleDisableBtn() ? "opacity-60" : "opacity-100"
+                  }`}
+                  title={"Redeem Gift Card"}
+                  onClick={() => handleBidaliClaim()}
+                  rightImage={processing ? undefined : icons.giftRedeem}
+                  btnDisable={handleDisableBtn()}
+                  loading={isLoading || processing}
+                />
               </div>
             )}
             {!processing && (
@@ -686,6 +607,16 @@ const ShareLink: FC<IShareLink> = (props) => {
                   rightImage={showShareIcon ? icons.shareBtnIconWhite : ""}
                   btnDisable={handleDisableBtn()}
                   loading={isLoading}
+                />
+                <SecondaryBtn
+                  className={`${
+                    handleDisableBtn() ? "opacity-60" : "opacity-100"
+                  }`}
+                  title={"Redeem Gift Card"}
+                  onClick={() => handleBidaliClaim()}
+                  rightImage={processing ? undefined : icons.giftRedeem}
+                  btnDisable={handleDisableBtn()}
+                  loading={isLoading || processing}
                 />
               </div>
             )}

@@ -1,14 +1,14 @@
 let Store: any = null;
 
 export function saveStore(createdStore: { state: any; dispatch: any }) {
-    Store = { ...createdStore };
+  Store = { ...createdStore };
 }
 
 export function getStore() {
-    return Store;
+  return Store;
 }
 
 export function clearStore() {
-    Store = null;
-    return Store;
+  Store = null;
+  return Store;
 }

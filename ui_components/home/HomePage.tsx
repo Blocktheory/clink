@@ -38,7 +38,11 @@ export default function HomePage(props: IHome) {
             anyone you share the link with
           </p>
           <div>
-            <Image className="m-auto mb-10 relative z-0 w-[50%] md:w-[35%] lg:w-[20%]" src={icons.tchest} alt="Chest" />
+            <Image
+              className="m-auto mb-10 relative z-0 w-[50%] md:w-[35%] lg:w-[20%]"
+              src={icons.tchest}
+              alt="Chest"
+            />
           </div>
           <div id="overlay-button">
             <PrimaryBtn

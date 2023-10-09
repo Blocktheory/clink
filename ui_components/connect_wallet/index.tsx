@@ -23,20 +23,14 @@ export default function ConnectWallet(props: IConnectWallet) {
   const [enableVerifyBtn, setEnableVerifyBtn] = useState(false);
 
   const onChange = (val: string) => {
-    console.log(val, "value");
     setOtp(val);
   };
 
   useEffect(() => {
-    // This effect runs after each render when 'otp' changes.
-    console.log(otp.length, "otp");
-
     // Check the length and set 'enableVerifyBtn' accordingly.
     if (otp.trim().length === 6) {
-      console.log("came to if");
       setEnableVerifyBtn(true);
     } else {
-      console.log("came to else");
       setEnableVerifyBtn(false);
     }
   }, [otp]);
@@ -100,7 +94,12 @@ export default function ConnectWallet(props: IConnectWallet) {
                 //     </span>
                 //   </button>
                 // </div>
-                <PrimaryBtn title={"Sign in With Lens"} leftImage={icons.lensLogo} onClick={handleLensLogin} className="mb-4" />
+                <PrimaryBtn
+                  title={"Sign in With Lens"}
+                  leftImage={icons.lensLogo}
+                  onClick={handleLensLogin}
+                  className="mb-4"
+                />
               ) : null}
               {!showMsg ? (
                 <div className="flex items-center justify-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto mb-4">
@@ -109,7 +108,11 @@ export default function ConnectWallet(props: IConnectWallet) {
                   <div className="border-t border-black/20 flex-grow"></div>
                 </div>
               ) : null}
-              <div className={`flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[400px] mx-auto rounded-lg ${showMsg ? "custom-shadow-sm border border-black" : ""}`}>
+              <div
+                className={`flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[400px] mx-auto rounded-lg ${
+                  showMsg ? "custom-shadow-sm border border-black" : ""
+                }`}
+              >
                 <>
                   {showMsg ? (
                     <div className="text-center">
@@ -118,7 +121,10 @@ export default function ConnectWallet(props: IConnectWallet) {
                       </p>
                       <p className="text-black/80 leading-[30px]">
                         We emailed a magic link to <br />
-                        <span className="text-black font-semibold">{value}</span> <br />
+                        <span className="text-black font-semibold">
+                          {value}
+                        </span>{" "}
+                        <br />
                         Please click the link to continue.
                       </p>
                     </div>
@@ -143,9 +149,10 @@ export default function ConnectWallet(props: IConnectWallet) {
                       />
                       <div className="my-4 cursor-pointer">
                         <SecondaryBtn
-                          className={`${value ? "opacity-100" : "opacity-40"
-                            }`}
-                          title={loading ? "Loading..." : "Sign in with Magic Link"}
+                          className={`${value ? "opacity-100" : "opacity-40"}`}
+                          title={
+                            loading ? "Loading..." : "Sign in with Magic Link"
+                          }
                           btnDisable={!value}
                           onClick={() => {
                             signIn(value);

@@ -13,46 +13,46 @@ import MetaHead from "../ui_components/siteMeta";
 import { BaseGoerli } from "../utils/chain/baseGoerli";
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-    [baseGoerli],
-    [publicProvider()],
+  [baseGoerli],
+  [publicProvider()]
 );
 
 const config = createConfig({
-    autoConnect: true,
-    connectors: [
-        new MetaMaskConnector({ chains }),
-        new CoinbaseWalletConnector({
-            chains,
-            options: {
-                appName: productName,
-                jsonRpcUrl: BaseGoerli.info.url,
-                chainId: BaseGoerli.coinId,
-            },
-        }),
-        new InjectedConnector({
-            chains,
-            options: {
-                name: "Injected",
-                shimDisconnect: true,
-            },
-        }),
-    ],
-    publicClient,
-    webSocketPublicClient,
+  autoConnect: true,
+  connectors: [
+    new MetaMaskConnector({ chains }),
+    new CoinbaseWalletConnector({
+      chains,
+      options: {
+        appName: productName,
+        jsonRpcUrl: BaseGoerli.info.url,
+        chainId: BaseGoerli.coinId,
+      },
+    }),
+    new InjectedConnector({
+      chains,
+      options: {
+        name: "Injected",
+        shimDisconnect: true,
+      },
+    }),
+  ],
+  publicClient,
+  webSocketPublicClient,
 });
 
 export default function claim() {
-    const router = useRouter();
-    const uuid = router.asPath;
-    return (
-        <WagmiConfig config={config}>
-            <MetaHead
-                title="Clink | Unlock Your Crypto Rewards with Every Link"
-                description="Experience seamless crypto rewards and transactions through smart contract links with Clink."
-                imageUrl="https://designstring.s3.ap-south-1.amazonaws.com/personal/meta.png"
-                urlEndpoint=""
-            />
-            <ShareLink uuid={uuid} />
-        </WagmiConfig>
-    );
+  const router = useRouter();
+  const uuid = router.asPath;
+  return (
+    <WagmiConfig config={config}>
+      <MetaHead
+        title="Micropay | Unlock Your Crypto Rewards with Every Link"
+        description="Experience seamless crypto rewards and transactions through smart contract links with Micropay."
+        imageUrl="https://designstring.s3.ap-south-1.amazonaws.com/personal/meta.png"
+        urlEndpoint=""
+      />
+      <ShareLink uuid={uuid} />
+    </WagmiConfig>
+  );
 }
