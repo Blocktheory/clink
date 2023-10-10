@@ -110,3 +110,55 @@ export const getUsdPrice = (): Promise<any[]> => {
       });
   });
 };
+
+export const getUnlimitConfiguration = (signature: string) => {
+  return new Promise(function (resolve, reject) {
+    const data = {
+      url: `https://cors.codecrane.com/https://api-sandbox.gatefi.com/onramp/v1/configuration`,
+      requestHeader: {
+        "api-key": "PFaHPNtxehDZIPKhIwcKuBLZKRNuqIAW",
+        signature: signature,
+      },
+    };
+    getApiService(data)
+      .then((response) => {
+        resolve(response);
+      })
+      .catch((e) => reject(e));
+  });
+};
+
+export const getUnlimitQuotes = (signature: string, data?: any) => {
+  return new Promise(function (resolve, reject) {
+    const data = {
+      url: `https://cors.codecrane.com/https://api-sandbox.gatefi.com/onramp/v1/quotes?crypto=ETH&fiat=USD&amount=100&partnerAccountId=86e450c1-b5ed-4956-8654-2ebaed2c0bd9&region=US&payment=BANKCARD`,
+      requestHeader: {
+        "api-key": "PFaHPNtxehDZIPKhIwcKuBLZKRNuqIAW",
+        signature: signature,
+      },
+    };
+    getApiService(data)
+      .then((response) => {
+        resolve(response);
+      })
+      .catch((e) => reject(e));
+  });
+};
+
+export const getUnlimitBuy = (signature: string, params?: any) => {
+  return new Promise(function (resolve, reject) {
+    const data = {
+      url: `https://cors.codecrane.com/https://api-sandbox.gatefi.com/onramp/v1/buy?region=US&payment=BANKCARD&crypto=ETH&fiat=USD&redirectUrl=https://blocktheory.com&partnerAccountId=86e450c1-b5ed-4956-8654-2ebaed2c0bd9`,
+      requestHeader: {
+        "api-key": "PFaHPNtxehDZIPKhIwcKuBLZKRNuqIAW",
+        signature: signature,
+      },
+      payload: params,
+    };
+    getApiService(data)
+      .then((response) => {
+        resolve(response);
+      })
+      .catch((e) => reject(e));
+  });
+};

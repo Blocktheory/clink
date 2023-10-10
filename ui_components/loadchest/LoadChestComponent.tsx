@@ -26,6 +26,9 @@ import {
   getBalance,
   getRelayTransactionStatus,
   getSendTransactionStatus,
+  getUnlimitBuy,
+  getUnlimitConfiguration,
+  getUnlimitQuotes,
   getUsdPrice,
 } from "../../apiServices";
 import { GlobalContext } from "../../context/GlobalContext";
@@ -63,6 +66,8 @@ import {
   PaymasterMode,
   SponsorUserOperationDto,
 } from "@biconomy/paymaster";
+import * as CryptoJS from "crypto-js";
+import { nanoid } from "nanoid/non-secure";
 
 export interface ILoadChestComponent {
   provider?: any;
@@ -115,11 +120,64 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
   }, []);
 
   useEffect(() => {
+    const secretKey: string = "LsdDnGNJCpbVfVOEvpZdLDNpyMhECvrQ";
+
+    // String will be method + api path
+    const dataVerify: string = "GET" + "/onramp/v1/configuration";
+
+    const hash: CryptoJS.lib.WordArray = CryptoJS.HmacSHA256(
+      dataVerify,
+      secretKey
+    );
+    const sig = CryptoJS.enc.Hex.stringify(hash);
+
+    getUnlimitConfiguration(sig).then((res: any) => {
+      console.log(res, "result");
+    });
+  }, []);
+
+  useEffect(() => {
     if (address) {
       fetchBalance();
       handleInitWallet();
+      const secretKey: string = "LsdDnGNJCpbVfVOEvpZdLDNpyMhECvrQ";
+
+      // String will be method + api path
+      const dataVerify: string = "GET" + "/onramp/v1/quotes";
+
+      const hash: CryptoJS.lib.WordArray = CryptoJS.HmacSHA256(
+        dataVerify,
+        secretKey
+      );
+      const sig = CryptoJS.enc.Hex.stringify(hash);
+      getUnlimitQuotes(sig);
     }
   }, [address]);
+
+  const handleBuy = () => {
+    const secretKey: string = "LsdDnGNJCpbVfVOEvpZdLDNpyMhECvrQ";
+
+    // String will be method + api path
+    const dataVerify: string = "GET" + "/onramp/v1/buy";
+
+    const hash: CryptoJS.lib.WordArray = CryptoJS.HmacSHA256(
+      dataVerify,
+      secretKey
+    );
+    const sig = CryptoJS.enc.Hex.stringify(hash);
+    const valueWithoutDollarSign = value.replace(/[^\d.]/g, "");
+    getUnlimitBuy(sig, {
+      orderCustomId: nanoid(10),
+      amount: valueWithoutDollarSign,
+      walletAddress: address,
+    }).then(async (res: any) => {
+      console.log(res["headers"]["x-final-url"], "buy res");
+      if (res["headers"]["x-final-url"]) {
+        window.open(res["headers"]["x-final-url"], "_blank");
+      }
+      // await axios.get(res.headers.x-final-url as unknown as string);
+    });
+  };
 
   const fetchBalance = async () => {
     setLoading(true);
@@ -495,13 +553,13 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                     btnDisable={btnDisable || !value}
                   />
                   <div
-                    id="overlay-button"
+                    // id="overlay-button"
                     className="w-full lg:w-[185px] max-w-[185px]"
                   >
                     <SecondaryBtn
                       className={`w-full text-[#010101] max-w-[185px] mx-0`}
                       title={"Buy"}
-                      onClick={handleBuyCrypto}
+                      onClick={handleBuy}
                     />
                   </div>
                 </div>
