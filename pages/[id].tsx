@@ -12,10 +12,7 @@ import ShareLink from "../ui_components/ShareLinkPage";
 import MetaHead from "../ui_components/siteMeta";
 import { BaseGoerli } from "../utils/chain/baseGoerli";
 
-const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [baseGoerli],
-  [publicProvider()]
-);
+const { chains, publicClient, webSocketPublicClient } = configureChains([baseGoerli], [publicProvider()]);
 
 const config = createConfig({
   autoConnect: true,
@@ -46,12 +43,7 @@ export default function claim() {
   const uuid = router.asPath;
   return (
     <WagmiConfig config={config}>
-      <MetaHead
-        title="Micropay | Unlock Your Crypto Rewards with Every Link"
-        description="Experience seamless crypto rewards and transactions through smart contract links with Micropay."
-        imageUrl="https://designstring.s3.ap-south-1.amazonaws.com/personal/meta.png"
-        urlEndpoint=""
-      />
+      <MetaHead title="Neopay | Unlock Your Crypto Rewards with Every Link" description="Experience seamless crypto rewards and transactions through smart contract links with Neopay." imageUrl="https://designstring.s3.ap-south-1.amazonaws.com/personal/meta.png" urlEndpoint="" />
       <ShareLink uuid={uuid} />
     </WagmiConfig>
   );

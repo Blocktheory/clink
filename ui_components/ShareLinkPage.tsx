@@ -2,17 +2,9 @@ import "react-toastify/dist/ReactToastify.css";
 import "tailwindcss/tailwind.css";
 
 import AccountAbstraction from "@safe-global/account-abstraction-kit-poc";
-import {
-  EthersAdapter,
-  SafeAccountConfig,
-  SafeFactory,
-} from "@safe-global/protocol-kit";
+import { EthersAdapter, SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
 import { GelatoRelayPack } from "@safe-global/relay-kit";
-import {
-  MetaTransactionData,
-  MetaTransactionOptions,
-  OperationType,
-} from "@safe-global/safe-core-sdk-types";
+import { MetaTransactionData, MetaTransactionOptions, OperationType } from "@safe-global/safe-core-sdk-types";
 import { initWasm } from "@trustwallet/wallet-core";
 import { BigNumber } from "bignumber.js";
 import { serializeError } from "eth-rpc-errors";
@@ -27,25 +19,9 @@ import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import { parseEther } from "viem";
 
-import {
-  getBalance,
-  getEstimatedGas,
-  getNonce,
-  getRelayTransactionStatus,
-  getSendRawTransaction,
-  getSendTransactionStatus,
-  getUsdPrice,
-} from "../apiServices";
+import { getBalance, getEstimatedGas, getNonce, getRelayTransactionStatus, getSendRawTransaction, getSendTransactionStatus, getUsdPrice } from "../apiServices";
 import { GlobalContext } from "../context/GlobalContext";
-import {
-  decodeAddressHash,
-  encryptAndEncodeHexStrings,
-  getCurrencyFormattedNumber,
-  getTokenValueFormatted,
-  hexFormatter,
-  hexToNumber,
-  numHex,
-} from "../utils";
+import { decodeAddressHash, encryptAndEncodeHexStrings, getCurrencyFormattedNumber, getTokenValueFormatted, hexFormatter, hexToNumber, numHex } from "../utils";
 import { Base } from "../utils/chain/base";
 import { BaseGoerli } from "../utils/chain/baseGoerli";
 import { icons } from "../utils/images";
@@ -61,17 +37,8 @@ import SecondaryBtn from "./SecondaryBtn";
 import { ShareBtnModal } from "./ShareBtnModal";
 import { IPaymaster, BiconomyPaymaster } from "@biconomy/paymaster";
 import { IBundler, Bundler } from "@biconomy/bundler";
-import {
-  BiconomySmartAccount,
-  BiconomySmartAccountV2,
-  DEFAULT_ENTRYPOINT_ADDRESS,
-  SmartAccount,
-} from "@biconomy/account";
-import {
-  IHybridPaymaster,
-  PaymasterMode,
-  SponsorUserOperationDto,
-} from "@biconomy/paymaster";
+import { BiconomySmartAccount, BiconomySmartAccountV2, DEFAULT_ENTRYPOINT_ADDRESS, SmartAccount } from "@biconomy/account";
+import { IHybridPaymaster, PaymasterMode, SponsorUserOperationDto } from "@biconomy/paymaster";
 
 export interface IShareLink {
   uuid: string;
@@ -90,9 +57,7 @@ const ShareLink: FC<IShareLink> = (props) => {
   const [shareText, setShareText] = useState("Share");
   const [showShareIcon, setShowShareIcon] = useState(true);
   const [tokenValue, setTokenValue] = useState("");
-  const [headingText, setHeadingText] = useState(
-    "Your Chest is ready to claim!"
-  );
+  const [headingText, setHeadingText] = useState("Your Chest is ready to claim!");
   const [linkValueUsd, setLinkValueUsd] = useState("");
   const [isRedirected, setIsRedirected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -102,12 +67,8 @@ const ShareLink: FC<IShareLink> = (props) => {
   const [showQr, setShowQr] = useState(false);
   const [isClaimSuccessful, setIsClaimSuccessful] = useState(false);
   const [txHash, setTxHash] = useState("");
-  const ethersProvider = new ethers.providers.JsonRpcProvider(
-    BaseGoerli.info.rpc
-  );
-  const relayPack = new GelatoRelayPack(
-    process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY
-  );
+  const ethersProvider = new ethers.providers.JsonRpcProvider(BaseGoerli.info.rpc);
+  const relayPack = new GelatoRelayPack(process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY);
   const options: MetaTransactionOptions = {
     gasLimit: "100000",
     isSponsored: true,
@@ -181,17 +142,10 @@ const ShareLink: FC<IShareLink> = (props) => {
     getUsdPrice().then(async (res: any) => {
       setTokenValue(getTokenValueFormatted(bgNum, 6, false));
       setIsLoading(false);
-      const formatBal = bgNum * res.data.ethereum.usd;
-      setLinkValueUsd(
-        getCurrencyFormattedNumber(roundDownToTenth(formatBal), 2, "USD", true)
-      );
-      const zeroBal =
-        getCurrencyFormattedNumber(formatBal, 2, "USD", true) === "$0";
-      setHeadingText(
-        zeroBal
-          ? "Chest have found their owner!"
-          : "Your Chest is ready to claim!"
-      );
+      const formatBal = bgNum * res.data.neo.usd;
+      setLinkValueUsd(getCurrencyFormattedNumber(roundDownToTenth(formatBal), 2, "USD", true));
+      const zeroBal = getCurrencyFormattedNumber(formatBal, 2, "USD", true) === "$0";
+      setHeadingText(zeroBal ? "Chest have found their owner!" : "Your Chest is ready to claim!");
     });
   };
 
@@ -232,9 +186,7 @@ const ShareLink: FC<IShareLink> = (props) => {
           connector: injectConnector,
         });
         setToAddress(result.account);
-        toast.success(
-          `Please wait, wallet connected and claim initiated for the chest`
-        );
+        toast.success(`Please wait, wallet connected and claim initiated for the chest`);
         handleCloseClaimModal();
         sendToken(result.account);
       } catch (e: any) {
@@ -266,13 +218,11 @@ const ShareLink: FC<IShareLink> = (props) => {
     const fromSigner = new ethers.Wallet(fromKey.key, ethersProvider);
 
     const paymaster = new BiconomyPaymaster({
-      paymasterUrl:
-        "https://paymaster.biconomy.io/api/v1/84531/76v47JPQ6.7a881a9f-4cec-45e0-95e9-c39c71ca54f4",
+      paymasterUrl: "https://paymaster.biconomy.io/api/v1/84531/76v47JPQ6.7a881a9f-4cec-45e0-95e9-c39c71ca54f4",
     });
 
     const bundler: IBundler = new Bundler({
-      bundlerUrl:
-        "https://bundler.biconomy.io/api/v2/84531/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44",
+      bundlerUrl: "https://bundler.biconomy.io/api/v2/84531/nJPK7B3ru.dd7f7861-190d-41bd-af80-6877f74b8f44",
       chainId: 84531,
       entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
     });
@@ -301,8 +251,7 @@ const ShareLink: FC<IShareLink> = (props) => {
         };
         const smartAccount = bicomomySmartAcc;
         let partialUserOp = await smartAccount.current?.buildUserOp([tx]);
-        const biconomyPaymaster = smartAccount.current
-          ?.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
+        const biconomyPaymaster = smartAccount.current?.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
         let paymasterServiceData: SponsorUserOperationDto = {
           mode: PaymasterMode.SPONSORED,
           // optional params...
@@ -310,21 +259,12 @@ const ShareLink: FC<IShareLink> = (props) => {
 
         try {
           // setChestLoadingText("Setting up paymaster...");
-          const paymasterAndDataResponse =
-            await biconomyPaymaster.getPaymasterAndData(
-              partialUserOp!,
-              paymasterServiceData
-            );
-          partialUserOp!.paymasterAndData =
-            paymasterAndDataResponse.paymasterAndData;
+          const paymasterAndDataResponse = await biconomyPaymaster.getPaymasterAndData(partialUserOp!, paymasterServiceData);
+          partialUserOp!.paymasterAndData = paymasterAndDataResponse.paymasterAndData;
 
-          const userOpResponse = await smartAccount.current?.sendUserOp(
-            partialUserOp!
-          );
+          const userOpResponse = await smartAccount.current?.sendUserOp(partialUserOp!);
           const transactionDetails = await userOpResponse?.wait();
-          handleTransactionStatus(
-            transactionDetails?.receipt.transactionHash ?? ""
-          );
+          handleTransactionStatus(transactionDetails?.receipt.transactionHash ?? "");
         } catch (error) {
           console.error("Error executing transaction:", error);
         }
@@ -404,26 +344,10 @@ const ShareLink: FC<IShareLink> = (props) => {
 
   return (
     <div className="w-full h-screen relative flex items-center overflow-hidden">
-      <ToastContainer
-        toastStyle={{ backgroundColor: "#282B30" }}
-        className={`w-50`}
-        style={{ width: "600px" }}
-        position="bottom-center"
-        autoClose={6000}
-        hideProgressBar={true}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        theme="dark"
-      />
-      <script
-        type="text/javascript"
-        src="https://commerce.staging.bidali.com/commerce.min.js"
-      ></script>
+      <ToastContainer toastStyle={{ backgroundColor: "#282B30" }} className={`w-50`} style={{ width: "600px" }} position="bottom-center" autoClose={6000} hideProgressBar={true} newestOnTop={false} closeOnClick rtl={false} theme="dark" />
+      <script type="text/javascript" src="https://commerce.staging.bidali.com/commerce.min.js"></script>
       <div className="w-full h-[70%] text-center p-4  flex flex-col gap-5 items-center">
-        {!processing && (
-          <p className="text-black text-[20px] font-bold">{headingText}</p>
-        )}
+        {!processing && <p className="text-black text-[20px] font-bold">{headingText}</p>}
 
         <div className="w-full md:w-[60%] max-w-[450px] h-[220px] shareLinkBg mb-10 cardShine">
           <div className=" rounded-lg profileBackgroundImage flex justify-between h-full">
@@ -438,15 +362,8 @@ const ShareLink: FC<IShareLink> = (props) => {
                   <p className="text-[40px] text-white font bold">{`${linkValueUsd}`}</p>
                   <p className="text-sm text-white/80">{`~ ${tokenValue} ETH`}</p>
                   <div className="flex justify-around w-[100px] mx-auto mt-1.5">
-                    <Link
-                      href={`https://goerli.basescan.org/address/${fromAddress}/#internaltx`}
-                      target="_blank"
-                    >
-                      <Image
-                        src={icons.linkWhite}
-                        alt="external link"
-                        className="w-5 cursor-pointer opacity-80 hover:opacity-100"
-                      />
+                    <Link href={`https://goerli.basescan.org/address/${fromAddress}/#internaltx`} target="_blank">
+                      <Image src={icons.linkWhite} alt="external link" className="w-5 cursor-pointer opacity-80 hover:opacity-100" />
                     </Link>
 
                     <Image
@@ -457,45 +374,23 @@ const ShareLink: FC<IShareLink> = (props) => {
                         setShowQr(!showQr);
                       }}
                     />
-                    <Image
-                      src={icons.copyIconWhite}
-                      alt="copy address"
-                      className="w-5 cursor-pointer opacity-80 hover:opacity-100"
-                      onClick={copyAddress}
-                    />
+                    <Image src={icons.copyIconWhite} alt="copy address" className="w-5 cursor-pointer opacity-80 hover:opacity-100" onClick={copyAddress} />
                   </div>
                 </div>
               </div>
             )}
-            <div className="self-end w-[45%]">
-              {isClaimSuccessful || linkValueUsd === "$0" ? (
-                <Image
-                  className="mt-[-29px]"
-                  src={icons.tchestopen}
-                  alt="Chest Open"
-                />
-              ) : (
-                <Image className="" src={icons.shareLinkTChest} alt="Chest" />
-              )}
-            </div>
+            <div className="self-end w-[45%]">{isClaimSuccessful || linkValueUsd === "$0" ? <Image className="mt-[-29px]" src={icons.tchestopen} alt="Chest Open" /> : <Image className="" src={icons.shareLinkTChest} alt="Chest" />}</div>
           </div>
         </div>
         {linkValueUsd === "$0" ? (
           txHash ? (
-            <div
-              className={`py-4 text-black support_text_bold font-normal rounded-lg flex gap-1 items-center w-full justify-center border custom-shadow-sm border-black max-w-[450px] mx-auto`}
-            >
+            <div className={`py-4 text-black support_text_bold font-normal rounded-lg flex gap-1 items-center w-full justify-center border custom-shadow-sm border-black max-w-[450px] mx-auto`}>
               <div>
                 <p>🎉 Claim successful!</p>
                 <p className="mt-3">
                   {" "}
                   The treasure is now yours to behold!
-                  <a
-                    target="_blank"
-                    href={`https://goerli.basescan.org/tx/${txHash}`}
-                    rel="noreferrer"
-                    className="underline ml-2"
-                  >
+                  <a target="_blank" href={`https://goerli.basescan.org/tx/${txHash}`} rel="noreferrer" className="underline ml-2">
                     {"View ->"}
                   </a>
                 </p>
@@ -507,9 +402,7 @@ const ShareLink: FC<IShareLink> = (props) => {
             {!processing && (
               <div className="lg:hidden block w-full">
                 <PrimaryBtn
-                  className={`${
-                    handleDisableBtn() ? "opacity-60" : "opacity-100"
-                  }`}
+                  className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"}`}
                   title="Share"
                   onClick={() => {
                     handleShareURL();
@@ -524,9 +417,7 @@ const ShareLink: FC<IShareLink> = (props) => {
             {!processing && (
               <div className="hidden lg:block w-full max-w-[400px]">
                 <PrimaryBtn
-                  className={`${
-                    handleDisableBtn() ? "opacity-60" : "opacity-100"
-                  }`}
+                  className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"}`}
                   title={shareText}
                   onClick={() => {
                     setOpenShareModal(true);
@@ -535,54 +426,21 @@ const ShareLink: FC<IShareLink> = (props) => {
                   btnDisable={handleDisableBtn()}
                   loading={isLoading}
                 />
-                <SecondaryBtn
-                  className={`${
-                    handleDisableBtn() ? "opacity-60" : "opacity-100"
-                  } mt-4`}
-                  title={"Redeem Gift Card"}
-                  onClick={() => handleBidaliClaim()}
-                  rightImage={processing ? undefined : icons.giftRedeem}
-                  btnDisable={handleDisableBtn()}
-                  loading={isLoading || processing}
-                />
+                <SecondaryBtn className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"} mt-4`} title={"Redeem Gift Card"} onClick={() => handleBidaliClaim()} rightImage={processing ? undefined : icons.giftRedeem} btnDisable={handleDisableBtn()} loading={isLoading || processing} />
               </div>
             )}
-            <SecondaryBtn
-              className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"}`}
-              title={"Claim"}
-              onClick={() => handleClaimClick()}
-              rightImage={processing ? undefined : icons.downloadBtnIconBlack}
-              btnDisable={handleDisableBtn()}
-              loading={isLoading || processing}
-            />
-            {processing && (
-              <p className="claim-processing">
-                {"⏳ Hang tight! We're currently processing your claim."}
-              </p>
-            )}
+            <SecondaryBtn className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"}`} title={"Claim"} onClick={() => handleClaimClick()} rightImage={processing ? undefined : icons.downloadBtnIconBlack} btnDisable={handleDisableBtn()} loading={isLoading || processing} />
+            {processing && <p className="claim-processing">{"⏳ Hang tight! We're currently processing your claim."}</p>}
           </>
         ) : (
           <>
-            <PrimaryBtn
-              className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"}`}
-              title={"Claim"}
-              onClick={() => handleClaimClick()}
-              rightImage={processing ? undefined : icons.downloadBtnIconBlack}
-              btnDisable={handleDisableBtn()}
-              loading={isLoading || processing}
-            />
+            <PrimaryBtn className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"}`} title={"Claim"} onClick={() => handleClaimClick()} rightImage={processing ? undefined : icons.downloadBtnIconBlack} btnDisable={handleDisableBtn()} loading={isLoading || processing} />
 
-            {processing && (
-              <p className="claim-processing">
-                {"⏳ Hang tight! We're currently processing your claim."}
-              </p>
-            )}
+            {processing && <p className="claim-processing">{"⏳ Hang tight! We're currently processing your claim."}</p>}
             {!processing && (
               <div className="lg:hidden block w-full">
                 <SecondaryBtn
-                  className={`${
-                    handleDisableBtn() ? "opacity-60" : "opacity-100"
-                  }`}
+                  className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"}`}
                   title="Share"
                   onClick={() => {
                     handleShareURL();
@@ -592,24 +450,13 @@ const ShareLink: FC<IShareLink> = (props) => {
                   btnDisable={handleDisableBtn()}
                   loading={isLoading}
                 />
-                <SecondaryBtn
-                  className={`${
-                    handleDisableBtn() ? "opacity-60" : "opacity-100"
-                  }`}
-                  title={"Redeem Gift Card"}
-                  onClick={() => handleBidaliClaim()}
-                  rightImage={processing ? undefined : icons.giftRedeem}
-                  btnDisable={handleDisableBtn()}
-                  loading={isLoading || processing}
-                />
+                <SecondaryBtn className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"}`} title={"Redeem Gift Card"} onClick={() => handleBidaliClaim()} rightImage={processing ? undefined : icons.giftRedeem} btnDisable={handleDisableBtn()} loading={isLoading || processing} />
               </div>
             )}
             {!processing && (
               <div className="hidden lg:block w-full max-w-[400px]">
                 <SecondaryBtn
-                  className={`${
-                    handleDisableBtn() ? "opacity-60" : "opacity-100"
-                  }`}
+                  className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"}`}
                   title={shareText}
                   onClick={() => {
                     setOpenShareModal(true);
@@ -618,38 +465,16 @@ const ShareLink: FC<IShareLink> = (props) => {
                   btnDisable={handleDisableBtn()}
                   loading={isLoading}
                 />
-                <SecondaryBtn
-                  className={`${
-                    handleDisableBtn() ? "opacity-60" : "opacity-100"
-                  }`}
-                  title={"Redeem Gift Card"}
-                  onClick={() => handleBidaliClaim()}
-                  rightImage={processing ? undefined : icons.giftRedeem}
-                  btnDisable={handleDisableBtn()}
-                  loading={isLoading || processing}
-                />
+                <SecondaryBtn className={`${handleDisableBtn() ? "opacity-60" : "opacity-100"}`} title={"Redeem Gift Card"} onClick={() => handleBidaliClaim()} rightImage={processing ? undefined : icons.giftRedeem} btnDisable={handleDisableBtn()} loading={isLoading || processing} />
               </div>
             )}
           </>
         )}
       </div>
-      <ClaimBtnModal
-        open={openClaimModal}
-        setOpen={setOpenClaimModal}
-        uuid={uuid}
-        handleConnect={handleConnect}
-        handlePublicAddressTransaction={handlePublicAddressTransaction}
-      />
+      <ClaimBtnModal open={openClaimModal} setOpen={setOpenClaimModal} uuid={uuid} handleConnect={handleConnect} handlePublicAddressTransaction={handlePublicAddressTransaction} />
       <ShareBtnModal open={openShareModal} setOpen={setOpenShareModal} />
       <QrModal open={showQr} setOpen={setShowQr} address={fromAddress} />
-      {isClaimSuccessful && (
-        <Confetti
-          width={2400}
-          height={1200}
-          recycle={false}
-          numberOfPieces={2000}
-        />
-      )}
+      {isClaimSuccessful && <Confetti width={2400} height={1200} recycle={false} numberOfPieces={2000} />}
 
       {/* <Footer /> */}
     </div>

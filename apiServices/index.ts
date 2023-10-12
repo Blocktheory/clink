@@ -95,7 +95,7 @@ export const getRelayTransactionStatus = async (taskId: string) => {
 export const getUsdPrice = (): Promise<any[]> => {
   const config = {
     method: "get",
-    url: "https://pro-api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd&x_cg_pro_api_key=CG-3rZprwbEEjFtakNBS8mghn8H",
+    url: "https://pro-api.coingecko.com/api/v3/simple/price?ids=neo&vs_currencies=usd&x_cg_pro_api_key=CG-3rZprwbEEjFtakNBS8mghn8H",
     headers: { "Content-Type": "application/json" },
   };
   return new Promise((resolve) => {

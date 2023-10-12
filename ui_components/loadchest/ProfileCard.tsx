@@ -51,7 +51,7 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
           />
         </div>
         <p className="text-sm mx-auto pt-1 text-white/80">
-          {loggedInVia === LOGGED_IN.LENS ? `${handle}` : "My Smart Account"}
+          {"Neo Account"}
         </p>
         {transactionLoading ? (
           <div className="w-20 h-3 my-2 animate-pulse bg-white/10 rounded-lg mx-auto"></div>
