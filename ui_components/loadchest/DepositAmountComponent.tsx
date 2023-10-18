@@ -99,7 +99,7 @@ export const DepositAmountComponent: FC<IDepositAmountComponent> = (props) => {
                 />
               </div>
               <p className="text-white text-[12px] leading-[14px] text-center">
-                ~ {inputValue} ETH
+                ~ {inputValue} NEO
               </p>
             </div>
           </div>

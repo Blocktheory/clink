@@ -153,10 +153,10 @@ const BottomSheet: FC<TProps> = (props) => {
                           role="presentation"
                           onClick={signIn}
                         >
-                          <div className="flex gap-2 items-center">
+                          {/* <div className="flex gap-2 items-center">
                             <Image src={icons.lensLogo} alt="login with lens" />
                             <p className="text-black">Login with Lens</p>
-                          </div>
+                          </div> */}
                           <Image
                             src={icons.chevronRight}
                             alt="login with google"

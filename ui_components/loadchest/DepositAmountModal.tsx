@@ -49,7 +49,7 @@ export const DepositAmountModal: FC<IDepositAmountModal> = (props) => {
     width: 240,
     height: 240,
     type: "svg",
-    image: icons.logo2.src,
+    image: icons.logoNeo.src,
     margin: 5,
     qrOptions: {
       typeNumber: 0,

@@ -6,7 +6,7 @@ export const Base = {
   name: "Base Mainnet",
   logo: "https://storage.googleapis.com/frontier-wallet/blockchains/base/info/logo.svg",
   coinId: 8453,
-  symbol: "ETH",
+  symbol: "NEO",
   chainId: "8453",
   chainIdHex: "0x2105",
   decimals: 18,

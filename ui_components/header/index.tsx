@@ -78,7 +78,7 @@ const Header = (props: IHeader) => {
         <div className={`w-[95%] max-w-[600px] h-[64px] rounded-lg  text-center flex items-center justify-between relative z-[9] bg-[#7356C6] border-2 border-[#010101]`}>
           {step === 1 ? (
             <div className="flex gap-1 pl-2">
-              <Image src={icons.logo2} alt="logo" className="w-10" />
+              <Image src={icons.logoNeo} alt="logo" className="w-10" />
               <p className="text-[16px] font-bold text-white self-center">Neopay</p>
             </div>
           ) : (
@@ -88,7 +88,7 @@ const Header = (props: IHeader) => {
           )}
 
           <div className="flex gap-4 items-center pr-2">
-            <button className={`px-4 h-[40px] rounded-lg bg-white flex gap-2 items-center justify-center border border-[#010101] shadow-sm`} onClick={signIn} disabled={address || loader || initLoader ? true : false}>
+            {/* <button className={`px-4 h-[40px] rounded-lg bg-white flex gap-2 items-center justify-center border border-[#010101] shadow-sm`} onClick={signIn} disabled={address || loader || initLoader ? true : false}>
               <Image src={!address ? icons.lensLogo : icons.baseLogo} alt="google login" width={20} height={20} className="w-5 rounded-full" />
               {loader || initLoader ? (
                 <div className="bouncing-loader">
@@ -99,7 +99,7 @@ const Header = (props: IHeader) => {
               ) : (
                 <span className="text-[16px] font-medium text-black self-center my-auto">{address ? trimAddress(address) : "Login"}</span>
               )}
-            </button>
+            </button> */}
             <div className="relative" ref={menuRef}>
               <button type="button" className="w-[40px] h-[40px] rounded-lg bg-white flex items-center justify-center border border-[#010101] shadow-sm">
                 <Image src={icons.hamburgerBlack} alt="more options" className="w-6 " onClick={handleClick} />
@@ -133,7 +133,7 @@ const Header = (props: IHeader) => {
                       ) : null}
 
                       <div className="bg-white w-full px-4 rounded-b-lg">
-                        {!isConnected ? (
+                        {/* {!isConnected ? (
                           <div className="flex justify-between items-center py-6 border-b-2 cursor-pointer" role="presentation" onClick={signIn}>
                             <div className="flex gap-2 items-center">
                               <Image className="w-8" src={icons.lensLogo} alt="login with lens" />
@@ -141,7 +141,7 @@ const Header = (props: IHeader) => {
                             </div>
                             <Image src={icons.chevronRight} alt="login with google" />
                           </div>
-                        ) : null}
+                        ) : null} */}
 
                         <Link
                           href="mailto:contact@blocktheory.com"

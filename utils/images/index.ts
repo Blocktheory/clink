@@ -8,6 +8,7 @@ import copyIconWhite from "../../public/assets/images/copy_icon_white.svg";
 import downloadBtnIcon from "../../public/assets/images/download_btn_icon.svg";
 import downloadBtnIconBlack from "../../public/assets/images/download_btn_icon_black.svg";
 import ethLogo from "../../public/assets/images/eth_logo.svg";
+import neoLogo from "../../public/assets/images/neo_logo.svg";
 import googleIcon from "../../public/assets/images/google_icon.svg";
 import hamburgerBlack from "../../public/assets/images/hamburger_black.svg";
 import helpIcon from "../../public/assets/images/help_icon.svg";
@@ -17,6 +18,7 @@ import loadAvatar from "../../public/assets/images/load_avatar.png";
 import giftRedeem from "../../public/assets/images/gift_redeem.svg";
 import logo from "../../public/assets/images/logo.svg";
 import logo2 from "../../public/assets/images/logo_micropay.png";
+import logoNeo from "../../public/assets/images/logo_neopay.png";
 import logoutIcon from "../../public/assets/images/logout_icon.svg";
 import qrWhite from "../../public/assets/images/qr_white.svg";
 import bicoLogo from "../../public/assets/images/biconomy_logo.png";
@@ -61,6 +63,8 @@ export type TImages =
   | "linkWhite"
   | "qrWhite"
   | "ethLogo"
+  | "neoLogo"
+  | "logoNeo"
   | "loadAvatar"
   | "shareLinkTChest"
   | "backIconGrey"
@@ -91,10 +95,12 @@ export const icons: Record<TImages, TNextImage> = {
   logoutIcon,
   helpIcon,
   ethLogo,
+  neoLogo,
   downloadBtnIconBlack,
   shareBtnIconWhite,
   profileCardBg,
   x,
+  logoNeo,
   linkedinBlue,
   telegramBlue,
   bicoLogo,

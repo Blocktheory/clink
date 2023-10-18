@@ -360,7 +360,7 @@ const ShareLink: FC<IShareLink> = (props) => {
               <div className="flex justify-between">
                 <div className="flex gap-1 flex-col text-start ml-3">
                   <p className="text-[40px] text-white font bold">{`${linkValueUsd}`}</p>
-                  <p className="text-sm text-white/80">{`~ ${tokenValue} ETH`}</p>
+                  <p className="text-sm text-white/80">{`~ ${tokenValue} NEO`}</p>
                   <div className="flex justify-around w-[100px] mx-auto mt-1.5">
                     <Link href={`https://goerli.basescan.org/address/${fromAddress}/#internaltx`} target="_blank">
                       <Image src={icons.linkWhite} alt="external link" className="w-5 cursor-pointer opacity-80 hover:opacity-100" />

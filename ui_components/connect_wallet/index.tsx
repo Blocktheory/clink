@@ -78,7 +78,7 @@ export default function ConnectWallet(props: IConnectWallet) {
             </div>
           ) : (
             <>
-              {!showMsg ? (
+              {/* {!showMsg ? (
                 // <div className={`flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto rounded-lg mt-10 mb-5 custom-shadow-sm border border-black`}>
                 //   <button
                 //     className={`py-4 w-full rounded-lg btnBg flex gap-2 items-center justify-center max-w-[400px]`}
@@ -100,14 +100,14 @@ export default function ConnectWallet(props: IConnectWallet) {
                   onClick={handleLensLogin}
                   className="mb-4"
                 />
-              ) : null}
-              {!showMsg ? (
+              ) : null} */}
+              {/* {!showMsg ? (
                 <div className="flex items-center justify-center w-[80%] md:w-[60%] lg:w-[360px] mx-auto mb-4">
                   <div className="border-t border-black/20 flex-grow"></div>
                   <p className="text-black/80 mx-4">OR</p>
                   <div className="border-t border-black/20 flex-grow"></div>
                 </div>
-              ) : null}
+              ) : null} */}
               <div
                 className={`flex gap-3 justify-center items-center w-[80%] md:w-[60%] lg:w-[400px] mx-auto rounded-lg ${
                   showMsg ? "custom-shadow-sm border border-black" : ""
@@ -120,7 +120,7 @@ export default function ConnectWallet(props: IConnectWallet) {
                         Check your email!
                       </p>
                       <p className="text-black/80 leading-[30px]">
-                        We emailed a magic link to <br />
+                        We emailed a login link to <br />
                         <span className="text-black font-semibold">
                           {value}
                         </span>{" "}
@@ -151,7 +151,7 @@ export default function ConnectWallet(props: IConnectWallet) {
                         <SecondaryBtn
                           className={`${value ? "opacity-100" : "opacity-40"}`}
                           title={
-                            loading ? "Loading..." : "Sign in with Magic Link"
+                            loading ? "Loading..." : "Sign in with Email"
                           }
                           btnDisable={!value}
                           onClick={() => {

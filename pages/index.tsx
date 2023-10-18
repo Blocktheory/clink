@@ -485,15 +485,15 @@ export default function Home() {
       .on("email-sent", (result: any) => {
         setSigninLoading(false);
         setShowMsg(true);
-        toast.success("Magic link has been sent!. Check your mail");
+        toast.success("Login link has been sent!. Check your mail");
       })
       .on("done", (result: any) => {
-        toast.success("Login sussessful through magic link");
+        toast.success("Login successfully through link");
       })
       .on("error", (reason: any) => {
         setSigninLoading(false);
         toast.error("Something went wrong!");
-        console.error(reason, "errorqw");
+        console.error(reason, "error");
       })
       .on("settled", () => {
         // is called when the Promise either resolves or rejects

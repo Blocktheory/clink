@@ -284,7 +284,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
           amount: "100",
         },
         defaultCrypto: {
-          currency: "ETH",
+          currency: "NEO",
         },
       });
     }
@@ -353,7 +353,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                         ) : (
                           <div>
                             <p className="text-[#010101] text-2xl font-semibold leading-10 mb-2">{price}</p>
-                            <p className="text-[#010101] text-xs leading-[14px]">{tokenValue} ETH</p>
+                            <p className="text-[#010101] text-xs leading-[14px]">{tokenValue} NEO</p>
                           </div>
                         )
                       ) : loading ? (
@@ -363,15 +363,15 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                         </div>
                       ) : (
                         <div>
-                          <p className="text-[#010101] text-2xl font-semibold leading-10 mb-2">~ {tokenValue} ETH</p>
+                          <p className="text-[#010101] text-2xl font-semibold leading-10 mb-2">~ {tokenValue} NEO</p>
                           <p className="text-[#010101] text-xs leading-[14px]">{price}</p>
                         </div>
                       )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Image src={!loading && !loader ? icons.ethLogo : icons.loadAvatar} className="w-8 h-8" alt="transferIcon" />
-                    {!loading && !loader ? <p className="text-[#010101] text-2xl font-normal leading-9">ETH</p> : <div className="w-10 h-3 my-2 animate-pulse bg-white/10 rounded-lg mx-auto"></div>}
+                    <Image src={!loading && !loader ? icons.neoLogo : icons.loadAvatar} className="w-8 h-8" alt="transferIcon" />
+                    {!loading && !loader ? <p className="text-[#010101] text-2xl font-normal leading-9">NEO</p> : <div className="w-10 h-3 my-2 animate-pulse bg-white/10 rounded-lg mx-auto"></div>}
                   </div>
                 </div>
                 <div
@@ -405,7 +405,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                           onWheel={() => (document.activeElement as HTMLElement).blur()}
                         />
                       </div>
-                      {Number(inputValue) > 0 && <p className="text-[#010101] text-sm leading-[14px] text-center">~ {inputValue} ETH</p>}
+                      {Number(inputValue) > 0 && <p className="text-[#010101] text-sm leading-[14px] text-center">~ {inputValue} NEO</p>}
                     </div>
                   </div>
                 </div>
@@ -446,7 +446,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                     // id="overlay-button"
                     className="w-full lg:w-[185px] max-w-[185px]"
                   >
-                    <SecondaryBtn className={`w-full text-[#010101] max-w-[185px] mx-0`} title={"Buy"} onClick={handleBuy} />
+                    <SecondaryBtn className={`w-full text-[#010101] max-w-[185px] mx-0`} title={"Send"} onClick={createWallet} btnDisable={btnDisable || !value} />
                   </div>
                 </div>
               </div>

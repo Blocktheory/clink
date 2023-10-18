@@ -46,7 +46,7 @@ export default function HomePage(props: IHome) {
           </div>
           <div id="overlay-button">
             <PrimaryBtn
-              title="Setup a Treasure Chest"
+              title="Setup a Treasure"
               onClick={() => handleSetupChest()}
               className="custom-shadow-lg"
               shadowLarge={true}

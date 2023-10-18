@@ -85,14 +85,14 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
             />
           </Link>
         </div>
-        <Link href={"https://www.biconomy.io/"} target="_blank">
+        {/* <Link href={"https://www.biconomy.io/"} target="_blank">
           <p className="inline text-[10px] text-white/80">Powered by: </p>
           <Image
             src={icons.bicoLogo}
             alt="safe logo"
             className="w-20 inline-block"
           />
-        </Link>
+        </Link> */}
 
         {/* {showActivity ? (
                     <div className="flex gap-2 items-center justify-center pb-4">
