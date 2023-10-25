@@ -68,7 +68,7 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
                         }}
                     />
                     <Link
-                        href={`https://goerli.basescan.org/address/${address}`}
+                        href={`${BaseGoerli.explorer.url}/address/${address}`}
                         target="_blank"
                     >
                         <Image

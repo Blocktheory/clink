@@ -23,7 +23,6 @@ export const BaseGoerli = {
         accountPath: "/address/",
     },
     info: {
-        url: "https://goerli.base.org/",
-        rpc: process.env.NEXT_PUBLIC_RPC_URL ?? "https://goerli.base.org/",
+        rpc: "https://goerli.base.org/",
     },
 };

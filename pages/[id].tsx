@@ -25,7 +25,7 @@ const config = createConfig({
             chains,
             options: {
                 appName: productName,
-                jsonRpcUrl: BaseGoerli.info.url,
+                jsonRpcUrl: BaseGoerli.info.rpc,
                 chainId: BaseGoerli.coinId,
             },
         }),

@@ -26,7 +26,6 @@ export const Base = {
         accountPath: "/address/",
     },
     info: {
-        url: "https://mainnet.base.org/",
         rpc: "https://mainnet.base.org/",
     },
 };

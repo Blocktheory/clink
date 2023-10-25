@@ -18,7 +18,7 @@ export const globalApiService = (method: string, params?: any) => {
         body,
     };
 
-    const jsonRpcUrl = BaseGoerli.info.url;
+    const jsonRpcUrl = BaseGoerli.info.rpc;
 
     return fetch(jsonRpcUrl, requestOptions)
         .then((response) => response.json())

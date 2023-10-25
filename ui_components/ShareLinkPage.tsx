@@ -380,7 +380,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                                     <p className="text-sm text-white/50">{`~ ${tokenValue} ETH`}</p>
                                     <div className="flex justify-around w-[100px] mx-auto mt-1.5">
                                         <Link
-                                            href={`https://goerli.basescan.org/address/${fromAddress}/#internaltx`}
+                                            href={`${BaseGoerli.explorer.url}/address/${fromAddress}/#internaltx`}
                                             target="_blank"
                                         >
                                             <Image
@@ -433,7 +433,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                                     The treasure is now yours to behold!
                                     <a
                                         target="_blank"
-                                        href={`https://goerli.basescan.org/tx/${txHash}`}
+                                        href={`${BaseGoerli.explorer.url}/tx/${txHash}`}
                                         rel="noreferrer"
                                         className="underline ml-2"
                                     >
