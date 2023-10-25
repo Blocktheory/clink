@@ -10,6 +10,7 @@ import { icons } from "../../utils/images";
 import { useWagmi } from "../../utils/wagmi/WagmiContext";
 import BackBtn from "../BackBtn";
 import PrimaryBtn from "../PrimaryBtn";
+import { SelectedChain } from "../../utils/chain";
 interface IHeader {
     walletAddress: string;
     signIn: () => Promise<void>;
@@ -123,7 +124,7 @@ const Header = (props: IHeader) => {
                             disabled={address || loader || initLoader ? true : false}
                         >
                             <Image
-                                src={!address ? icons.googleIcon : icons.baseLogo}
+                                src={!address ? icons.googleIcon : SelectedChain.logo}
                                 alt="google login"
                                 width={20}
                                 height={20}

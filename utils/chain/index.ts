@@ -8,5 +8,5 @@ import { Optimism } from "./optimism";
 import { Arbitrum } from "./artbitrum";
 
 export const SelectedChain = {
-  ...BaseGoerli
+  ...Arbitrum,
 };
