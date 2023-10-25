@@ -9,6 +9,7 @@ import { GlobalContext } from "../../context/GlobalContext";
 import { trimAddress } from "../../utils";
 import { icons } from "../../utils/images";
 import QrModal from "../QrModal";
+import { BaseGoerli } from "../../utils/chain/baseGoerli";
 
 export interface IProfileCard {
     profileImage?: string;
