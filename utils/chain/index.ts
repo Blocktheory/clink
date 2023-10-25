@@ -6,7 +6,8 @@ export enum CHAINS_ENUMS {
 import { BaseGoerli } from "./baseGoerli";
 import { Optimism } from "./optimism";
 import { Arbitrum } from "./artbitrum";
+import { OptimismGoerli } from "./optimismGoerli";
 
 export const SelectedChain = {
-  ...Arbitrum,
+  ...OptimismGoerli,
 };
