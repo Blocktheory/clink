@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BaseGoerli } from "./chain/baseGoerli";
+import { SelectedChain } from "./chain";
 
 export const globalApiService = (method: string, params?: any) => {
     const headers = new Headers();
@@ -18,7 +18,7 @@ export const globalApiService = (method: string, params?: any) => {
         body,
     };
 
-    const jsonRpcUrl = BaseGoerli.info.rpc;
+    const jsonRpcUrl = SelectedChain.info.rpc;
 
     return fetch(jsonRpcUrl, requestOptions)
         .then((response) => response.json())

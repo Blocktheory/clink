@@ -38,8 +38,6 @@ export interface IDepositAmountModal {
 export const DepositAmountModal: FC<IDepositAmountModal> = (props) => {
     const { open, setOpen, walletAddress, tokenPrice, fetchBalance } = props;
 
-    // const { getAccount, injectConnector, connect, baseGoerli } = useWagmi();
-
     const { isConnecting, address, isConnected } = useAccount();
     const { openConnectModal } = useConnectModal();
 

@@ -32,7 +32,7 @@ import Footer from "../ui_components/footer";
 import Header from "../ui_components/header";
 import HomePage from "../ui_components/home/HomePage";
 import { LoadChestComponent } from "../ui_components/loadchest/LoadChestComponent";
-import { BaseGoerli } from "../utils/chain/baseGoerli";
+import { SelectedChain } from "../utils/chain";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
 
 export type THandleStep = {
@@ -86,11 +86,11 @@ export default function Home() {
             setInitLoader(true);
             const chainConfig = {
                 chainNamespace: CHAIN_NAMESPACES.EIP155,
-                chainId: BaseGoerli.chainIdHex,
-                rpcTarget: BaseGoerli.info.rpc,
-                displayName: BaseGoerli.name,
-                blockExplorer: BaseGoerli.explorer.url,
-                ticker: BaseGoerli.symbol,
+                chainId: SelectedChain.chainIdHex,
+                rpcTarget: SelectedChain.info.rpc,
+                displayName: SelectedChain.name,
+                blockExplorer: SelectedChain.explorer.url,
+                ticker: SelectedChain.symbol,
                 tickerName: "Ethereum",
             };
 

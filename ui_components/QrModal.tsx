@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import { trimAddress } from "../utils";
 import { icons } from "../utils/images";
 import { QRComponent } from "./loadchest/QRComponent";
-import { BaseGoerli } from "../utils/chain/baseGoerli";
+import { SelectedChain } from "../utils/chain";
 
 export default dynamic(() => Promise.resolve(QrModal), {
     ssr: false,
@@ -80,7 +80,7 @@ export const QrModal: FC<IQrModal> = (props) => {
                                             </div>
                                             <div className="w-fit mt-[15px] border-dashed border border-secondary-300 dark:border-secondaryDark-300 rounded-[10px] flex justify-center items-center md:items-center p-2">
                                                 <Link
-                                                    href={`${BaseGoerli.explorer.url}/address/${address}`}
+                                                    href={`${SelectedChain.explorer.url}/address/${address}`}
                                                     target="_blank"
                                                     className="text-sm text-white pb-2 underline"
                                                 >{`${trimAddress(address)}`}</Link>

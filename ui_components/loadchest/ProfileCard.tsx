@@ -9,7 +9,7 @@ import { GlobalContext } from "../../context/GlobalContext";
 import { trimAddress } from "../../utils";
 import { icons } from "../../utils/images";
 import QrModal from "../QrModal";
-import { BaseGoerli } from "../../utils/chain/baseGoerli";
+import { SelectedChain } from "../../utils/chain";
 
 export interface IProfileCard {
     profileImage?: string;
@@ -69,7 +69,7 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
                         }}
                     />
                     <Link
-                        href={`${BaseGoerli.explorer.url}/address/${address}`}
+                        href={`${SelectedChain.explorer.url}/address/${address}`}
                         target="_blank"
                     >
                         <Image

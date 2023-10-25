@@ -38,7 +38,7 @@ import {
     getTokenValueFormatted,
     hexToNumber,
 } from "../../utils";
-import { BaseGoerli } from "../../utils/chain/baseGoerli";
+import { SelectedChain } from "../../utils/chain";
 import { icons } from "../../utils/images";
 import { useWagmi } from "../../utils/wagmi/WagmiContext";
 import { Wallet } from "../../utils/wallet";
@@ -74,7 +74,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     const [balanceInUsd, setBalanceInUsd] = useState("");
     const [showActivity, setShowActivity] = useState(false);
     const [chestLoadingText, setChestLoadingText] = useState("");
-    const ethersProvider = new ethers.providers.JsonRpcProvider(BaseGoerli.info.rpc);
+    const ethersProvider = new ethers.providers.JsonRpcProvider(SelectedChain.info.rpc);
     const relayPack = new GelatoRelayPack(process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY);
     const isRelayInitiated = useRef(false);
     const handleToggle = () => {

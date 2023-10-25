@@ -7,11 +7,11 @@ import axios, {
 
 import { TApiResponse } from "../types";
 import { toastFlashMessage } from ".";
-import { BaseGoerli } from "./chain/baseGoerli";
+import { SelectedChain } from "./chain";
 
 const axiosInstance: AxiosInstance = axios.create();
 
-axiosInstance.defaults.baseURL = `${BaseGoerli.info.rpc}`;
+axiosInstance.defaults.baseURL = `${SelectedChain.info.rpc}`;
 axiosInstance.interceptors.request.use(
     function (config: AxiosRequestConfig) {
         return config;

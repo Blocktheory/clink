@@ -43,7 +43,7 @@ import {
     numHex,
 } from "../utils";
 import { Base } from "../utils/chain/base";
-import { BaseGoerli } from "../utils/chain/baseGoerli";
+import { SelectedChain } from "../utils/chain";
 import { icons } from "../utils/images";
 import { useWagmi } from "../utils/wagmi/WagmiContext";
 import { Wallet } from "../utils/wallet";
@@ -61,7 +61,7 @@ export interface IShareLink {
 }
 
 const ShareLink: FC<IShareLink> = (props) => {
-    const { connect, baseGoerli, injectConnector, getAccount } = useWagmi();
+    const { connect, injectConnector, getAccount } = useWagmi();
     const {
         state: { isConnected },
     } = useContext(GlobalContext);
@@ -83,7 +83,7 @@ const ShareLink: FC<IShareLink> = (props) => {
     const [showQr, setShowQr] = useState(false);
     const [isClaimSuccessful, setIsClaimSuccessful] = useState(false);
     const [txHash, setTxHash] = useState("");
-    const ethersProvider = new ethers.providers.JsonRpcProvider(BaseGoerli.info.rpc);
+    const ethersProvider = new ethers.providers.JsonRpcProvider(SelectedChain.info.rpc);
     const relayPack = new GelatoRelayPack(process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY);
     const options: MetaTransactionOptions = {
         gasLimit: "100000",
@@ -194,7 +194,7 @@ const ShareLink: FC<IShareLink> = (props) => {
         } else {
             try {
                 const result = await connect({
-                    chainId: baseGoerli.id,
+                    chainId: SelectedChain.chainId,
                     connector: injectConnector,
                 });
                 setToAddress(result.account);
@@ -380,7 +380,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                                     <p className="text-sm text-white/50">{`~ ${tokenValue} ETH`}</p>
                                     <div className="flex justify-around w-[100px] mx-auto mt-1.5">
                                         <Link
-                                            href={`${BaseGoerli.explorer.url}/address/${fromAddress}/#internaltx`}
+                                            href={`${SelectedChain.explorer.url}/address/${fromAddress}/#internaltx`}
                                             target="_blank"
                                         >
                                             <Image
@@ -433,7 +433,7 @@ const ShareLink: FC<IShareLink> = (props) => {
                                     The treasure is now yours to behold!
                                     <a
                                         target="_blank"
-                                        href={`${BaseGoerli.explorer.url}/tx/${txHash}`}
+                                        href={`${SelectedChain.explorer.url}/tx/${txHash}`}
                                         rel="noreferrer"
                                         className="underline ml-2"
                                     >

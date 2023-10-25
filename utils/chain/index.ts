@@ -1,13 +1,12 @@
-export enum CHAINS_IDS {
-    ETHEREUM = "ethereum",
-    BSC = "bsc",
-    POLYGON = "polygon",
-    BASE = "base-mainnet",
-    BASEGOERLI = "base-testnet",
-    OPTIMISM = "optimism",
-    CUSTOM = "custom_evm",
-}
 
 export enum CHAINS_ENUMS {
     ETHEREUM = "Ethereum",
 }
+
+import { BaseGoerli } from "./baseGoerli";
+import { Optimism } from "./optimism";
+import { Arbitrum } from "./artbitrum";
+
+export const SelectedChain = {
+  ...BaseGoerli
+};

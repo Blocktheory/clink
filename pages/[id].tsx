@@ -10,7 +10,7 @@ import { publicProvider } from "wagmi/providers/public";
 import { productName } from "../constants";
 import ShareLink from "../ui_components/ShareLinkPage";
 import MetaHead from "../ui_components/siteMeta";
-import { BaseGoerli } from "../utils/chain/baseGoerli";
+import { SelectedChain } from "../utils/chain";
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
     [baseGoerli],
@@ -25,8 +25,8 @@ const config = createConfig({
             chains,
             options: {
                 appName: productName,
-                jsonRpcUrl: BaseGoerli.info.rpc,
-                chainId: BaseGoerli.coinId,
+                jsonRpcUrl: SelectedChain.info.rpc,
+                chainId: SelectedChain.coinId,
             },
         }),
         new InjectedConnector({

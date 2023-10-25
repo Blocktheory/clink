@@ -26,9 +26,6 @@ export interface IClaimBtnModal {
 
 export const ShareBtnModal: FC<IClaimBtnModal> = (props) => {
     const { open, setOpen } = props;
-
-    // const { getAccount, injectConnector, connect, baseGoerli } = useWagmi();
-
     const { isConnecting, address, isConnected } = useAccount();
     const { openConnectModal } = useConnectModal();
 
