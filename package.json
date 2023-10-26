@@ -18,6 +18,7 @@
         "@safe-global/auth-kit": "^1.2.0",
         "@safe-global/protocol-kit": "^1.2.0",
         "@safe-global/relay-kit": "^1.2.0",
+        "@safe-global/safe-core-sdk": "^3.3.5",
         "@trustwallet/wallet-core": "^3.2.10",
         "@types/node": "20.4.5",
         "@types/react": "18.2.17",
