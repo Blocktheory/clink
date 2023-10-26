@@ -41,9 +41,10 @@ import { ProfileCard } from "./ProfileCard";
 export interface ILoadChestComponent {
   provider?: any;
   loader: boolean;
+  handleRemoveOwner: any;
 }
 export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
-  const { provider, loader } = props;
+  const { provider, loader, handleRemoveOwner } = props;
 
   const {
     state: { loggedInVia, address },
@@ -147,7 +148,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     });
 
     const safeAccountConfig: SafeAccountConfig = {
-      owners: [destinationEOAAddress, "0x06e70f295B6337c213DDe82D13cc198027687A7B"],
+      owners: [destinationEOAAddress],
       threshold: 1,
     };
     const destinationAdd = await safeFactory.predictSafeAddress(safeAccountConfig);
@@ -300,7 +301,12 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     <div className="mx-auto relative max-w-[400px]">
       {!transactionLoading ? (
         <div>
-          <ProfileCard balance={price} showActivity={false} transactionLoading={loader}></ProfileCard>
+          <ProfileCard
+            balance={price}
+            showActivity={false}
+            transactionLoading={loader}
+            handleRemoveOwner={handleRemoveOwner}
+          ></ProfileCard>
 
           {!showActivity ? (
             <>

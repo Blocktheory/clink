@@ -2,7 +2,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { EthersAdapter, SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
+import Safe, { EthersAdapter, SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
 import { CHAIN_NAMESPACES, SafeEventEmitterProvider, WALLET_ADAPTERS } from "@web3auth/base";
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { Web3AuthNoModal } from "@web3auth/no-modal";
@@ -195,11 +195,41 @@ export default function Home() {
     });
     const safeFactory = await SafeFactory.create({ ethAdapter: ethAdapter });
     const safeAccountConfig: SafeAccountConfig = {
-      owners: [await signer.getAddress()],
+      owners: [await signer.getAddress(), "0x06e70f295B6337c213DDe82D13cc198027687A7B"],
       threshold: 1,
     };
+
+    safeFactory.deploySafe({ safeAccountConfig, options: { gasLimit: "100000" } }).then((res) => {
+      const address = res.getAddress();
+      console.log("address", address);
+    });
+
     const safeSdkOwnerPredicted = await safeFactory.predictSafeAddress(safeAccountConfig);
+
     return safeSdkOwnerPredicted;
+  };
+
+  const handleRemoveOwner = async () => {
+    const safeAddress = await deploySafeContract();
+    const ethProvider = new ethers.providers.Web3Provider(provider!);
+    const signer = await ethProvider.getSigner();
+    const ethAdapter = new EthersAdapter({
+      ethers,
+      signerOrProvider: signer || ethProvider,
+    });
+    const safeSdk: Safe = await Safe.create({
+      ethAdapter: ethAdapter,
+      safeAddress: safeAddress,
+    });
+    const removeTx = await safeSdk.createRemoveOwnerTx({
+      ownerAddress: "0x06e70f295B6337c213DDe82D13cc198027687A7B",
+      threshold: 1,
+    });
+
+    const txResult = await safeSdk.executeTransaction(removeTx);
+
+    console.log("removeTx", removeTx);
+    console.log("txResult", txResult);
   };
 
   const signOut = async () => {
@@ -238,7 +268,7 @@ export default function Home() {
       case ESTEPS.TWO:
         return <ConnectWallet signIn={signIn} handleSteps={handleSteps} loader={loader} />;
       case ESTEPS.THREE:
-        return <LoadChestComponent provider={provider} loader={loader} />;
+        return <LoadChestComponent provider={provider} loader={loader} handleRemoveOwner={handleRemoveOwner} />;
       default:
         return <></>;
     }

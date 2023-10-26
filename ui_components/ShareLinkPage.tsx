@@ -439,12 +439,6 @@ const ShareLink: FC<IShareLink> = (props) => {
                   <br />
                 </div>
               </div>
-              <SecondaryBtn
-                className={`"opacity-100"`}
-                title={"Remove Owner"}
-                onClick={() => handleRemove()}
-                loading={isLoading || processing}
-              />
             </>
           ) : null
         ) : isRedirected ? (
