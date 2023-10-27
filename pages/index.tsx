@@ -195,21 +195,38 @@ export default function Home() {
     });
     const safeFactory = await SafeFactory.create({ ethAdapter: ethAdapter });
     const safeAccountConfig: SafeAccountConfig = {
-      owners: [await signer.getAddress(), "0x06e70f295B6337c213DDe82D13cc198027687A7B"],
+      owners: ["0x06e70f295B6337c213DDe82D13cc198027687A7B", await signer.getAddress()],
       threshold: 1,
     };
 
-    // safeFactory
-    //   .deploySafe({
-    //     safeAccountConfig,
-    //     options: { gasLimit: "1000000", gasPrice: "50", maxFeePerGas: "100000050", maxPriorityFeePerGas: "100000050" },
-    //   })
-    //   .then((res) => {
-    //     const address = res.getAddress();
-    //     console.log("address", address);
-    //   });
-
     const safeSdkOwnerPredicted = await safeFactory.predictSafeAddress(safeAccountConfig);
+
+    const safeSdk: Safe = await Safe.create({
+      ethAdapter: ethAdapter,
+      safeAddress: safeSdkOwnerPredicted,
+    });
+
+    const isDeployed = await safeSdk.isSafeDeployed();
+
+    console.log("isDeployed", isDeployed);
+
+    if (!isDeployed) {
+      safeFactory
+        .deploySafe({
+          safeAccountConfig,
+          options: {
+            gasLimit: "1000000",
+            gasPrice: "50",
+            maxFeePerGas: "100000050",
+            maxPriorityFeePerGas: "100000050",
+          },
+        })
+        .then((res) => {
+          console.log("res", res);
+          const address = res.getAddress();
+          console.log("address", address);
+        });
+    }
 
     return safeSdkOwnerPredicted;
   };
@@ -226,6 +243,8 @@ export default function Home() {
       ethAdapter: ethAdapter,
       safeAddress: safeAddress,
     });
+
+    safeSdk.isSafeDeployed();
     const removeTx = await safeSdk.createRemoveOwnerTx({
       ownerAddress: "0x06e70f295B6337c213DDe82D13cc198027687A7B",
       threshold: 1,
