@@ -42,9 +42,10 @@ export interface ILoadChestComponent {
   provider?: any;
   loader: boolean;
   handleRemoveOwner: any;
+  handleAddOwner: any;
 }
 export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
-  const { provider, loader, handleRemoveOwner } = props;
+  const { provider, loader, handleRemoveOwner, handleAddOwner } = props;
 
   const {
     state: { loggedInVia, address },
@@ -306,6 +307,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
             showActivity={false}
             transactionLoading={loader}
             handleRemoveOwner={handleRemoveOwner}
+            handleAddOwner={handleAddOwner}
           ></ProfileCard>
 
           {!showActivity ? (

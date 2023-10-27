@@ -17,9 +17,10 @@ export interface IProfileCard {
   showActivity: boolean;
   transactionLoading: boolean;
   handleRemoveOwner: any;
+  handleAddOwner: any;
 }
 export const ProfileCard: FC<IProfileCard> = (props) => {
-  const { transactionLoading, handleRemoveOwner } = props;
+  const { transactionLoading, handleRemoveOwner, handleAddOwner } = props;
   const {
     state: { address },
   } = useContext(GlobalContext);
@@ -78,6 +79,14 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
           <Image src={icons.safeLogo} alt="safe logo" className="w-10 inline-block" />
         </Link>
         <p className="my-2">
+          <a
+            className="inline text-[12px] text-black border border-black p-2 rounded-lg cursor-pointer mr-4 btnBg"
+            onClick={() => {
+              handleAddOwner();
+            }}
+          >
+            Add owner
+          </a>
           <a
             className="inline text-[12px] text-white/50 border p-2 rounded-lg cursor-pointer"
             onClick={() => {
