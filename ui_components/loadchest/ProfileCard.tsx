@@ -18,9 +18,10 @@ export interface IProfileCard {
   transactionLoading: boolean;
   handleRemoveOwner: any;
   handleAddOwner: any;
+  deploySafe: any;
 }
 export const ProfileCard: FC<IProfileCard> = (props) => {
-  const { transactionLoading, handleRemoveOwner, handleAddOwner } = props;
+  const { transactionLoading, handleRemoveOwner, handleAddOwner, deploySafe } = props;
   const {
     state: { address },
   } = useContext(GlobalContext);
@@ -80,7 +81,7 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
         </Link>
         <p className="my-2">
           <a
-            className="inline text-[12px] text-black border border-black p-2 rounded-lg cursor-pointer mr-4 btnBg"
+            className="inline text-[12px] text-white/50 border p-2 rounded-lg cursor-pointer mr-4"
             onClick={() => {
               handleAddOwner();
             }}
@@ -88,12 +89,20 @@ export const ProfileCard: FC<IProfileCard> = (props) => {
             Add owner
           </a>
           <a
-            className="inline text-[12px] text-white/50 border p-2 rounded-lg cursor-pointer"
+            className="inline text-[12px] text-white/50 border p-2 rounded-lg cursor-pointer mr-4"
             onClick={() => {
               handleRemoveOwner();
             }}
           >
             Remove owner
+          </a>
+          <a
+            className="inline text-[12px] text-white/50 border p-2 rounded-lg cursor-pointer"
+            onClick={() => {
+              deploySafe();
+            }}
+          >
+            Deploy
           </a>
         </p>
         {/* {showActivity ? (

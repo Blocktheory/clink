@@ -195,7 +195,25 @@ export default function Home() {
     });
     const safeFactory = await SafeFactory.create({ ethAdapter: ethAdapter });
     const safeAccountConfig: SafeAccountConfig = {
-      owners: ["0x06e70f295B6337c213DDe82D13cc198027687A7B", await signer.getAddress()],
+      owners: [await signer.getAddress(), "0x06e70f295B6337c213DDe82D13cc198027687A7B"],
+      threshold: 1,
+    };
+
+    const safeSdkOwnerPredicted = await safeFactory.predictSafeAddress(safeAccountConfig);
+
+    return safeSdkOwnerPredicted;
+  };
+
+  const deploySafe = async () => {
+    const ethProvider = new ethers.providers.Web3Provider(provider!);
+    const signer = await ethProvider.getSigner();
+    const ethAdapter = new EthersAdapter({
+      ethers,
+      signerOrProvider: signer || ethProvider,
+    });
+    const safeFactory = await SafeFactory.create({ ethAdapter: ethAdapter });
+    const safeAccountConfig: SafeAccountConfig = {
+      owners: [await signer.getAddress(), "0x06e70f295B6337c213DDe82D13cc198027687A7B"],
       threshold: 1,
     };
 
@@ -227,8 +245,6 @@ export default function Home() {
           console.log("address", address);
         });
     }
-
-    return safeSdkOwnerPredicted;
   };
 
   const handleRemoveOwner = async () => {
@@ -324,6 +340,7 @@ export default function Home() {
             loader={loader}
             handleRemoveOwner={handleRemoveOwner}
             handleAddOwner={handleAddOwner}
+            deploySafe={deploySafe}
           />
         );
       default:
