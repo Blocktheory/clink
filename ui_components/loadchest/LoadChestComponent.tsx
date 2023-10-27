@@ -200,7 +200,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
                         };
 
                         const options: MetaTransactionOptions = {
-                            gasLimit: "100000",
+                            gasLimit: "50000",
                             isSponsored: true,
                         };
 

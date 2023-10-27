@@ -86,7 +86,7 @@ const ShareLink: FC<IShareLink> = (props) => {
     const ethersProvider = new ethers.providers.JsonRpcProvider(SelectedChain.info.rpc);
     const relayPack = new GelatoRelayPack(process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY);
     const options: MetaTransactionOptions = {
-        gasLimit: "100000",
+        gasLimit: "50000",
         isSponsored: true,
     };
     const router = useRouter();
