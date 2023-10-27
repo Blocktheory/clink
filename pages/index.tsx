@@ -212,16 +212,20 @@ export default function Home() {
       signerOrProvider: signer || ethProvider,
     });
     const safeFactory = await SafeFactory.create({ ethAdapter: ethAdapter });
+    const owner = await signer.getAddress();
     const safeAccountConfig: SafeAccountConfig = {
-      owners: [await signer.getAddress(), "0x06e70f295B6337c213DDe82D13cc198027687A7B"],
+      owners: [owner, "0x06e70f295B6337c213DDe82D13cc198027687A7B"],
       threshold: 1,
     };
 
-    const safeSdkOwnerPredicted = await safeFactory.predictSafeAddress(safeAccountConfig);
-
     const safeSdk: Safe = await Safe.create({
       ethAdapter: ethAdapter,
-      safeAddress: safeSdkOwnerPredicted,
+      predictedSafe: {
+        safeAccountConfig: {
+          owners: [owner, "0x06e70f295B6337c213DDe82D13cc198027687A7B"],
+          threshold: 1,
+        },
+      },
     });
 
     const isDeployed = await safeSdk.isSafeDeployed();
