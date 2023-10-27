@@ -1,6 +1,5 @@
-
 export enum CHAINS_ENUMS {
-    ETHEREUM = "Ethereum",
+  ETHEREUM = "Ethereum",
 }
 
 import { BaseGoerli } from "./baseGoerli";
