@@ -9,3 +9,5 @@ export const web3AuthClientId =
 export const productName = "Clink Safe";
 export const rainbowKitProjectId = "fb3037b60ba3165d90a7f1bb1a727cc5";
 // export const ALCHEMY_KEY = "GVkrt_8cLHv1Yi04m7lqZ2dbteVprcjQ";
+export const POLYGON_ZKEVM_TEST = "https://rpc.public.zkevm-test.net";
+export const POLYGON_ZKEVM = "https://rpc.ankr.com/polygon_zkevm";

@@ -53,6 +53,8 @@ import SecondaryBtn from "../SecondaryBtn";
 import DepositAmountModal from "./DepositAmountModal";
 import { ProfileCard } from "./ProfileCard";
 import Link from "next/link";
+import { createSafeWallet } from "../../utils/Safe";
+import { computePublicKey } from "../../utils/Lit";
 
 export interface ILoadChestComponent {
   provider?: any;
@@ -83,6 +85,9 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
   const [chestLoadingText, setChestLoadingText] = useState("");
   const [destinationAddress, setDestinationAddress] = useState("");
   const [linkHash, setLinkHash] = useState("");
+
+  const [email, setEmail] = useState<string>("vaithisowmi959@gamil.com");
+  const [mobile, setMobile] = useState<number>(8667576005);
   const ethersProvider = new ethers.providers.JsonRpcProvider(
     SelectedChain.info.rpc
   );
@@ -373,7 +378,75 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
   const handleShowActivity = () => {
     setShowActivity(!showActivity);
   };
+  const completeInvite = async () => {
+    try {
+      // take the inputs
+      // calculate the user address
+      const data = await getPubKey();
+      console.log(data, "data");
 
+      if (!data) {
+        console.log("Pub Key can't be calculate");
+        return;
+      }
+      // setUserAddress(data.address);
+      // create safeFortheUser
+      const safeSDK = await createSafeWallet(data?.address, "9");
+      // safe SDK instance is provider & safeAddress
+      const safeAddress = await safeSDK?.getAddress();
+      console.log(safeAddress, "safeAddress");
+
+      // store data on firebase , add(name , email , pkpAddress, safeAddress) => new Person
+      // addUser();
+
+      // add pending invite to the current user => old Person (current)
+      // pending message
+
+      // initiate an email invite  , with inviting user to the platform
+      // sendEmail()
+      // sendInviteEmail(email , )
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getPubKey = async (): Promise<
+    { address: string; pubKey: string } | undefined
+  > => {
+    try {
+      if (email) {
+        const res = await fetch("/api/getUser", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ mobile, email }),
+        });
+        const result = await res.json();
+        const user_id = result.user[0].user_id;
+        console.log(user_id, "user_id");
+
+        // if (!STYTCH_PROJECT_ID) {
+        //   throw Error(
+        //     "Could not find stytch project secret or id in enviorment"
+        //   );
+        // }
+
+        // compute public Key
+        //   console.log(user_id, STYTCH_PROJECT_ID);
+        const data = await computePublicKey(user_id, "");
+        console.log(data);
+        return data;
+      } else {
+        console.log("No Input found");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // useEffect(() => {
+  //   completeInvite();
+  // }, []);
   return (
     <div className="mx-auto relative max-w-[400px]">
       {!transactionLoading ? (
