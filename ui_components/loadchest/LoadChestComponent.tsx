@@ -223,6 +223,11 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
               "🚀 ~ file: LoadChestComponent.tsx:222 ~ createWal ~ safeTransaction:",
               safeTransaction
             );
+            const signedTx = await safeSDK.signTransaction(safeTransaction);
+            console.log(
+              "🚀 ~ file: LoadChestComponent.tsx:227 ~ createWal ~ signedTx:",
+              signedTx
+            );
             // const txResponse = await safeSDK.executeTransaction(
             //   safeTransaction
             // );
