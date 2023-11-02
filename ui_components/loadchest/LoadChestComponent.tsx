@@ -223,16 +223,16 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
               "🚀 ~ file: LoadChestComponent.tsx:222 ~ createWal ~ safeTransaction:",
               safeTransaction
             );
-            const txResponse = await safeSDK.executeTransaction(
-              safeTransaction
-            );
-            console.log(
-              "🚀 ~ file: LoadChestComponent.tsx:226 ~ createWal ~ txResponse:",
-              txResponse
-            );
-            await txResponse.transactionResponse?.wait();
-            console.log(`https://goerli.basescan.org/tx/${txResponse.hash}`);
-            return `https://goerli.basescan.org/tx/${txResponse.hash}`;
+            // const txResponse = await safeSDK.executeTransaction(
+            //   safeTransaction
+            // );
+            // console.log(
+            //   "🚀 ~ file: LoadChestComponent.tsx:226 ~ createWal ~ txResponse:",
+            //   txResponse
+            // );
+            // await txResponse.transactionResponse?.wait();
+            // console.log(`https://goerli.basescan.org/tx/${txResponse.hash}`);
+            // return `https://goerli.basescan.org/tx/${txResponse.hash}`;
 
             // const options: MetaTransactionOptions = {
             //   gasLimit: "100000",
