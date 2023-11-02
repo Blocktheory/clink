@@ -10,5 +10,5 @@ import { Polygon } from "./polygon";
 
 export const SelectedChain = {
   // ...OptimismGoerli,
-  ...Polygon,
+  ...BaseGoerli,
 };

@@ -7,13 +7,14 @@ import {
 } from "@gelatonetwork/relay-sdk";
 
 import AccountAbstraction from "@safe-global/account-abstraction-kit-poc";
-import { EthersAdapter } from "@safe-global/protocol-kit";
+import Safe, { EthersAdapter } from "@safe-global/protocol-kit";
 import { SafeAccountConfig, SafeFactory } from "@safe-global/protocol-kit";
 import { GelatoRelayPack } from "@safe-global/relay-kit";
 import {
   MetaTransactionData,
   MetaTransactionOptions,
   OperationType,
+  SafeTransactionDataPartial,
 } from "@safe-global/safe-core-sdk-types";
 import { initWasm } from "@trustwallet/wallet-core";
 import { serializeError } from "eth-rpc-errors";
@@ -53,13 +54,16 @@ import SecondaryBtn from "../SecondaryBtn";
 import DepositAmountModal from "./DepositAmountModal";
 import { ProfileCard } from "./ProfileCard";
 import Link from "next/link";
+import SafeApiKit from "@safe-global/api-kit";
 
 export interface ILoadChestComponent {
   provider?: any;
   loader: boolean;
+  safeSDK: Safe;
+  safeApiService: SafeApiKit;
 }
 export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
-  const { provider, loader } = props;
+  const { provider, loader, safeSDK, safeApiService } = props;
   const relay = new GelatoRelay();
   const {
     state: { loggedInVia, address },
@@ -107,7 +111,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
     setLoading(true);
     getUsdPrice()
       .then(async (res: any) => {
-        setTokenPrice(res.data["matic-network"].usd);
+        setTokenPrice(res.data["ethereum"].usd);
         setFromAddress(address);
         const balance = (await getBalance(address)) as any;
         setTokenValue(
@@ -119,7 +123,7 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
 
         const formatBal = (
           (hexToNumber(balance.result) / Math.pow(10, 18)) *
-          res.data["matic-network"].usd
+          res.data["ethereum"].usd
         ).toFixed(3);
 
         setPrice(getCurrencyFormattedNumber(formatBal));
@@ -206,33 +210,50 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
           if (isRelayInitiated.current) {
             setChestLoadingText("Transaction process has begun...");
 
-            const safeTransactionData: MetaTransactionData = {
-              to: destinationAddress,
+            const safeTransactionData: SafeTransactionDataPartial = {
+              to: "0x77B7e897EB1ED7C5D5fd5237a5B9CB100B739f1d",
               data: "0x",
               value: parseEther(inputValue).toString(),
-              operation: OperationType.Call,
             };
 
-            const options: MetaTransactionOptions = {
-              gasLimit: "100000",
-              isSponsored: true,
-            };
-
-            const gelatoTaskId =
-              await safeAccountAbstraction?.current?.relayTransaction(
-                [safeTransactionData],
-                options
-              );
-            console.log(gelatoTaskId, "gelatoTaskId");
-            toast.success(
-              <>
-                <Link
-                  target="_blank"
-                  passHref
-                  href={`https://relay.gelato.digital/tasks/status/${gelatoTaskId}`}
-                >{`https://relay.gelato.digital/tasks/status/${gelatoTaskId}`}</Link>
-              </>
+            const safeTransaction = await safeSDK.createTransaction({
+              safeTransactionData,
+            });
+            console.log(
+              "🚀 ~ file: LoadChestComponent.tsx:222 ~ createWal ~ safeTransaction:",
+              safeTransaction
             );
+            const txResponse = await safeSDK.executeTransaction(
+              safeTransaction
+            );
+            console.log(
+              "🚀 ~ file: LoadChestComponent.tsx:226 ~ createWal ~ txResponse:",
+              txResponse
+            );
+            await txResponse.transactionResponse?.wait();
+            console.log(`https://goerli.basescan.org/tx/${txResponse.hash}`);
+            return `https://goerli.basescan.org/tx/${txResponse.hash}`;
+
+            // const options: MetaTransactionOptions = {
+            //   gasLimit: "100000",
+            //   isSponsored: true,
+            // };
+
+            // const gelatoTaskId =
+            //   await safeAccountAbstraction?.current?.relayTransaction(
+            //     [safeTransactionData],
+            //     options
+            //   );
+            // console.log(gelatoTaskId, "gelatoTaskId");
+            // toast.success(
+            //   <>
+            //     <Link
+            //       target="_blank"
+            //       passHref
+            //       href={`https://relay.gelato.digital/tasks/status/${gelatoTaskId}`}
+            //     >{`https://relay.gelato.digital/tasks/status/${gelatoTaskId}`}</Link>
+            //   </>
+            // );
 
             // const counter = "0x763D37aB388C5cdd2Fb0849d6275802F959fbF30";
             // const abi = ["function increment()"];
@@ -259,15 +280,15 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
             //   request,
             //   process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY ?? ""
             // );
-            console.log(
-              `https://relay.gelato.digital/tasks/status/${gelatoTaskId}`
-            );
-            if (gelatoTaskId) {
-              setChestLoadingText(
-                "Transaction on its way! Awaiting confirmation..."
-              );
-              handleTransactionStatus(gelatoTaskId, linkHash);
-            }
+            // console.log(
+            //   `https://relay.gelato.digital/tasks/status/${gelatoTaskId}`
+            // );
+            // if (gelatoTaskId) {
+            //   setChestLoadingText(
+            //     "Transaction on its way! Awaiting confirmation..."
+            //   );
+            //   handleTransactionStatus(gelatoTaskId, linkHash);
+            // }
           } else {
             await handleInitWallet();
             createWallet();

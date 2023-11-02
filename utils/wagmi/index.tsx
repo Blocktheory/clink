@@ -9,7 +9,7 @@ import { publicProvider } from "wagmi/providers/public";
 import { productName, rainbowKitProjectId } from "../../constants";
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [polygonMumbai],
+  [baseGoerli],
   [publicProvider()]
 );
 
