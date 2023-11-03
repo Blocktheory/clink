@@ -255,6 +255,10 @@ export default function Home() {
       safeAccountConfig
     );
     const owners = [await signer.getAddress()];
+    console.log(
+      "🚀 ~ file: index.tsx:258 ~ deploySafeContract ~ owners:",
+      owners
+    );
     const threshold = 1;
     const safeSdk = await Safe.create({
       ethAdapter,

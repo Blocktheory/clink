@@ -15,6 +15,7 @@ import {
   MetaTransactionOptions,
   OperationType,
   SafeTransactionDataPartial,
+  TransactionOptions,
 } from "@safe-global/safe-core-sdk-types";
 import { initWasm } from "@trustwallet/wallet-core";
 import { serializeError } from "eth-rpc-errors";
@@ -55,12 +56,14 @@ import DepositAmountModal from "./DepositAmountModal";
 import { ProfileCard } from "./ProfileCard";
 import Link from "next/link";
 import SafeApiKit from "@safe-global/api-kit";
+import safeFactory from "@safe-global/protocol-kit/dist/src/safeFactory";
 
 export interface ILoadChestComponent {
   provider?: any;
   loader: boolean;
   safeSDK: Safe;
   safeApiService: SafeApiKit;
+  // owner1Address: string;
 }
 export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
   const { provider, loader, safeSDK, safeApiService } = props;
@@ -214,8 +217,10 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
               to: "0x77B7e897EB1ED7C5D5fd5237a5B9CB100B739f1d",
               data: "0x",
               value: parseEther(inputValue).toString(),
+              safeTxGas: "21000",
             };
-
+            console.log(await safeSDK.getOwners(), "owners");
+            console.log(safeTransactionData, "safeTransactionData");
             const safeTransaction = await safeSDK.createTransaction({
               safeTransactionData,
             });
@@ -223,11 +228,109 @@ export const LoadChestComponent: FC<ILoadChestComponent> = (props) => {
               "🚀 ~ file: LoadChestComponent.tsx:222 ~ createWal ~ safeTransaction:",
               safeTransaction
             );
-            const signedTx = await safeSDK.signTransaction(safeTransaction);
+            const signedTX = await safeSDK.signTransaction(safeTransaction);
+            // console.log(
+            //   "🚀 ~ file: LoadChestComponent.tsx:231 ~ createWal ~ signedTX:",
+            //   signedTX
+            // );
+            // console.log(
+            //   "🚀 ~ file:~ createWal ~ signedTX:",
+            //   signedTX.encodedSignatures()
+            // );
+            // console.log("at 214");
+            // const safeTxHash1 = await safeSDK.getTransactionHash(
+            //   safeTransaction
+            // );
+
+            // // Sign transaction to verify that the transaction is coming from owner 1
+            // const senderSignature = await safeSDK.signTransactionHash(
+            //   safeTxHash1
+            // );
+
+            // await safeApiService.proposeTransaction({
+            //   safeAddress: address,
+            //   safeTransactionData: safeTransaction.data,
+            //   safeTxHash: safeTxHash1,
+            //   senderAddress: owner1Address,
+            //   senderSignature: senderSignature.data,
+            // });
+            // const pendingTransactions = (
+            //   await safeApiService.getPendingTransactions(address)
+            // ).results;
+            // console.log(
+            //   "🚀 ~ file: LoadChestComponent.tsx:233 ~ createWal ~ pendingTransactions:",
+            //   pendingTransactions
+            // );
+            // const transaction = pendingTransactions[0];
+            // const safeTxHash = transaction.safeTxHash;
+            const mnemonic =
+              "book goddess limit become olympic deer race all aware supreme verb alley";
+            const ethersProvider1 = new ethers.providers.JsonRpcProvider(
+              SelectedChain.info.rpc
+            );
+
+            const walletCore = await initWasm();
+            const wallet = new Wallet(walletCore);
+            const payData = await wallet.createAddressAndKeyUsingMnemonic(
+              mnemonic
+            );
+            const oneSigner = new ethers.Wallet(payData.key, ethersProvider1);
+            const oneSignerEOAAddress = await oneSigner.getAddress();
             console.log(
-              "🚀 ~ file: LoadChestComponent.tsx:227 ~ createWal ~ signedTx:",
+              "🚀 ~ file: LoadChestComponent.tsx:282 ~ createWal ~ oneSignerEOAAddress:",
+              oneSignerEOAAddress
+            );
+
+            const ethAdapter1 = new EthersAdapter({
+              ethers,
+              signerOrProvider: oneSigner,
+            });
+
+            const safeAccountConfig = {
+              owners: [oneSignerEOAAddress],
+              threshold: 1,
+            };
+
+            const safeSdk1 = await Safe.create({
+              ethAdapter: ethAdapter1,
+              predictedSafe: {
+                safeAccountConfig: safeAccountConfig,
+              },
+            });
+
+            const cntSDK = await safeSdk1.connect({
+              ethAdapter: ethAdapter1,
+              safeAddress: await safeSdk1.getAddress(),
+            });
+
+            const sdkOwnerContract = await safeSdk1.getAddress();
+
+            console.log("oneSignerEOAAddress", oneSignerEOAAddress);
+            console.log("sdkOwnerContract", sdkOwnerContract);
+
+            const signedTx = await safeSdk1.executeTransaction(signedTX, {
+              gasLimit: 100000,
+              // gas: 100,
+              // gasPrice: 100,
+              // from: await safeSDK.getAddress(),
+            });
+            console.log(
+              "🚀 ~ file: LoadChestComponent.tsx:311 ~ createWal ~ signedTx:",
               signedTx
             );
+            console.log(`https://goerli.basescan.org/tx/${signedTx.hash}`);
+            // console.log(
+            //   "🚀 ~ file: LoadChestComponent.tsx:227 ~ createWal ~ signedTx:",
+            //   signedTx
+            // );
+            // console.log(signedTx, "signedTx");
+            // await signedTx.transactionResponse?.wait();
+            // console.log(`https://goerli.basescan.org/tx/${signedTx.hash}`);
+
+            // const broadcastTx = await safeSDK.
+
+            // const signature = await safeSDK.signTransactionHash(signedTx);
+            // console.log(signature, "signature");
             // const txResponse = await safeSDK.executeTransaction(
             //   safeTransaction
             // );
